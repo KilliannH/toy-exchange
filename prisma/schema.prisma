@@ -1,0 +1,80 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+generator client {
+provider = "prisma-client-js"
+}
+
+
+model User {
+id String @id @default(cuid())
+email String @unique
+name String?
+city String?
+lat Float?
+lng Float?
+radiusKm Int? @default(10)
+createdAt DateTime @default(now())
+toys Toy[]
+}
+
+
+model Toy {
+id String @id @default(cuid())
+userId String
+user User @relation(fields: [userId], references: [id])
+title String
+description String
+condition Condition
+category Category
+ageMin Int
+ageMax Int
+mode Mode
+lat Float?
+lng Float?
+status Status @default(AVAILABLE)
+createdAt DateTime @default(now())
+images ToyImage[]
+}
+
+
+enum Condition {
+  NEW
+  VERY_GOOD
+  GOOD
+  USED
+}
+
+
+enum Category {
+  CONSTRUCTION
+  DOLLS
+  VEHICLES
+  BOARD_GAMES
+  BOOKS
+  OTHER
+}
+
+enum Mode {
+  DON
+  EXCHANGE
+  POINTS
+}
+
+enum Status {
+  AVAILABLE
+  RESERVED
+  EXCHANGED
+}
+
+
+model ToyImage {
+id String @id @default(cuid())
+toyId String
+toy Toy @relation(fields: [toyId], references: [id])
+url String
+order Int @default(0)
+}
