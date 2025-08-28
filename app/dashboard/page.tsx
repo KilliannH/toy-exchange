@@ -9,6 +9,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function DashboardPage() {
   const { data: toys, error, isLoading } = useSWR("/api/toys/mine", fetcher);
+  const { data: stats } = useSWR("/api/profile/stats", fetcher);
   const [editingToy, setEditingToy] = useState<any | null>(null);
 
   async function handleDelete(toyId: string) {
@@ -62,10 +63,10 @@ export default function DashboardPage() {
         {/* Stats cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
           {[
-            { label: "Mes jouets", value: toys?.length || 0, icon: "🧸", color: "from-blue-500 to-cyan-500" },
-            { label: "Échanges actifs", value: "3", icon: "🔄", color: "from-green-500 to-emerald-500" },
-            { label: "Messages", value: "12", icon: "💬", color: "from-purple-500 to-pink-500" },
-            { label: "Favoris", value: "8", icon: "❤️", color: "from-red-500 to-orange-500" }
+            { label: "Mes jouets", value: stats?.toysCount || toys?.length || 0, icon: "🧸", color: "from-blue-500 to-cyan-500" },
+            { label: "Échanges actifs", value: stats?.exchangesCount || 0, icon: "🔄", color: "from-green-500 to-emerald-500" },
+            { label: "Messages", value: stats?.unreadMessages || 0, icon: "💬", color: "from-purple-500 to-pink-500" },
+            { label: "Note moyenne", value: stats?.avgRating ? stats.avgRating.toFixed(1) : "N/A", icon: "⭐", color: "from-yellow-500 to-orange-500" }
           ].map((stat, i) => (
             <div key={i} className="group bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:scale-105 transition-all duration-300">
               <div className="text-3xl mb-2 group-hover:scale-110 transition-transform duration-300">{stat.icon}</div>
@@ -80,10 +81,6 @@ export default function DashboardPage() {
         {/* Editing form */}
         {editingToy && (
           <div className="mb-8 bg-black/20 backdrop-blur-xl border border-purple-500/30 rounded-3xl p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="text-3xl">✏️</div>
-              <h2 className="text-2xl font-bold text-white">Modifier le jouet</h2>
-            </div>
             <EditToyForm toy={editingToy} onClose={() => setEditingToy(null)} />
           </div>
         )}

@@ -5,14 +5,38 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user) {
+    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  }
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { name: true, email: true, city: true, radiusKm: true },
+    include: {
+      toys: {
+        select: { id: true }
+      },
+      receivedReviews: {
+        select: { rating: true }
+      }
+    }
   });
 
-  return NextResponse.json(user);
+  if (!user) {
+    return NextResponse.json({ error: "Utilisateur introuvable" }, { status: 404 });
+  }
+
+  const toysCount = user.toys.length;
+  const avgRating = user.receivedReviews.length > 0 
+    ? user.receivedReviews.reduce((sum, review) => sum + review.rating, 0) / user.receivedReviews.length
+    : 0;
+
+  return NextResponse.json({
+    ...user,
+    stats: {
+      toysCount,
+      avgRating: Math.round(avgRating * 10) / 10
+    }
+  });
 }
 
 export async function PATCH(req: NextRequest) {

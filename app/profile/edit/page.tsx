@@ -186,7 +186,6 @@ export default function EditProfilePage() {
             {/* Preview card */}
             <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
               <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                <span className="text-3xl">👀</span>
                 Aperçu du profil
               </h2>
 
