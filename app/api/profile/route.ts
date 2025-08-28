@@ -26,7 +26,7 @@ export async function GET() {
   }
 
   const toysCount = user.toys.length;
-  const avgRating = user.receivedReviews.length > 0 
+  const avgRating = user.receivedReviews.length > 0
     ? user.receivedReviews.reduce((sum, review) => sum + review.rating, 0) / user.receivedReviews.length
     : 0;
 
