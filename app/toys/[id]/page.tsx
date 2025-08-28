@@ -15,12 +15,48 @@ export default function ToyDetailPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
+  const [dragY, setDragY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [lastMouseY, setLastMouseY] = useState(0);
+
+  // TOUS les hooks d'abord, avant les conditions de retour
+  const images = toy?.images || [];
 
   useEffect(() => {
-    // Simulate random like state
-    setIsLiked(Math.random() > 0.7);
-  }, []);
+    if (images[currentImageIndex]?.offsetY !== undefined) {
+      setDragY(images[currentImageIndex].offsetY);
+    } else {
+      setDragY(0);
+    }
+  }, [currentImageIndex, images]);
 
+  // Vos fonctions de gestion du drag
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setLastMouseY(e.clientY);
+    e.preventDefault();
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    const deltaY = e.clientY - lastMouseY;
+    setDragY(prev => prev + deltaY);
+    setLastMouseY(e.clientY);
+  };
+
+  const handleMouseUp = async () => {
+  if (isDragging && images[currentImageIndex]) {
+    // Sauvegarder la nouvelle position
+    await fetch(`/api/images/${images[currentImageIndex].id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ offsetY: dragY })
+    });
+  }
+  setIsDragging(false);
+};
+
+  // MAINTENANT les conditions de retour anticipé
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-900 to-slate-900 flex items-center justify-center p-6">
@@ -28,7 +64,7 @@ export default function ToyDetailPage() {
           <div className="text-8xl mb-6 animate-pulse">💔</div>
           <h2 className="text-3xl font-bold text-red-400 mb-4">Jouet introuvable</h2>
           <p className="text-red-300 mb-6">Ce trésor semble avoir disparu...</p>
-          <button 
+          <button
             onClick={() => window.history.back()}
             className="bg-red-500/20 hover:bg-red-500/30 text-red-300 px-6 py-3 rounded-xl transition-all duration-300"
           >
@@ -53,9 +89,6 @@ export default function ToyDetailPage() {
     );
   }
 
-  const images = toy.images || [];
-  console.log(images)
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative">
       {/* Dynamic background */}
@@ -66,7 +99,7 @@ export default function ToyDetailPage() {
 
       <div className="relative z-10 pt-24 pb-12 px-6 max-w-6xl mx-auto">
         {/* Back button */}
-        <button 
+        <button
           onClick={() => window.history.back()}
           className="mb-8 group flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105"
         >
@@ -84,46 +117,59 @@ export default function ToyDetailPage() {
               <div className="aspect-square relative">
                 {images.length > 0 ? (
                   <>
-                    <img
-                      src={images[currentImageIndex]?.signedUrl}
-                      alt={toy.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    
-                    {/* Image navigation */}
-                    {images.length > 1 && (
-                      <>
-                        <button
-                          onClick={() => setCurrentImageIndex(prev => prev > 0 ? prev - 1 : images.length - 1)}
-                          className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full backdrop-blur-sm transition-all duration-300 opacity-0 group-hover:opacity-100"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                          </svg>
-                        </button>
-                        <button
-                          onClick={() => setCurrentImageIndex(prev => prev < images.length - 1 ? prev + 1 : 0)}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full backdrop-blur-sm transition-all duration-300 opacity-0 group-hover:opacity-100"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </button>
-                        
-                        {/* Image indicator */}
-                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          {images.map((_, index) => (
-                            <div
-                              key={index}
-                              className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                                index === currentImageIndex ? "bg-white" : "bg-white/50"
-                              }`}
-                            />
-                          ))}
-                        </div>
-                      </>
-                    )}
+                    <div
+                      className="aspect-square relative cursor-grab active:cursor-grabbing overflow-hidden"
+                      onMouseDown={handleMouseDown}
+                      onMouseMove={handleMouseMove}
+                      onMouseUp={handleMouseUp}
+                      onMouseLeave={handleMouseUp}
+                    >
+                      <img
+                        src={images[currentImageIndex]?.signedUrl}
+                        alt={toy.title}
+                        className="w-full h-auto min-h-full object-cover transition-transform duration-100"
+                        style={{
+                          transform: `translateY(${dragY}px) ${isDragging ? '' : 'scale(1.05)'}`,
+                          userSelect: 'none'
+                        }}
+                        draggable={false}
+                      />
+                      {/* Overlay qui apparaît seulement au hover, pas pendant le drag */}
+                      <div className={`absolute inset-0 bg-gradient-to-t from-black/30 to-transparent transition-opacity duration-300 ${isDragging ? 'opacity-0' : 'opacity-0 group-hover:opacity-100'
+                        }`} />
+                      {/* Image navigation */}
+                      {images.length > 1 && !isDragging && (
+                        <>
+                          <button
+                            onClick={() => setCurrentImageIndex(prev => prev > 0 ? prev - 1 : images.length - 1)}
+                            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full backdrop-blur-sm transition-all duration-300 opacity-0 group-hover:opacity-100"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => setCurrentImageIndex(prev => prev < images.length - 1 ? prev + 1 : 0)}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full backdrop-blur-sm transition-all duration-300 opacity-0 group-hover:opacity-100"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </button>
+
+                          {/* Image indicator */}
+                          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            {images.map((_, index) => (
+                              <div
+                                key={index}
+                                className={`w-2 h-2 rounded-full transition-all duration-200 ${index === currentImageIndex ? "bg-white" : "bg-white/50"
+                                  }`}
+                              />
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </div>
                   </>
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-500/20 to-pink-500/20">
@@ -140,11 +186,10 @@ export default function ToyDetailPage() {
                   <button
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
-                    className={`relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden transition-all duration-300 ${
-                      index === currentImageIndex 
-                        ? "ring-2 ring-cyan-400 scale-105" 
-                        : "opacity-70 hover:opacity-100 hover:scale-105"
-                    }`}
+                    className={`relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden transition-all duration-300 ${index === currentImageIndex
+                      ? "ring-2 ring-cyan-400 scale-105"
+                      : "opacity-70 hover:opacity-100 hover:scale-105"
+                      }`}
                   >
                     <img
                       src={image.signedUrl}
@@ -167,25 +212,23 @@ export default function ToyDetailPage() {
                     {toy.title}
                   </h1>
                   <div className="flex items-center gap-3">
-                    <span className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${
-                      toy.mode === "exchange" 
-                        ? "bg-blue-500/20 text-blue-300 border border-blue-500/30" 
-                        : toy.mode === "lend" 
+                    <span className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${toy.mode === "exchange"
+                      ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                      : toy.mode === "lend"
                         ? "bg-green-500/20 text-green-300 border border-green-500/30"
                         : "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"
-                    }`}>
+                      }`}>
                       {toy.mode === "exchange" ? "🔄 Échange" : toy.mode === "lend" ? "🤝 Prêt" : "💰 Vente"}
                     </span>
                   </div>
                 </div>
-                
+
                 <button
                   onClick={() => setIsLiked(!isLiked)}
-                  className={`p-4 rounded-2xl transition-all duration-300 hover:scale-110 ${
-                    isLiked 
-                      ? "bg-red-500/20 text-red-400 border border-red-500/30" 
-                      : "bg-white/10 text-gray-400 border border-white/20 hover:text-red-400"
-                  }`}
+                  className={`p-4 rounded-2xl transition-all duration-300 hover:scale-110 ${isLiked
+                    ? "bg-red-500/20 text-red-400 border border-red-500/30"
+                    : "bg-white/10 text-gray-400 border border-white/20 hover:text-red-400"
+                    }`}
                 >
                   <svg className="w-6 h-6" fill={isLiked ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -204,20 +247,18 @@ export default function ToyDetailPage() {
                   <div className="text-purple-300 font-semibold">Âge conseillé</div>
                   <div className="text-white text-xl font-bold">{toy.ageMin}-{toy.ageMax} ans</div>
                 </div>
-                <div className={`rounded-2xl p-4 border ${
-                  toy.condition === "Excellent" 
-                    ? "bg-green-500/10 border-green-500/20" 
-                    : toy.condition === "Bon"
+                <div className={`rounded-2xl p-4 border ${toy.condition === "Excellent"
+                  ? "bg-green-500/10 border-green-500/20"
+                  : toy.condition === "Bon"
                     ? "bg-blue-500/10 border-blue-500/20"
                     : "bg-orange-500/10 border-orange-500/20"
-                }`}>
+                  }`}>
                   <div className="text-2xl mb-2">
                     {toy.condition === "Excellent" ? "⭐" : toy.condition === "Bon" ? "👍" : "🔧"}
                   </div>
-                  <div className={`font-semibold ${
-                    toy.condition === "Excellent" ? "text-green-300" : 
+                  <div className={`font-semibold ${toy.condition === "Excellent" ? "text-green-300" :
                     toy.condition === "Bon" ? "text-blue-300" : "text-orange-300"
-                  }`}>
+                    }`}>
                     État
                   </div>
                   <div className="text-white text-xl font-bold">{toy.condition}</div>
@@ -261,7 +302,7 @@ export default function ToyDetailPage() {
                   </svg>
                   Partager
                 </button>
-                
+
                 <button className="group bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-6 py-4 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2">
                   <svg className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />

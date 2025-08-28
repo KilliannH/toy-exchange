@@ -29,7 +29,7 @@ export default function NavBar() {
           href="/" 
           className="text-2xl font-black bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent hover:scale-105 transition-transform duration-300"
         >
-          TroqueJouets
+          ToyExchange
         </Link>
 
         {/* Navigation Links */}

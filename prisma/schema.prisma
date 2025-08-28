@@ -169,6 +169,7 @@ model ToyImage {
   fileName  String? // Pour gérer les fichiers uploadés
   signedUrl String? // URL temporaire signée
   order     Int     @default(0)
+  offsetY  Int?
 }
 
 // Modèles NextAuth existants

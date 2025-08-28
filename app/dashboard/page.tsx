@@ -4,6 +4,20 @@ import useSWR from "swr";
 import Link from "next/link";
 import { useState } from "react";
 import EditToyForm from "@/components/EditToyForm";
+import { 
+  AlertTriangle, 
+  Loader2, 
+  BarChart3, 
+  RefreshCw, 
+  MessageSquare, 
+  Star, 
+  Gamepad2,
+  Plus,
+  Eye,
+  Edit,
+  Trash2,
+  ChevronRight
+} from "lucide-react";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -22,7 +36,7 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-6">
         <div className="bg-red-500/10 backdrop-blur-xl border border-red-500/20 rounded-2xl p-8 text-center">
-          <div className="text-6xl mb-4">💥</div>
+          <AlertTriangle className="w-16 h-16 text-red-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-red-400 mb-2">Oups, une erreur !</h2>
           <p className="text-red-300">Impossible de charger vos jouets</p>
         </div>
@@ -34,7 +48,7 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-purple-400 border-t-transparent rounded-full animate-spin mb-4 mx-auto"></div>
+          <Loader2 className="w-16 h-16 text-purple-400 animate-spin mx-auto mb-4" />
           <p className="text-white/80 text-lg">Chargement de vos trésors...</p>
         </div>
       </div>
@@ -63,13 +77,13 @@ export default function DashboardPage() {
         {/* Stats cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
           {[
-            { label: "Mes jouets", value: stats?.toysCount || toys?.length || 0, icon: "🧸", color: "from-blue-500 to-cyan-500" },
-            { label: "Échanges actifs", value: stats?.exchangesCount || 0, icon: "🔄", color: "from-green-500 to-emerald-500" },
-            { label: "Messages", value: stats?.unreadMessages || 0, icon: "💬", color: "from-purple-500 to-pink-500" },
-            { label: "Note moyenne", value: stats?.avgRating ? stats.avgRating.toFixed(1) : "N/A", icon: "⭐", color: "from-yellow-500 to-orange-500" }
+            { label: "Mes jouets", value: stats?.toysCount || toys?.length || 0, icon: <Gamepad2 className="w-8 h-8" />, color: "from-blue-500 to-cyan-500" },
+            { label: "Échanges actifs", value: stats?.exchangesCount || 0, icon: <RefreshCw className="w-8 h-8" />, color: "from-green-500 to-emerald-500" },
+            { label: "Messages", value: stats?.unreadMessages || 0, icon: <MessageSquare className="w-8 h-8" />, color: "from-purple-500 to-pink-500" },
+            { label: "Note moyenne", value: stats?.avgRating ? stats.avgRating.toFixed(1) : "N/A", icon: <Star className="w-8 h-8" />, color: "from-yellow-500 to-orange-500" }
           ].map((stat, i) => (
             <div key={i} className="group bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:scale-105 transition-all duration-300">
-              <div className="text-3xl mb-2 group-hover:scale-110 transition-transform duration-300">{stat.icon}</div>
+              <div className="text-cyan-400 mb-2 group-hover:scale-110 transition-transform duration-300">{stat.icon}</div>
               <div className={`text-2xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
                 {stat.value}
               </div>
@@ -81,6 +95,10 @@ export default function DashboardPage() {
         {/* Editing form */}
         {editingToy && (
           <div className="mb-8 bg-black/20 backdrop-blur-xl border border-purple-500/30 rounded-3xl p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="text-3xl">✏️</div>
+              <h2 className="text-2xl font-bold text-white">Modifier le jouet</h2>
+            </div>
             <EditToyForm toy={editingToy} onClose={() => setEditingToy(null)} />
           </div>
         )}
@@ -95,9 +113,12 @@ export default function DashboardPage() {
             </p>
             <Link 
               href="/post" 
-              className="group relative overflow-hidden bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold px-8 py-4 rounded-2xl shadow-2xl hover:scale-105 transition-all duration-300 inline-block"
+              className="group relative overflow-hidden bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold px-8 py-4 rounded-2xl shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-2"
             >
-              <span className="relative z-10">🚀 Poster mon premier jouet</span>
+              <span className="relative z-10 flex items-center gap-2">
+                <Plus className="w-5 h-5" />
+                Poster mon premier jouet
+              </span>
               <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-emerald-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </Link>
           </div>
@@ -109,7 +130,8 @@ export default function DashboardPage() {
                 href="/post" 
                 className="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold px-6 py-3 rounded-xl hover:scale-105 hover:shadow-lg hover:shadow-green-500/25 transition-all duration-300 flex items-center gap-2"
               >
-                <span className="text-xl">+</span> Ajouter un jouet
+                <Plus className="w-5 h-5" />
+                Ajouter un jouet
               </Link>
             </div>
 
@@ -134,8 +156,8 @@ export default function DashboardPage() {
                           {toy.description}
                         </p>
                       </div>
-                      <div className="ml-4 text-3xl group-hover:scale-110 transition-transform duration-300">
-                        🎮
+                      <div className="ml-4 text-cyan-400 group-hover:scale-110 transition-transform duration-300">
+                        <Gamepad2 className="w-8 h-8" />
                       </div>
                     </div>
 
@@ -155,10 +177,9 @@ export default function DashboardPage() {
                         href={`/toys/${toy.id}`}
                         className="text-cyan-400 font-medium hover:text-cyan-300 transition-colors duration-200 flex items-center gap-2"
                       >
+                        <Eye className="w-4 h-4" />
                         <span>Voir détails</span>
-                        <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
+                        <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
                       </Link>
 
                       <div className="flex gap-2">
@@ -167,9 +188,7 @@ export default function DashboardPage() {
                           className="group/btn p-2 bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/20 hover:border-yellow-500/40 rounded-lg transition-all duration-200"
                           title="Modifier"
                         >
-                          <svg className="w-4 h-4 text-yellow-400 group-hover/btn:scale-110 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
+                          <Edit className="w-4 h-4 text-yellow-400 group-hover/btn:scale-110 transition-transform duration-200" />
                         </button>
                         
                         <button
@@ -177,9 +196,7 @@ export default function DashboardPage() {
                           className="group/btn p-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40 rounded-lg transition-all duration-200"
                           title="Supprimer"
                         >
-                          <svg className="w-4 h-4 text-red-400 group-hover/btn:scale-110 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
+                          <Trash2 className="w-4 h-4 text-red-400 group-hover/btn:scale-110 transition-transform duration-200" />
                         </button>
                       </div>
                     </div>

@@ -175,7 +175,7 @@ export default function HomePage() {
             Rejoignez la révolution du partage
           </h2>
           <p className="text-xl text-gray-300 mb-10 font-light">
-            Plus de 850 familles ont déjà transformé leur façon de consommer les jouets
+            Commencez aujourd’hui à échanger vos jouets et découvrez de nouveaux trésors pour vos enfants
           </p>
 
           <div className="relative inline-block group">
