@@ -1,28 +1,35 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { prisma } from "@/lib/prisma";
-import { redirect } from "next/navigation";
+"use client";
+
+import useSWR from "swr";
 import Link from "next/link";
+import { useState } from "react";
+import EditToyForm from "@/components/EditToyForm";
 
-export default async function DashboardPage() {
-  // Récupérer la session côté serveur
-  const session = await getServerSession(authOptions);
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-  if (!session?.user) {
-    redirect("/login"); // 🔒
+export default function DashboardPage() {
+  const { data: toys, error, isLoading } = useSWR("/api/toys/mine", fetcher);
+  const [editingToy, setEditingToy] = useState<any | null>(null);
+
+  async function handleDelete(toyId: string) {
+    if (!confirm("Supprimer ce jouet ?")) return;
+    const res = await fetch(`/api/toys/${toyId}`, { method: "DELETE" });
+    if (!res.ok) alert("Erreur lors de la suppression");
   }
 
-  // Charger les jouets liés à cet utilisateur
-  const toys = await prisma.toy.findMany({
-    where: { userId: session.user.id },
-    orderBy: { createdAt: "desc" },
-  });
+  if (error) return <div className="p-4 text-red-500">Erreur ❌</div>;
+  if (isLoading || !toys) return <div className="p-4">Chargement...</div>;
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">
-        Dashboard – Bonjour {session.user.name || session.user.email}
-      </h1>
+      <h1 className="text-2xl font-bold mb-6">Mon Dashboard</h1>
+
+      {editingToy && (
+        <div className="mb-6 p-4 border rounded bg-gray-50">
+          <h2 className="font-semibold mb-2">Modifier le jouet</h2>
+          <EditToyForm toy={editingToy} onClose={() => setEditingToy(null)} />
+        </div>
+      )}
 
       {toys.length === 0 ? (
         <p className="text-gray-600">
@@ -33,7 +40,7 @@ export default async function DashboardPage() {
         </p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {toys.map((toy) => (
+          {toys.map((toy: any) => (
             <div
               key={toy.id}
               className="rounded-xl border p-4 shadow hover:shadow-md transition"
@@ -49,6 +56,20 @@ export default async function DashboardPage() {
               >
                 Voir →
               </Link>
+              <div className="flex gap-3 mt-2">
+                <button
+                  onClick={() => setEditingToy(toy)}
+                  className="text-sm text-yellow-600 hover:underline"
+                >
+                  Éditer
+                </button>
+                <button
+                  onClick={() => handleDelete(toy.id)}
+                  className="text-sm text-red-600 hover:underline"
+                >
+                  Supprimer
+                </button>
+              </div>
             </div>
           ))}
         </div>

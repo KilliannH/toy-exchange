@@ -60,13 +60,14 @@ export async function POST(req: NextRequest) {
       category: body.category,
       mode: body.mode,
       userId: session.user.id,
-      images: body.images
-        ? {
-            create: body.images.map((img: { fileName: string }) => ({
-              url: img.fileName, // ⚠️ stocker seulement le fileName
+      images:
+        body.images && body.images.length > 0
+          ? {
+            create: body.images.slice(0, 5).map((img: { fileName: string }) => ({
+              url: img.fileName,
             })),
           }
-        : undefined,
+          : undefined,
     },
     include: { images: true },
   });

@@ -144,7 +144,14 @@ export default function PostToyForm() {
           type="file"
           accept="image/*"
           multiple
-          onChange={(e) => setFiles(Array.from(e.target.files || []))}
+          onChange={(e) => {
+            const selected = Array.from(e.target.files || []);
+            if (selected.length > 5) {
+              alert("Maximum 5 images par jouet");
+              return;
+            }
+            setFiles(selected);
+          }}
         />
 
         {/* Preview */}
