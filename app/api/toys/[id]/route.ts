@@ -139,5 +139,18 @@ export async function GET(
     return NextResponse.json({ error: "Toy not found" }, { status: 404 });
   }
 
-  return NextResponse.json(toy);
+  // Générer des signed URLs pour les images
+  const signedImages = await Promise.all(
+    toy.images.map(async (img) => {
+      const file = bucket.file(img.url); // en DB c’est juste le fileName
+      const [signedUrl] = await file.getSignedUrl({
+        version: "v4",
+        action: "read",
+        expires: Date.now() + 15 * 60 * 1000, // 15 min
+      });
+      return { ...img, signedUrl };
+    })
+  );
+
+  return NextResponse.json({ ...toy, images: signedImages });
 }

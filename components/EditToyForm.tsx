@@ -11,6 +11,7 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
     const [removeImages, setRemoveImages] = useState<string[]>([]);
     const [newFiles, setNewFiles] = useState<File[]>([]);
     const [loading, setLoading] = useState(false);
+    const [visibleImages, setVisibleImages] = useState(toy.images);
 
     async function uploadImages(files: File[]) {
         const fileNames: string[] = [];
@@ -93,16 +94,17 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
             <div>
                 <p className="font-medium">Images existantes</p>
                 <div className="flex gap-2 flex-wrap">
-                    {toy.images?.map((img: any) => (
+                    {visibleImages.map((img: any) => (
                         <div key={img.id} className="relative">
                             <img src={img.signedUrl} alt="" className="w-20 h-20 object-cover rounded" />
                             <button
                                 type="button"
-                                onClick={() =>
+                                onClick={() => {
                                     setRemoveImages((prev) =>
                                         prev.includes(img.url) ? prev : [...prev, img.url]
-                                    )
-                                }
+                                    );
+                                    setVisibleImages((prev) => prev.filter((i: any) => i.id !== img.id));
+                                }}
                                 className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded px-1"
                             >
                                 ❌
