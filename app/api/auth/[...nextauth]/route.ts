@@ -41,6 +41,10 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith(baseUrl)) return url;
+      return `${baseUrl}/dashboard`;
+    }
   },
   pages: {
     signIn: "/login", // 👈 redirige vers une page custom

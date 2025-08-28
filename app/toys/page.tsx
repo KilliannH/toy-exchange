@@ -22,7 +22,14 @@ export default function ToysPage() {
                     >
                         {toy.images?.[0] && (
                             <img
-                                src={toy.images[0].url}
+                                src={toy.images[0].signedUrl}
+                                alt={toy.title}
+                                className="h-40 w-full object-cover rounded-lg mb-2"
+                            />
+                        )}
+                        {toy.images?.[1] && (
+                            <img
+                                src={toy.images[1].signedUrl}
                                 alt={toy.title}
                                 className="h-40 w-full object-cover rounded-lg mb-2"
                             />

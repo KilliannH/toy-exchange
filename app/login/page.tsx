@@ -13,7 +13,7 @@ export default function LoginPage() {
       email,
       password,
       redirect: true,
-      callbackUrl: "/",
+      callbackUrl: "/dashboard",
     });
     console.log(res);
   }

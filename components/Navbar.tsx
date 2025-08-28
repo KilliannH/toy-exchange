@@ -11,20 +11,36 @@ export default function NavBar() {
       <div className="mx-auto max-w-6xl px-4 py-3 flex gap-6 items-center">
         <Link href="/">Accueil</Link>
         <Link href="/toys">Jouets</Link>
-        <Link href="/post">Poster</Link>
-        <Link href="/profile">Profil</Link>
+
+        {/* Affiché uniquement si connecté */}
+        {session?.user && (
+          <>
+            <Link href="/profile">Profil</Link>
+            <Link href="/post">Poster</Link>
+            <Link href="/dashboard">Dashboard</Link>
+          </>
+        )}
+
         <div className="ml-auto">
           {session ? (
             <>
-              <span className="mr-2">Bonjour {session.user?.name}</span>
-              <button onClick={() => signOut()} className="text-red-500">Se déconnecter</button>
+              <span className="mr-2">👋 {session.user?.name || session.user?.email}</span>
+              <button
+                onClick={() => signOut({ callbackUrl: "/" })}
+                className="text-red-500 hover:underline"
+              >
+                Se déconnecter
+              </button>
             </>
           ) : (
             <>
-              <button onClick={() => signIn("credentials")} className="text-blue-600">
+              <button
+                onClick={() => signIn()}
+                className="text-blue-600 hover:underline"
+              >
                 Se connecter
               </button>
-              <Link href="/register" className="text-green-600 ml-4">
+              <Link href="/register" className="ml-4 text-green-600 hover:underline">
                 S'inscrire
               </Link>
             </>
