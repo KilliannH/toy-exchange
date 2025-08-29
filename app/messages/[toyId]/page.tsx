@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, MessageSquare, Send, Loader2, Frown, ToyBrick, User } from "lucide-react";
@@ -19,22 +19,27 @@ export default function ConversationPage() {
     const toyId = params.toyId as string;
     const partnerId = searchParams.get('partnerId');
 
-    const { data: messages, error, isLoading } = useSWR(
+    const { data, error, isLoading } = useSWR(
         session && partnerId ? `/api/conversations/${toyId}/messages?partnerId=${partnerId}` : null,
         fetcher,
-        { refreshInterval: 5000 } // Actualise la conversation toutes les 5 secondes
+        { refreshInterval: 5000 }
     );
+    const messages = data?.messages ?? [];
 
     const [newMessage, setNewMessage] = useState("");
     const [isSending, setIsSending] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    // Fonction pour scroller en bas des messages
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
-    useEffect(scrollToBottom, [messages]);
+    useEffect(() => {
+        scrollToBottom();
+        if (session && partnerId && messages) {
+            mutate('/api/messages/unread');
+        }
+     }, [messages, session, partnerId]);
 
     const handleSendMessage = async () => {
         if (!newMessage.trim() || !session || !partnerId) return;
@@ -63,25 +68,8 @@ export default function ConversationPage() {
         }
     };
     
-    // Rendu en fonction des états de l'application
-    if (!session) {
-        // Rediriger vers la page de connexion si non authentifié
-        router.push('/login');
-        return null;
-    }
-
-    if (error) {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-900 to-slate-900 flex items-center justify-center p-6">
-                <div className="bg-red-500/10 backdrop-blur-xl border border-red-500/20 rounded-3xl p-12 text-center max-w-md">
-                    <div className="text-8xl mb-6 text-red-400"><Frown size={96} className="mx-auto" /></div>
-                    <h2 className="text-3xl font-bold text-red-400 mb-4">Erreur de chargement</h2>
-                    <p className="text-red-300">Impossible de charger la conversation.</p>
-                </div>
-            </div>
-        );
-    }
-    
+    // Now, early return conditions
+    // The session check can stay outside the useEffect if you want to render a loading screen
     if (isLoading || !messages) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
@@ -92,13 +80,12 @@ export default function ConversationPage() {
             </div>
         );
     }
-
-    // Le partenaire est soit le sender, soit le receiver
-    const conversationPartner = messages[0]?.sender.id === session.user.id 
+    const conversationPartner = messages[0]?.senderId === session?.user?.id 
                                 ? messages[0]?.receiver 
                                 : messages[0]?.sender;
     const toyTitle = messages[0]?.toy?.title || "Jouet inconnu";
-    
+
+    console.log("messages raw from API:", messages);
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative">
             {/* ... (background animations) ... */}
@@ -128,15 +115,15 @@ export default function ConversationPage() {
                     {messages.map((msg, index) => (
                         <div
                             key={index}
-                            className={`flex ${msg.sender.id === session.user.id ? 'justify-end' : 'justify-start'}`}
+                            className={`flex ${msg.sender.id === session?.user?.id ? 'justify-end' : 'justify-start'}`}
                         >
                             <div className={`p-4 rounded-3xl max-w-xs md:max-w-md ${
-                                msg.sender.id === session.user.id
+                                msg.sender.id === session?.user?.id
                                     ? 'bg-purple-600 text-white rounded-br-none'
                                     : 'bg-white/10 text-gray-300 rounded-bl-none'
                             }`}>
                                 <div className="text-xs text-gray-400 mb-1">
-                                  {msg.sender.id === session.user.id ? "Vous" : conversationPartner?.name}
+                                  {msg.sender.id === session?.user?.id ? "Vous" : conversationPartner?.name}
                                 </div>
                                 {msg.content}
                             </div>

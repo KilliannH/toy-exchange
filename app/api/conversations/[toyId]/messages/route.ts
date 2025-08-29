@@ -16,8 +16,6 @@ export async function GET(request: Request, { params }: { params: { toyId: strin
   const toyId = params.toyId;
 
   try {
-    // We need to know the conversation partner to filter messages correctly.
-    // Let's assume the partner's ID is passed as a query parameter.
     const { searchParams } = new URL(request.url);
     const partnerId = searchParams.get('partnerId');
 
@@ -25,6 +23,31 @@ export async function GET(request: Request, { params }: { params: { toyId: strin
       return NextResponse.json({ error: "partnerId is required" }, { status: 400 });
     }
 
+    // Fetch toy details once for the entire conversation
+    const toy = await prisma.toy.findUnique({
+      where: { id: toyId },
+      select: {
+        id: true,
+        title: true,
+      },
+    });
+
+    if (!toy) {
+      return NextResponse.json({ error: "Toy not found" }, { status: 404 });
+    }
+
+    // Mark messages as read for the current user
+    await prisma.message.updateMany({
+      where: {
+        toyId: toyId,
+        receiverId: userId,
+        senderId: partnerId,
+        isRead: false,
+      },
+      data: { isRead: true },
+    });
+
+    // Fetch messages without including toy details for each message
     const messages = await prisma.message.findMany({
       where: {
         toyId: toyId,
@@ -40,18 +63,8 @@ export async function GET(request: Request, { params }: { params: { toyId: strin
       },
     });
 
-    // Mark messages as read for the current user
-    await prisma.message.updateMany({
-      where: {
-        toyId: toyId,
-        receiverId: userId,
-        senderId: partnerId,
-        isRead: false,
-      },
-      data: { isRead: true },
-    });
-
-    return NextResponse.json(messages);
+    // Combine toy and messages data in the final response
+    return NextResponse.json({ messages, toy });
   } catch (error) {
     console.error('Error fetching messages:', error);
     return NextResponse.json({ error: "Failed to fetch messages" }, { status: 500 });
@@ -87,7 +100,7 @@ export async function POST(request: Request, { params }: { params: { toyId: stri
         receiver: { select: { id: true, name: true, email: true } },
       },
     });
-    
+
     return NextResponse.json(newMessage, { status: 201 });
   } catch (error) {
     console.error('Error sending message:', error);

@@ -78,12 +78,6 @@ export default function MessagesPage() {
                     <h1 className="text-4xl font-black bg-gradient-to-r from-white via-cyan-300 to-purple-300 bg-clip-text text-transparent">
                         Mes conversations
                     </h1>
-                    <Link
-                        href="/post"
-                        className="bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-semibold px-6 py-3 rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl flex items-center gap-2"
-                    >
-                        <Plus size={20} /> Nouveau message
-                    </Link>
                 </div>
 
                 {conversations.length === 0 ? (
@@ -103,7 +97,6 @@ export default function MessagesPage() {
                 ) : (
                     <div className="space-y-4">
                         {conversations.map((conv) => (
-                            console.log(conv.toy),
                             <Link href={`/messages/${conv.toy.id}?partnerId=${conv.sender.id === session.user.id ? conv.receiver.id : conv.sender.id}`} key={conv.toy.id} className="relative group p-6 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl hover:bg-white/10 hover:border-white/20 transition-all duration-300 block">
                                 <div className="flex items-center gap-4">
                                     <div className="flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden bg-white/10">
