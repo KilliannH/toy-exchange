@@ -1,3 +1,4 @@
+// components/DashboardPage.tsx
 "use client";
 
 import useSWR, { mutate } from "swr";
@@ -16,7 +17,9 @@ import {
   Eye,
   Edit,
   Trash2,
-  ChevronRight
+  ChevronRight,
+  Heart,
+  ToyBrick
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
@@ -31,9 +34,12 @@ export default function DashboardPage() {
     "/api/exchanges/mine",
     fetcher
   );
+  // New SWR call for favorites
+  const { data: favorites, error: favoritesError, isLoading: favoritesLoading } = useSWR(
+    session ? "/api/favorites" : null,
+    fetcher
+  );
   const [editingToy, setEditingToy] = useState<any | null>(null);
-
-  console.log(stats);
 
   async function handleDelete(toyId: string) {
     if (!confirm("Supprimer ce jouet ?")) return;
@@ -42,14 +48,10 @@ export default function DashboardPage() {
       toast.error("Erreur lors de la suppression");
     } else {
       toast.success("Jouet supprimé !");
-      // 1️⃣ re-fetch depuis le serveur
-      // mutate("/api/toys/mine");
-
-      // 2️⃣ ou mise à jour locale optimiste
       mutate(
         "/api/toys/mine",
         (prev: any) => prev?.filter((toy: any) => toy.id !== toyId),
-        false // false = ne refait pas de refetch tout de suite
+        false
       );
     }
   }
@@ -226,6 +228,70 @@ export default function DashboardPage() {
                 </div>
               ))}
             </div>
+            {/* Section Mes favoris */}
+            <div className="mt-16">
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-3xl font-bold text-white">Mes favoris ({favorites?.length})</h2>
+              </div>
+
+              {favoritesLoading ? (
+                <div className="text-center text-gray-400">Chargement de vos favoris...</div>
+              ) : favoritesError ? (
+                <div className="text-center text-red-400">Erreur lors du chargement des favoris</div>
+              ) : !favorites || favorites.length === 0 ? (
+                <div className="text-center py-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl">
+                  <Heart size={96} className="text-gray-500 mx-auto mb-6" />
+                  <h3 className="text-2xl font-bold text-white mb-2">Aucun favori pour le moment</h3>
+                  <p className="text-gray-400 max-w-md mx-auto">
+                    Parcourez les jouets et ajoutez ceux qui vous plaisent à vos favoris !
+                  </p>
+                  <Link
+                    href="/toys"
+                    className="mt-6 inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold px-6 py-3 rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl"
+                  >
+                    <ToyBrick size={20} />
+                    Découvrir des jouets
+                  </Link>
+                </div>
+              ) : (
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {favorites.map((fav: any) => (
+                    <div
+                      key={fav.id}
+                      className="group bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition-all duration-300"
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden bg-white/10">
+                          {fav.toy.images?.[0] && (
+                            <img
+                              src={fav.toy.images[0].signedUrl}
+                              alt={fav.toy.title}
+                              className="w-full h-full object-cover"
+                              style={{ transform: `translateY(${fav.toy.images[0].offsetYPercentage || 0}%)` }}
+                            />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-xl font-bold text-white mb-2">
+                            {fav.toy.title}
+                          </h3>
+                          <p className="text-gray-400 text-sm mb-4">
+                            Proposé par {fav.toy.user.name || fav.toy.user.email}
+                          </p>
+                          <Link
+                            href={`/toys/${fav.toy.id}`}
+                            className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors text-sm"
+                          >
+                            <Eye className="w-4 h-4" />
+                            Voir les détails
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             {/* Section Mes échanges */}
             <div className="mt-16">
               <h2 className="text-3xl font-bold text-white mb-8">Mes échanges ({exchanges?.length})</h2>
@@ -267,8 +333,8 @@ export default function DashboardPage() {
 
                       <Link
                         href={`/messages/${ex.toy.id}?partnerId=${ex.requesterId === session?.user.id
-                          ? ex.toy.user.id   // je suis le demandeur → partenaire = propriétaire du jouet
-                          : ex.requesterId  // je suis le propriétaire → partenaire = demandeur
+                          ? ex.toy.user.id  // je suis le demandeur → partenaire = propriétaire du jouet
+                          : ex.requesterId // je suis le propriétaire → partenaire = demandeur
                           }`}
                         className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors text-sm"
                       >

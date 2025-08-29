@@ -16,15 +16,21 @@ const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function ToyDetailPage() {
   const params = useParams();
-  const { data: toy, error, isLoading } = useSWR(
+  const { data: toy, error, isLoading, mutate: mutateToy } = useSWR(
     params?.id ? `/api/toys/${params.id}` : null,
     fetcher
   );
-
   const { data: session } = useSession();
 
+  // Utilisez useSWR pour vérifier si le jouet est déjà dans les favoris
+  const { data: isFavorite, mutate: mutateIsFavorite } = useSWR(
+    session && toy ? `/api/favorites/${toy.id}` : null,
+    fetcher
+  );
+
+  const isLiked = isFavorite?.isFavorite || false;
+
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isLiked, setIsLiked] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
   const [dragY, setDragY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -83,6 +89,34 @@ export default function ToyDetailPage() {
       });
     }
     setIsDragging(false);
+  };
+
+  const handleLike = async () => {
+    if (!session) {
+      toast.error("Veuillez vous connecter pour ajouter un favori.");
+      return;
+    }
+
+    const method = isLiked ? "DELETE" : "POST";
+
+    // Mise à jour locale optimiste pour une réaction instantanée
+    mutateIsFavorite({ isFavorite: !isLiked }, false);
+
+    try {
+      const res = await fetch(`/api/favorites/${toy.id}`, { method });
+
+      if (res.ok) {
+        toast.success(isLiked ? "Retiré des favoris." : "Ajouté aux favoris !");
+        // La revalidation a déjà eu lieu localement, pas besoin d'une autre mutation.
+      } else {
+        toast.error("Erreur lors de la mise à jour des favoris.");
+        // En cas d'erreur, on restaure l'état précédent
+        mutateIsFavorite({ isFavorite: isLiked }, false);
+      }
+    } catch (err) {
+      toast.error("Erreur réseau.");
+      mutateIsFavorite({ isFavorite: isLiked }, false);
+    }
   };
 
   // New function to send a message
@@ -333,10 +367,10 @@ export default function ToyDetailPage() {
                     {/* Status badge */}
                     <span
                       className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${toy.status === "AVAILABLE"
-                          ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                          : toy.status === "RESERVED"
-                            ? "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"
-                            : "bg-red-500/20 text-red-300 border border-red-500/30"
+                        ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                        : toy.status === "RESERVED"
+                          ? "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"
+                          : "bg-red-500/20 text-red-300 border border-red-500/30"
                         }`}
                     >
                       {toy.status === "AVAILABLE"
@@ -349,7 +383,7 @@ export default function ToyDetailPage() {
                 </div>
 
                 <button
-                  onClick={() => setIsLiked(!isLiked)}
+                  onClick={() => handleLike()}
                   className={`p-4 rounded-2xl transition-all duration-300 hover:scale-110 ${isLiked
                     ? "bg-red-500/20 text-red-400 border border-red-500/30"
                     : "bg-white/10 text-gray-400 border border-white/20 hover:text-red-400"
