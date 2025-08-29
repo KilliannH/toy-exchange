@@ -330,7 +330,7 @@ export default function ConversationPage() {
                             placeholder={isDonated ? `${
                                 toy.mode === "DON" ? "Le don est confirmé, vous ne pouvez plus envoyer de message." 
                                 : toy.mode === "EXCHANGE" ? "L'échange est confirmé, vous ne pouvez plus envoyer de message." 
-                                : "La transaction est confirmée, vous ne pouvez plus envoyer de message."}` : "Écrire un message..."}
+                                : "Le don (points) est confirmé, vous ne pouvez plus envoyer de message."}` : "Écrire un message..."}
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
                             onKeyDown={(e) => {

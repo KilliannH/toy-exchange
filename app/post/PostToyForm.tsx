@@ -16,6 +16,7 @@ export default function PostToyForm() {
   const [files, setFiles] = useState<File[]>([]);
   const [currentStep, setCurrentStep] = useState(1);
   const [dragActive, setDragActive] = useState(false);
+  const [pointsCost, setPointsCost] = useState<number>(0);
 
   const totalSteps = 4;
   const progressWidth = `${(currentStep / totalSteps) * 100}%`;
@@ -56,6 +57,7 @@ export default function PostToyForm() {
         condition,
         category,
         mode,
+        pointsCost: mode === "POINTS" ? pointsCost : null,
         images: uploadedFiles.map((fileName) => ({ fileName })),
       }),
     });
@@ -117,11 +119,11 @@ export default function PostToyForm() {
 
   const getConditionIcon = (condition: string) => {
     switch (condition) {
-        case "NEW": return <Sparkles size={24} />;
-        case "VERY_GOOD": return <Star size={24} />;
-        case "GOOD": return <ThumbsUp size={24} />;
-        case "USED": return <Wrench size={24} />;
-        default: return null;
+      case "NEW": return <Sparkles size={24} />;
+      case "VERY_GOOD": return <Star size={24} />;
+      case "GOOD": return <ThumbsUp size={24} />;
+      case "USED": return <Wrench size={24} />;
+      default: return null;
     }
   };
 
@@ -156,7 +158,7 @@ export default function PostToyForm() {
                 <span className="text-sm text-gray-400">{Math.round((currentStep / totalSteps) * 100)}%</span>
               </div>
               <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                <div 
+                <div
                   className="h-full bg-gradient-to-r from-emerald-400 to-cyan-500 rounded-full transition-all duration-700 ease-out"
                   style={{ width: progressWidth }}
                 />
@@ -171,17 +173,15 @@ export default function PostToyForm() {
                 { num: 3, label: "Détails", icon: <Settings size={20} /> },
                 { num: 4, label: "Photos", icon: <Camera size={20} /> }
               ].map((step) => (
-                <div 
+                <div
                   key={step.num}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${
-                    currentStep >= step.num 
-                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' 
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${currentStep >= step.num
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                       : 'bg-white/5 text-gray-400 border border-white/10'
-                  }`}
+                    }`}
                 >
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
-                    currentStep >= step.num ? 'bg-emerald-500 text-white' : 'bg-white/20'
-                  }`}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${currentStep >= step.num ? 'bg-emerald-500 text-white' : 'bg-white/20'
+                    }`}>
                     {currentStep > step.num ? <Check size={20} /> : step.icon}
                   </div>
                   <span className="text-sm font-medium hidden sm:block">
@@ -320,11 +320,10 @@ export default function PostToyForm() {
                             key={cat.value}
                             type="button"
                             onClick={() => setCategory(cat.value)}
-                            className={`p-4 rounded-2xl border transition-all duration-300 hover:scale-105 ${
-                              category === cat.value
+                            className={`p-4 rounded-2xl border transition-all duration-300 hover:scale-105 ${category === cat.value
                                 ? "bg-purple-500/20 text-purple-300 border-purple-500/30 shadow-lg"
                                 : "bg-white/5 text-gray-400 border-white/20 hover:bg-white/10 hover:text-white"
-                            }`}
+                              }`}
                           >
                             <div className="text-2xl mb-1 flex justify-center">{cat.icon}</div>
                             <div className="text-sm font-medium">{cat.label}</div>
@@ -349,11 +348,10 @@ export default function PostToyForm() {
                             key={cond.value}
                             type="button"
                             onClick={() => setCondition(cond.value)}
-                            className={`p-4 rounded-2xl border transition-all duration-300 hover:scale-105 ${
-                              condition === cond.value
+                            className={`p-4 rounded-2xl border transition-all duration-300 hover:scale-105 ${condition === cond.value
                                 ? `bg-${cond.color}-500/20 text-${cond.color}-300 border-${cond.color}-500/30 shadow-lg`
                                 : "bg-white/5 text-gray-400 border-white/20 hover:bg-white/10 hover:text-white"
-                            }`}
+                              }`}
                           >
                             <div className="text-2xl mb-1 flex justify-center">{cond.icon}</div>
                             <div className="text-sm font-medium">{cond.label}</div>
@@ -377,11 +375,10 @@ export default function PostToyForm() {
                             key={m.value}
                             type="button"
                             onClick={() => setMode(m.value)}
-                            className={`p-4 rounded-2xl border transition-all duration-300 hover:scale-105 ${
-                              mode === m.value
+                            className={`p-4 rounded-2xl border transition-all duration-300 hover:scale-105 ${mode === m.value
                                 ? `bg-${m.color}-500/20 text-${m.color}-300 border-${m.color}-500/30 shadow-lg`
                                 : "bg-white/5 text-gray-400 border-white/20 hover:bg-white/10 hover:text-white"
-                            }`}
+                              }`}
                           >
                             <div className="text-2xl mb-1 flex justify-center">{m.icon}</div>
                             <div className="text-sm font-medium">{m.label}</div>
@@ -389,6 +386,26 @@ export default function PostToyForm() {
                         ))}
                       </div>
                     </div>
+
+                    {/* Points cost (uniquement si mode = POINTS) */}
+                    {mode === "POINTS" && (
+                      <div className="relative group">
+                        <label className="block text-sm font-medium text-gray-300 mb-3">
+                          Valeur en points
+                        </label>
+                        <input
+                          type="number"
+                          min={1}
+                          value={pointsCost}
+                          onChange={(e) => setPointsCost(Number(e.target.value))}
+                          placeholder="Ex: 50"
+                          className="w-full bg-white/5 border border-white/20 text-white placeholder-gray-400 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-300"
+                        />
+                        <p className="text-xs text-gray-400 mt-1">
+                          Nombre de points requis pour obtenir ce jouet
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -410,11 +427,10 @@ export default function PostToyForm() {
                     onDragLeave={handleDrag}
                     onDragOver={handleDrag}
                     onDrop={handleDrop}
-                    className={`relative border-2 border-dashed rounded-3xl p-12 text-center transition-all duration-300 ${
-                      dragActive
+                    className={`relative border-2 border-dashed rounded-3xl p-12 text-center transition-all duration-300 ${dragActive
                         ? "border-emerald-400 bg-emerald-500/10"
                         : "border-white/30 hover:border-white/50 bg-white/5 hover:bg-white/10"
-                    }`}
+                      }`}
                   >
                     <input
                       type="file"
@@ -430,7 +446,7 @@ export default function PostToyForm() {
                       }}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
-                    
+
                     <div className="space-y-4">
                       <div className="text-6xl text-cyan-400 animate-bounce">
                         <UploadCloud size={64} className="mx-auto" />

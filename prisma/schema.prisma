@@ -44,6 +44,7 @@ model Toy {
   ageMin      Int
   ageMax      Int
   mode        Mode
+  pointsCost  Int?
   lat         Float?
   lng         Float?
   status      Status    @default(AVAILABLE)

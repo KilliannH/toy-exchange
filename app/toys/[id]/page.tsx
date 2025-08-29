@@ -306,14 +306,28 @@ export default function ToyDetailPage() {
                     {toy.title}
                   </h1>
                   <div className="flex items-center gap-3">
-                    <span className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${toy.mode === "EXCHANGE"
-                      ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
-                      : toy.mode === "POINTS"
-                        ? "bg-green-500/20 text-green-300 border border-green-500/30"
-                        : "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"
-                      }`}>
-                      {getModeIcon(toy.mode)} {toy.mode === "EXCHANGE" ? "Échange" : toy.mode === "POINTS" ? "Points" : "Don"}
+                    <span
+                      className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${toy.mode === "EXCHANGE"
+                          ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                          : toy.mode === "POINTS"
+                            ? "bg-green-500/20 text-green-300 border border-green-500/30"
+                            : "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"
+                        }`}
+                    >
+                      {getModeIcon(toy.mode)}{" "}
+                      {toy.mode === "EXCHANGE"
+                        ? "Échange"
+                        : toy.mode === "POINTS"
+                          ? "Points"
+                          : "Don"}
                     </span>
+
+                    {/* 👇 Badge supplémentaire si mode = POINTS */}
+                    {toy.mode === "POINTS" && (
+                      <span className="px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
+                        {toy.pointsCost ?? 0} pts
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -472,8 +486,8 @@ export default function ToyDetailPage() {
                           key={t.id}
                           onClick={() => setSelectedToyId(t.id)}
                           className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${selectedToyId === t.id
-                              ? "border-cyan-400 bg-cyan-500/10"
-                              : "border-white/20 hover:border-cyan-300"
+                            ? "border-cyan-400 bg-cyan-500/10"
+                            : "border-white/20 hover:border-cyan-300"
                             }`}
                         >
                           <img

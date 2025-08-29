@@ -59,6 +59,7 @@ export async function POST(req: NextRequest) {
       condition: body.condition,
       category: body.category,
       mode: body.mode,
+      pointsCost: body.pointsCost,
       userId: session.user.id,
       images:
         body.images && body.images.length > 0
