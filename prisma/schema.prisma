@@ -58,6 +58,7 @@ model Toy {
   proposedExchanges Exchange[] @relation("ProposedToy") // 👈 opposé de Exchange.proposedToy
   messages          Message[]
   favorites         Favorite[]
+  messagesWithProposedToy Message[] @relation("MessageProposedToy")
 }
 
 // Nouveau modèle pour les échanges
@@ -93,6 +94,9 @@ model Message {
   sender   User @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
   receiver User @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
   toy      Toy? @relation(fields: [toyId], references: [id], onDelete: SetNull)
+
+  proposedToyId String?
+  proposedToy   Toy? @relation("MessageProposedToy", fields: [proposedToyId], references: [id])
 }
 
 // Nouveau modèle pour les évaluations

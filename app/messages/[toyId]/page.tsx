@@ -11,70 +11,70 @@ import Link from "next/link";
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 function ReviewForm({ exchangeId, partner, existingReview }) {
-  const [rating, setRating] = useState(existingReview?.rating || 0);
-  const [comment, setComment] = useState(existingReview?.comment || "");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+    const [rating, setRating] = useState(existingReview?.rating || 0);
+    const [comment, setComment] = useState(existingReview?.comment || "");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async () => {
-    if (rating === 0) {
-      alert("Veuillez donner une note de 1 à 5 étoiles.");
-      return;
-    }
-    setIsSubmitting(true);
-    await fetch(`/api/exchanges/${exchangeId}/reviews`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ rating, comment }),
-    });
-    alert("Merci pour votre avis !");
-    setIsSubmitting(false);
-    mutate(`/api/conversations/${exchangeId}/messages`);
-  };
+    const handleSubmit = async () => {
+        if (rating === 0) {
+            alert("Veuillez donner une note de 1 à 5 étoiles.");
+            return;
+        }
+        setIsSubmitting(true);
+        await fetch(`/api/exchanges/${exchangeId}/reviews`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ rating, comment }),
+        });
+        alert("Merci pour votre avis !");
+        setIsSubmitting(false);
+        mutate(`/api/conversations/${exchangeId}/messages`);
+    };
 
-  const isReadOnly = !!existingReview;
+    const isReadOnly = !!existingReview;
 
-  return (
-    <div className="bg-white/5 border border-white/10 p-6 rounded-2xl">
-      <h3 className="text-xl font-bold text-white mb-4">
-        <Star className="inline-block mr-2 text-yellow-400" size={24} /> 
-        Avis sur {partner?.name || "votre partenaire"}
-      </h3>
+    return (
+        <div className="bg-white/5 border border-white/10 p-6 rounded-2xl">
+            <h3 className="text-xl font-bold text-white mb-4">
+                <Star className="inline-block mr-2 text-yellow-400" size={24} />
+                Avis sur {partner?.name || "votre partenaire"}
+            </h3>
 
-      {/* Étoiles */}
-      <div className="flex gap-2 mb-4">
-        {[1, 2, 3, 4, 5].map((n) => (
-          <button
-            key={n}
-            onClick={() => !isReadOnly && setRating(n)}
-            disabled={isReadOnly}
-            className={n <= rating ? "text-yellow-400" : "text-gray-500"}
-          >
-            ★
-          </button>
-        ))}
-      </div>
+            {/* Étoiles */}
+            <div className="flex gap-2 mb-4">
+                {[1, 2, 3, 4, 5].map((n) => (
+                    <button
+                        key={n}
+                        onClick={() => !isReadOnly && setRating(n)}
+                        disabled={isReadOnly}
+                        className={n <= rating ? "text-yellow-400" : "text-gray-500"}
+                    >
+                        ★
+                    </button>
+                ))}
+            </div>
 
-      {/* Commentaire */}
-      <textarea
-        value={comment}
-        onChange={(e) => !isReadOnly && setComment(e.target.value)}
-        placeholder="Votre commentaire..."
-        className="w-full bg-white/5 border border-white/20 text-white rounded-xl p-3 resize-none"
-        disabled={isReadOnly}
-      />
+            {/* Commentaire */}
+            <textarea
+                value={comment}
+                onChange={(e) => !isReadOnly && setComment(e.target.value)}
+                placeholder="Votre commentaire..."
+                className="w-full bg-white/5 border border-white/20 text-white rounded-xl p-3 resize-none"
+                disabled={isReadOnly}
+            />
 
-      {/* Bouton seulement si pas encore soumis */}
-      {!isReadOnly && (
-        <button
-          onClick={handleSubmit}
-          disabled={isSubmitting || rating === 0}
-          className="mt-4 bg-cyan-600 hover:bg-cyan-700 px-4 py-2 rounded-xl text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isSubmitting ? "Envoi..." : "Envoyer l’avis"}
-        </button>
-      )}
-    </div>
-  );
+            {/* Bouton seulement si pas encore soumis */}
+            {!isReadOnly && (
+                <button
+                    onClick={handleSubmit}
+                    disabled={isSubmitting || rating === 0}
+                    className="mt-4 bg-cyan-600 hover:bg-cyan-700 px-4 py-2 rounded-xl text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    {isSubmitting ? "Envoi..." : "Envoyer l’avis"}
+                </button>
+            )}
+        </div>
+    );
 }
 
 export default function ConversationPage() {
@@ -201,7 +201,7 @@ export default function ConversationPage() {
 
     const isOwner = session?.user?.id === toy.userId;
     const isDonated = toy.status === "EXCHANGED";
-    const showReviewForm = exchange?.status === 'COMPLETED' && !exchange?.review;
+    const showReviewForm = exchange?.status === 'COMPLETED';
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative">
@@ -253,13 +253,21 @@ export default function ConversationPage() {
                             className={`flex ${msg.sender.id === session?.user?.id ? 'justify-end' : 'justify-start'}`}
                         >
                             <div className={`p-4 rounded-3xl max-w-xs md:max-w-md ${msg.sender.id === session?.user?.id
-                                    ? 'bg-purple-600 text-white rounded-br-none'
-                                    : 'bg-white/10 text-gray-300 rounded-bl-none'
+                                ? 'bg-purple-600 text-white rounded-br-none'
+                                : 'bg-white/10 text-gray-300 rounded-bl-none'
                                 }`}>
                                 <div className="text-xs text-gray-400 mb-1">
                                     {msg.sender.id === session?.user?.id ? "Vous" : conversationPartner?.name}
                                 </div>
-                                {msg.content}
+                                {msg.proposedToy ? (
+                                    <div className="bg-white/10 p-4 rounded-xl">
+                                        <img src={msg.proposedToy.images?.[0]?.signedUrl} className="w-32 h-32 object-cover rounded-lg mb-2" />
+                                        <div className="text-white font-semibold">{msg.proposedToy.title}</div>
+                                        {msg.content && <p className="text-gray-300 mt-2">{msg.content}</p>}
+                                    </div>
+                                ) : (
+                                    <p>{msg.content}</p>
+                                )}
                             </div>
                         </div>
                     ))}
@@ -267,10 +275,10 @@ export default function ConversationPage() {
                 </div>
 
                 {/* Affichage conditionnel du formulaire d'avis */}
-                {exchange && (
-                  <div className="mt-4">
-                    <ReviewForm exchangeId={exchange.id} partner={conversationPartner} existingReview={exchange.review} />
-                  </div>
+                {showReviewForm && (
+                    <div className="mt-4">
+                        <ReviewForm exchangeId={exchange.id} partner={conversationPartner} existingReview={exchange.review} />
+                    </div>
                 )}
 
                 <div className="p-4 bg-black/50 backdrop-blur-lg rounded-3xl border border-white/10">

@@ -4,13 +4,13 @@ import useSWR from "swr";
 import Link from "next/link";
 import { useState } from "react";
 import EditToyForm from "@/components/EditToyForm";
-import { 
-  AlertTriangle, 
-  Loader2, 
-  BarChart3, 
-  RefreshCw, 
-  MessageSquare, 
-  Star, 
+import {
+  AlertTriangle,
+  Loader2,
+  BarChart3,
+  RefreshCw,
+  MessageSquare,
+  Star,
   Gamepad2,
   Plus,
   Eye,
@@ -18,12 +18,18 @@ import {
   Trash2,
   ChevronRight
 } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function DashboardPage() {
+  const { data: session } = useSession();
   const { data: toys, error, isLoading } = useSWR("/api/toys/mine", fetcher);
   const { data: stats } = useSWR("/api/profile/stats", fetcher);
+  const { data: exchanges, error: exchangesError, isLoading: exchangesLoading } = useSWR(
+    "/api/exchanges/mine",
+    fetcher
+  );
   const [editingToy, setEditingToy] = useState<any | null>(null);
 
   async function handleDelete(toyId: string) {
@@ -107,8 +113,8 @@ export default function DashboardPage() {
             <p className="text-xl text-gray-400 mb-8 max-w-md mx-auto">
               Commencez par ajouter vos premiers jouets et rejoignez la communauté d'échange !
             </p>
-            <Link 
-              href="/post" 
+            <Link
+              href="/post"
               className="group relative overflow-hidden bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold px-8 py-4 rounded-2xl shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-2"
             >
               <span className="relative z-10 flex items-center gap-2">
@@ -122,8 +128,8 @@ export default function DashboardPage() {
           <>
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-3xl font-bold text-white">Mes jouets ({toys.length})</h2>
-              <Link 
-                href="/post" 
+              <Link
+                href="/post"
                 className="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold px-6 py-3 rounded-xl hover:scale-105 hover:shadow-lg hover:shadow-green-500/25 transition-all duration-300 flex items-center gap-2"
               >
                 <Plus className="w-5 h-5" />
@@ -140,7 +146,7 @@ export default function DashboardPage() {
                 >
                   {/* Card glow effect */}
                   <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 rounded-3xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500" />
-                  
+
                   <div className="relative z-10">
                     {/* Toy header */}
                     <div className="flex items-start justify-between mb-4">
@@ -186,7 +192,7 @@ export default function DashboardPage() {
                         >
                           <Edit className="w-4 h-4 text-yellow-400 group-hover/btn:scale-110 transition-transform duration-200" />
                         </button>
-                        
+
                         <button
                           onClick={() => handleDelete(toy.id)}
                           className="group/btn p-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40 rounded-lg transition-all duration-200"
@@ -199,6 +205,61 @@ export default function DashboardPage() {
                   </div>
                 </div>
               ))}
+            </div>
+            {/* Section Mes échanges */}
+            <div className="mt-16">
+              <h2 className="text-3xl font-bold text-white mb-8">Mes échanges ({exchanges.length})</h2>
+
+              {exchangesLoading ? (
+                <div className="text-center text-gray-400">Chargement de vos échanges...</div>
+              ) : exchangesError ? (
+                <div className="text-center text-red-400">Erreur lors du chargement des échanges</div>
+              ) : !exchanges || exchanges.length === 0 ? (
+                <div className="text-center text-gray-400">Vous n’avez aucun échange en cours.</div>
+              ) : (
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {exchanges.map((ex: any) => (
+                    console.log("xxx", ex),
+                    <div
+                      key={ex.id}
+                      className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition-all duration-300"
+                    >
+                      <h3 className="text-lg font-bold text-white mb-2">
+                        {ex.toy.title}
+                      </h3>
+                      <p className="text-gray-400 text-sm mb-4">
+                        Proposé par {ex.requester.name || ex.requester.email}
+                      </p>
+
+                      <div className="flex items-center gap-2 mb-4">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-medium border ${ex.status === "PENDING"
+                            ? "bg-yellow-500/20 text-yellow-300 border-yellow-500/30"
+                            : ex.status === "ACCEPTED"
+                              ? "bg-green-500/20 text-green-300 border-green-500/30"
+                              : ex.status === "REJECTED"
+                                ? "bg-red-500/20 text-red-300 border-red-500/30"
+                                : "bg-gray-500/20 text-gray-300 border-gray-500/30"
+                            }`}
+                        >
+                          {ex.status}
+                        </span>
+                      </div>
+
+                      <Link
+                        href={`/messages/${ex.toy.id}?partnerId=${ex.requesterId === session?.user.id
+                            ? ex.toy.user.id   // je suis le demandeur → partenaire = propriétaire du jouet
+                            : ex.requesterId  // je suis le propriétaire → partenaire = demandeur
+                          }`}
+                        className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors text-sm"
+                      >
+                        <MessageSquare className="w-4 h-4" />
+                        Ouvrir la conversation
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </>
         )}

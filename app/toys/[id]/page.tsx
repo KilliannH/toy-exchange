@@ -4,8 +4,8 @@ import useSWR from "swr";
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { 
-  Heart, MessageSquare, Share2, AlertTriangle, ArrowLeft, RotateCcw, Handshake, Gem, Star, 
+import {
+  Heart, MessageSquare, Share2, AlertTriangle, ArrowLeft, RotateCcw, Handshake, Gem, Star,
   ThumbsUp, Wrench, Package, Frown, ToyBrick, Send, Loader2, Gift,
   Bolt
 } from "lucide-react";
@@ -28,7 +28,14 @@ export default function ToyDetailPage() {
   const [dragY, setDragY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [lastMouseY, setLastMouseY] = useState(0);
-  
+
+  const { data: myToys, isLoading: isLoadingMyToys } = useSWR(
+    session ? "/api/toys/mine" : null,
+    fetcher
+  );
+  const availableToys = myToys?.filter((t: any) => t.status === "AVAILABLE") || [];
+  const [selectedToyId, setSelectedToyId] = useState<string | null>(null);
+
   // New state for messaging
   const [messageContent, setMessageContent] = useState("");
   const [isSendingMessage, setIsSendingMessage] = useState(false);
@@ -80,40 +87,40 @@ export default function ToyDetailPage() {
   // New function to send a message
   const handleSendMessage = async () => {
     if (!session) {
-        alert("Vous devez être connecté pour envoyer un message.");
-        return;
+      alert("Vous devez être connecté pour envoyer un message.");
+      return;
     }
 
     if (!messageContent.trim()) {
-        alert("Le message ne peut pas être vide.");
-        return;
+      alert("Le message ne peut pas être vide.");
+      return;
     }
 
     setIsSendingMessage(true);
-    
-    try {
-        const res = await fetch(`/api/conversations/${toy.id}/messages?partnerId=${toy.userId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                content: messageContent,
-                receiverId: toy.userId
-            })
-        });
 
-        if (res.ok) {
-            alert("Message envoyé avec succès!");
-            setMessageContent("");
-            setShowContactForm(false);
-        } else {
-            const data = await res.json();
-            alert(`Erreur lors de l'envoi du message: ${data.error}`);
-        }
+    try {
+      const res = await fetch(`/api/conversations/${toy.id}/messages?partnerId=${toy.userId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: messageContent,
+          receiverId: toy.userId
+        })
+      });
+
+      if (res.ok) {
+        alert("Message envoyé avec succès!");
+        setMessageContent("");
+        setShowContactForm(false);
+      } else {
+        const data = await res.json();
+        alert(`Erreur lors de l'envoi du message: ${data.error}`);
+      }
     } catch (err) {
-        alert("Une erreur inattendue est survenue.");
-        console.error(err);
+      alert("Une erreur inattendue est survenue.");
+      console.error(err);
     } finally {
-        setIsSendingMessage(false);
+      setIsSendingMessage(false);
     }
   };
 
@@ -374,29 +381,29 @@ export default function ToyDetailPage() {
             {/* Action buttons */}
             <div className="space-y-4">
               {/* Le bouton de contact n'est affiché que si l'utilisateur est connecté et n'est pas l'auteur */}
-              {session && !isAuthor && (
+              {session && !isAuthor && toy.mode !== "EXCHANGE" && (
                 <button
-                    onClick={() => setShowContactForm(!showContactForm)}
-                    className="group relative overflow-hidden w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold px-8 py-6 rounded-3xl shadow-2xl hover:scale-105 transition-all duration-300"
+                  onClick={() => setShowContactForm(!showContactForm)}
+                  className="group relative overflow-hidden w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold px-8 py-6 rounded-3xl shadow-2xl hover:scale-105 transition-all duration-300"
                 >
-                    <span className="relative z-10 flex items-center justify-center gap-3 text-xl">
+                  <span className="relative z-10 flex items-center justify-center gap-3 text-xl">
                     <MessageSquare size={28} />
                     {showContactForm ? "Masquer le contact" : "Contacter le propriétaire"}
-                    </span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-700 to-cyan-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-700 to-cyan-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </button>
               )}
               {/* Le bouton s'inscrire s'il n'y a pas de session active */}
               {!session && (
-                  <Link 
-                      href="/register" 
-                      className="group relative overflow-hidden w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold px-8 py-6 rounded-3xl shadow-2xl hover:scale-105 transition-all duration-300 text-center flex items-center justify-center"
-                  >
-                      <span className="relative z-10 flex items-center justify-center gap-3 text-xl">
-                        <MessageSquare size={28} />
-                        S'inscrire pour contacter
-                      </span>
-                  </Link>
+                <Link
+                  href="/register"
+                  className="group relative overflow-hidden w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold px-8 py-6 rounded-3xl shadow-2xl hover:scale-105 transition-all duration-300 text-center flex items-center justify-center"
+                >
+                  <span className="relative z-10 flex items-center justify-center gap-3 text-xl">
+                    <MessageSquare size={28} />
+                    S'inscrire pour contacter
+                  </span>
+                </Link>
               )}
 
               <div className="grid grid-cols-2 gap-4">
@@ -411,6 +418,92 @@ export default function ToyDetailPage() {
                 </button>
               </div>
             </div>
+
+            {session && !isAuthor && toy.mode === "EXCHANGE" && (
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 space-y-4">
+                <h3 className="text-lg font-semibold text-white">Proposer un échange</h3>
+
+                {!availableToys ? (
+                  <p className="text-gray-400 text-sm">Chargement de vos jouets...</p>
+                ) : availableToys.length === 0 ? (
+                  <p className="text-gray-400 text-sm">
+                    Vous n’avez aucun jouet disponible pour échanger.
+                  </p>
+                ) : (
+                  <form
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      if (!selectedToyId) {
+                        alert("Veuillez choisir un jouet à proposer.");
+                        return;
+                      }
+
+                      setIsSendingMessage(true);
+
+                      const form = e.currentTarget as HTMLFormElement;
+                      const message = (form.elements.namedItem("exchangeMessage") as HTMLInputElement).value;
+
+                      const res = await fetch("/api/exchanges", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          toyId: toy.id,
+                          proposedToyId: selectedToyId,
+                          message,
+                        }),
+                      });
+
+                      setIsSendingMessage(false);
+                      if (res.ok) {
+                        alert("Votre proposition d’échange a été envoyée !");
+                        form.reset();
+                        setSelectedToyId(null);
+                      } else {
+                        const err = await res.json();
+                        alert("Erreur : " + err.error);
+                      }
+                    }}
+                    className="space-y-4"
+                  >
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      {availableToys.map((t: any) => (
+                        <button
+                          type="button"
+                          key={t.id}
+                          onClick={() => setSelectedToyId(t.id)}
+                          className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${selectedToyId === t.id
+                              ? "border-cyan-400 bg-cyan-500/10"
+                              : "border-white/20 hover:border-cyan-300"
+                            }`}
+                        >
+                          <img
+                            src={t.images[0]?.signedUrl || "/placeholder.png"}
+                            alt={t.title}
+                            className="w-12 h-12 rounded-lg object-cover"
+                          />
+                          <span className="text-white">{t.title}</span>
+                        </button>
+                      ))}
+                    </div>
+
+                    <input
+                      type="text"
+                      name="exchangeMessage"
+                      placeholder="Message optionnel..."
+                      className="w-full bg-white/5 border border-white/20 text-white px-4 py-2 rounded-xl"
+                    />
+
+                    <button
+                      type="submit"
+                      disabled={isSendingMessage}
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:scale-105 transition-all disabled:opacity-50"
+                    >
+                      {isSendingMessage ? "Envoi..." : "Envoyer la proposition"}
+                    </button>
+                  </form>
+                )}
+              </div>
+            )}
 
             {/* Contact form */}
             {showContactForm && (
@@ -442,7 +535,7 @@ export default function ToyDetailPage() {
                     >
                       Annuler
                     </button>
-                    <button 
+                    <button
                       onClick={handleSendMessage}
                       disabled={isSendingMessage}
                       className="group relative overflow-hidden flex-2 bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold px-6 py-3 rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl disabled:opacity-50 disabled:hover:scale-100"
