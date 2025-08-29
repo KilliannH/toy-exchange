@@ -3,7 +3,7 @@
 import Link from "next/link";
 import useSWR from "swr";
 import { useState } from "react";
-import { Search, RotateCcw, Handshake, DollarSign, Gem, ToyBrick, X, ListFilter, Grid2X2 } from "lucide-react";
+import { Search, RotateCcw, Handshake, Gem, ToyBrick, X, ListFilter, Grid2X2, Gift } from "lucide-react";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -61,8 +61,8 @@ export default function ToysPage() {
                 return <RotateCcw size={14} />;
             case "lend":
                 return <Handshake size={14} />;
-            case "sell":
-                return <DollarSign size={14} />;
+            case "gift":
+                return <Gift size={14} />;
             default:
                 return null;
         }
@@ -112,7 +112,7 @@ export default function ToysPage() {
                                 { key: "all", label: "Tout", icon: <ListFilter size={18} /> },
                                 { key: "exchange", label: "Échange", icon: <RotateCcw size={18} /> },
                                 { key: "lend", label: "Prêt", icon: <Handshake size={18} /> },
-                                { key: "sell", label: "Vente", icon: <DollarSign size={18} /> }
+                                { key: "gift", label: "Don", icon: <Gift size={18} /> }
                             ].map((filterOption) => (
                                 <button
                                     key={filterOption.key}
@@ -205,7 +205,7 @@ export default function ToysPage() {
                                                     : "bg-yellow-500/80 text-yellow-100 border-yellow-400/50"
                                                 }`}>
                                                 {getModeIcon(toy.mode)}
-                                                <span className="text-white hidden sm:inline">{toy.mode === "exchange" ? "Échange" : toy.mode === "lend" ? "Prêt" : "Vente"}</span>
+                                                <span className="text-white hidden sm:inline">{toy.mode === "exchange" ? "Échange" : toy.mode === "lend" ? "Prêt" : "Don"}</span>
                                             </span>
                                         </div>
                                     </div>

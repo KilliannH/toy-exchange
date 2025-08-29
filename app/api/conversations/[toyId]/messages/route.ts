@@ -5,15 +5,16 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
 
 // GET all messages in a specific conversation
-export async function GET(request: Request, { params }: { params: { toyId: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ toyId: string }> }) {
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const toyIdParams = await params;
   const userId = session.user.id;
-  const toyId = params.toyId;
+  const toyId = toyIdParams.toyId;
 
   try {
     const { searchParams } = new URL(request.url);
@@ -23,18 +24,31 @@ export async function GET(request: Request, { params }: { params: { toyId: strin
       return NextResponse.json({ error: "partnerId is required" }, { status: 400 });
     }
 
-    // Fetch toy details once for the entire conversation
+    // Fetch toy details once for the entire conversation, including donation status
     const toy = await prisma.toy.findUnique({
       where: { id: toyId },
       select: {
         id: true,
         title: true,
+        status: true,
+        userId: true, // Pour savoir qui est le propriétaire du jouet
       },
     });
 
     if (!toy) {
       return NextResponse.json({ error: "Toy not found" }, { status: 404 });
     }
+
+    const exchange = await prisma.exchange.findFirst({
+      where: {
+        toyId,
+        OR: [
+          { requesterId: userId },
+          { requesterId: partnerId },
+        ],
+      },
+      include: { review: true }, // pour savoir si une review existe déjà
+    });
 
     // Mark messages as read for the current user
     await prisma.message.updateMany({
@@ -64,7 +78,7 @@ export async function GET(request: Request, { params }: { params: { toyId: strin
     });
 
     // Combine toy and messages data in the final response
-    return NextResponse.json({ messages, toy });
+    return NextResponse.json({ messages, toy, exchange });
   } catch (error) {
     console.error('Error fetching messages:', error);
     return NextResponse.json({ error: "Failed to fetch messages" }, { status: 500 });

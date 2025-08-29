@@ -5,8 +5,8 @@ import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { 
-  Heart, MessageSquare, Share2, AlertTriangle, ArrowLeft, RotateCcw, Handshake, DollarSign, Gem, Star, 
-  ThumbsUp, Wrench, Package, Frown, ToyBrick, Send, Loader2
+  Heart, MessageSquare, Share2, AlertTriangle, ArrowLeft, RotateCcw, Handshake, Gem, Star, 
+  ThumbsUp, Wrench, Package, Frown, ToyBrick, Send, Loader2, Gift
 } from "lucide-react";
 import Link from "next/link";
 
@@ -159,8 +159,8 @@ export default function ToyDetailPage() {
         return <RotateCcw size={18} />;
       case "lend":
         return <Handshake size={18} />;
-      case "sell":
-        return <DollarSign size={18} />;
+      case "gift":
+        return <Gift size={18} />;
       default:
         return null;
     }
@@ -304,7 +304,7 @@ export default function ToyDetailPage() {
                         ? "bg-green-500/20 text-green-300 border border-green-500/30"
                         : "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"
                       }`}>
-                      {getModeIcon(toy.mode)} {toy.mode === "exchange" ? "Échange" : toy.mode === "lend" ? "Prêt" : "Vente"}
+                      {getModeIcon(toy.mode)} {toy.mode === "exchange" ? "Échange" : toy.mode === "lend" ? "Prêt" : "Don"}
                     </span>
                   </div>
                 </div>
