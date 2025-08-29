@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { mutate } from "swr";
+import { Pen, FileText, Baby, Camera, UploadCloud, X, Save, Loader2 } from "lucide-react";
 
 export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () => void }) {
     const [title, setTitle] = useState(toy.title);
@@ -100,7 +101,9 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
-                    <div className="text-3xl">✏️</div>
+                    <div className="text-3xl text-yellow-400">
+                        <Pen size={32} />
+                    </div>
                     <div>
                         <h2 className="text-2xl font-bold text-white">Modifier le jouet</h2>
                         <p className="text-gray-400">Mettez à jour les informations</p>
@@ -110,9 +113,7 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
                     onClick={onClose}
                     className="p-2 hover:bg-white/10 rounded-xl transition-all duration-200 text-gray-400 hover:text-white"
                 >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <X className="w-6 h-6" />
                 </button>
             </div>
 
@@ -120,7 +121,7 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
                 {/* Basic info section */}
                 <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
                     <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                        <span className="text-xl">📝</span>
+                        <FileText className="w-5 h-5" />
                         Informations de base
                     </h3>
                     
@@ -156,7 +157,7 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
                 {/* Age range section */}
                 <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
                     <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                        <span className="text-xl">👶</span>
+                        <Baby className="w-5 h-5" />
                         Tranche d'âge
                     </h3>
                     
@@ -199,7 +200,7 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
                 {/* Images management */}
                 <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
                     <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                        <span className="text-xl">🖼️</span>
+                        <Camera className="w-5 h-5" />
                         Gestion des images
                         <span className="text-sm bg-cyan-500/20 text-cyan-300 px-2 py-1 rounded-full">
                             {remainingSlots} slots libres
@@ -228,7 +229,7 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
                                             }}
                                             className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 text-xs"
                                         >
-                                            ×
+                                            <X className="w-4 h-4" />
                                         </button>
                                     </div>
                                 ))}
@@ -270,7 +271,9 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
                                 />
                                 
                                 <div className="space-y-2">
-                                    <div className="text-3xl">📸</div>
+                                    <div className="text-3xl text-cyan-400">
+                                        <UploadCloud size={32} className="mx-auto" />
+                                    </div>
                                     <div>
                                         <p className="text-white font-medium">
                                             Glissez vos photos ici
@@ -299,7 +302,7 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
                                                     onClick={() => removeFile(index)}
                                                     className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 text-xs"
                                                 >
-                                                    ×
+                                                    <X className="w-4 h-4" />
                                                 </button>
                                                 <div className="absolute bottom-0 left-0 right-0 bg-emerald-500/80 text-white text-xs px-1 py-0.5 rounded-b-xl">
                                                     NOUVEAU
@@ -343,12 +346,12 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
                         <span className="relative z-10 flex items-center justify-center gap-2">
                             {loading ? (
                                 <>
-                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                    <Loader2 className="w-5 h-5 animate-spin" />
                                     Sauvegarde...
                                 </>
                             ) : (
                                 <>
-                                    💾 Sauvegarder les modifications
+                                    <Save size={20} /> Sauvegarder les modifications
                                 </>
                             )}
                         </span>

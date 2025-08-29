@@ -3,6 +3,7 @@
 import Link from "next/link";
 import useSWR from "swr";
 import { useState } from "react";
+import { Search, RotateCcw, Handshake, DollarSign, Gem, ToyBrick, X, ListFilter, Grid2X2 } from "lucide-react";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -15,10 +16,12 @@ export default function ToysPage() {
         return (
             <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-6">
                 <div className="bg-red-500/10 backdrop-blur-xl border border-red-500/20 rounded-3xl p-12 text-center max-w-md">
-                    <div className="text-8xl mb-6">💥</div>
+                    <div className="text-8xl mb-6 text-red-400">
+                        <X size={96} className="mx-auto" />
+                    </div>
                     <h2 className="text-3xl font-bold text-red-400 mb-4">Oups !</h2>
                     <p className="text-red-300">Impossible de charger les jouets</p>
-                    <button 
+                    <button
                         onClick={() => window.location.reload()}
                         className="mt-6 bg-red-500/20 hover:bg-red-500/30 text-red-300 px-6 py-3 rounded-xl transition-all duration-300"
                     >
@@ -35,7 +38,9 @@ export default function ToysPage() {
                 <div className="text-center">
                     <div className="relative mb-8">
                         <div className="w-24 h-24 border-4 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
-                        <div className="absolute inset-0 flex items-center justify-center text-3xl animate-pulse">🎲</div>
+                        <div className="absolute inset-0 flex items-center justify-center text-3xl animate-pulse text-purple-400">
+                            <Gem size={36} />
+                        </div>
                     </div>
                     <p className="text-white/80 text-xl font-light">Découverte des trésors en cours...</p>
                 </div>
@@ -45,10 +50,23 @@ export default function ToysPage() {
 
     const filteredToys = toys.filter((toy: any) => {
         const matchesSearch = toy.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                             toy.description.toLowerCase().includes(searchTerm.toLowerCase());
+            toy.description.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesFilter = filter === "all" || toy.mode === filter;
         return matchesSearch && matchesFilter;
     });
+
+    const getModeIcon = (mode: string) => {
+        switch (mode) {
+            case "exchange":
+                return <RotateCcw size={14} />;
+            case "lend":
+                return <Handshake size={14} />;
+            case "sell":
+                return <DollarSign size={14} />;
+            default:
+                return null;
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative">
@@ -75,12 +93,15 @@ export default function ToysPage() {
                     <div className="flex flex-col md:flex-row gap-4">
                         {/* Search bar */}
                         <div className="relative flex-1 group">
+                            <div className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-cyan-400 transition-colors">
+                                <Search size={20} />
+                            </div>
                             <input
                                 type="text"
-                                placeholder="🔍 Rechercher un jouet..."
+                                placeholder="Rechercher un jouet..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full bg-white/5 border border-white/20 text-white placeholder-gray-400 px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-300 group-hover:border-white/30"
+                                className="w-full bg-white/5 border border-white/20 text-white placeholder-gray-400 pl-14 pr-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-300 group-hover:border-white/30"
                             />
                             <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
                         </div>
@@ -88,19 +109,18 @@ export default function ToysPage() {
                         {/* Filter buttons */}
                         <div className="flex gap-3">
                             {[
-                                { key: "all", label: "Tout", icon: "🎪" },
-                                { key: "exchange", label: "Échange", icon: "🔄" },
-                                { key: "lend", label: "Prêt", icon: "🤝" },
-                                { key: "sell", label: "Vente", icon: "💰" }
+                                { key: "all", label: "Tout", icon: <ListFilter size={18} /> },
+                                { key: "exchange", label: "Échange", icon: <RotateCcw size={18} /> },
+                                { key: "lend", label: "Prêt", icon: <Handshake size={18} /> },
+                                { key: "sell", label: "Vente", icon: <DollarSign size={18} /> }
                             ].map((filterOption) => (
                                 <button
                                     key={filterOption.key}
                                     onClick={() => setFilter(filterOption.key)}
-                                    className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 flex items-center gap-2 hover:scale-105 ${
-                                        filter === filterOption.key
-                                            ? "bg-gradient-to-r from-cyan-500 to-purple-500 text-white shadow-lg"
-                                            : "bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white border border-white/20"
-                                    }`}
+                                    className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 flex items-center gap-2 hover:scale-105 ${filter === filterOption.key
+                                        ? "bg-gradient-to-r from-cyan-500 to-purple-500 text-white shadow-lg"
+                                        : "bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white border border-white/20"
+                                        }`}
                                 >
                                     <span className="text-sm">{filterOption.icon}</span>
                                     <span className="hidden sm:inline">{filterOption.label}</span>
@@ -117,9 +137,7 @@ export default function ToysPage() {
                     </p>
                     <div className="flex gap-2">
                         <button className="p-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all duration-300 hover:scale-105" title="Vue grille">
-                            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                            </svg>
+                            <Grid2X2 size={20} className="text-white" />
                         </button>
                     </div>
                 </div>
@@ -127,7 +145,9 @@ export default function ToysPage() {
                 {/* Toys grid */}
                 {filteredToys.length === 0 ? (
                     <div className="text-center py-20">
-                        <div className="text-8xl mb-6">🕵️</div>
+                        <div className="text-8xl mb-6 text-gray-500">
+                            <ToyBrick size={96} className="mx-auto" />
+                        </div>
                         <h2 className="text-3xl font-bold text-white mb-4">Aucun résultat trouvé</h2>
                         <p className="text-gray-400 max-w-md mx-auto">
                             Essayez de modifier votre recherche ou vos filtres pour découvrir plus de jouets
@@ -143,7 +163,7 @@ export default function ToysPage() {
                             >
                                 {/* Card glow effect */}
                                 <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 rounded-3xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500" />
-                                
+
                                 <div className="relative z-10">
                                     {/* Image section */}
                                     <div className="relative h-48 bg-gradient-to-br from-purple-500/20 to-pink-500/20 overflow-hidden">
@@ -152,7 +172,12 @@ export default function ToysPage() {
                                                 <img
                                                     src={toy.images[0].signedUrl}
                                                     alt={toy.title}
-                                                    className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                                    className="h-full w-full group-hover:scale-110 transition-transform duration-500" // `object-cover` removed
+                                                    style={{
+                                                        // Use object-position with the percentage value
+                                                        objectFit: 'cover',
+                                                        objectPosition: `center ${toy.images[0].offsetYPercentage || 0}%`,
+                                                    }}
                                                 />
                                                 {toy.images[1] && (
                                                     <img
@@ -165,20 +190,22 @@ export default function ToysPage() {
                                             </div>
                                         ) : (
                                             <div className="h-full flex items-center justify-center">
-                                                <div className="text-6xl group-hover:scale-110 transition-transform duration-300">🎮</div>
+                                                <div className="text-6xl group-hover:scale-110 transition-transform duration-300 text-gray-400">
+                                                    <ToyBrick size={64} />
+                                                </div>
                                             </div>
                                         )}
-                                        
+
                                         {/* Mode badge */}
                                         <div className="absolute top-4 right-4">
-                                            <span className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm border ${
-                                                toy.mode === "exchange" 
-                                                    ? "bg-blue-500/80 text-blue-100 border-blue-400/50" 
-                                                    : toy.mode === "lend" 
+                                            <span className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm border flex items-center gap-1 ${toy.mode === "exchange"
+                                                ? "bg-blue-500/80 text-blue-100 border-blue-400/50"
+                                                : toy.mode === "lend"
                                                     ? "bg-green-500/80 text-green-100 border-green-400/50"
                                                     : "bg-yellow-500/80 text-yellow-100 border-yellow-400/50"
-                                            }`}>
-                                                {toy.mode === "exchange" ? "🔄" : toy.mode === "lend" ? "🤝" : "💰"}
+                                                }`}>
+                                                {getModeIcon(toy.mode)}
+                                                <span className="text-white hidden sm:inline">{toy.mode === "exchange" ? "Échange" : toy.mode === "lend" ? "Prêt" : "Vente"}</span>
                                             </span>
                                         </div>
                                     </div>
@@ -190,15 +217,15 @@ export default function ToysPage() {
                                                 {toy.title}
                                             </Link>
                                         </h2>
-                                        
+
                                         <p className="text-gray-400 text-sm mb-4 line-clamp-2 leading-relaxed">
                                             {toy.description}
                                         </p>
-                                        
+
                                         {/* Age and condition tags */}
                                         <div className="flex items-center gap-2 mb-4">
                                             <span className="bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full text-xs font-medium border border-purple-500/30 flex items-center gap-1">
-                                                👶 {toy.ageMin}-{toy.ageMax} ans
+                                                <Gem size={12} /> {toy.ageMin}-{toy.ageMax} ans
                                             </span>
                                             <span className={"px-3 py-1 rounded-full text-xs font-medium border flex items-center gap-1 bg-green-500/20 text-green-300 border-green-500/30"}>
                                                 {toy.condition}

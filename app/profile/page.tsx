@@ -4,6 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import ProfileClient from "@/components/ProfileClient";
+import { Frown } from "lucide-react"; // Import a suitable icon
 
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions);
@@ -20,7 +21,9 @@ export default async function ProfilePage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-900 to-slate-900 flex items-center justify-center p-6">
         <div className="bg-red-500/10 backdrop-blur-xl border border-red-500/20 rounded-3xl p-12 text-center max-w-md">
-          <div className="text-8xl mb-6 animate-pulse">😵</div>
+          <div className="text-8xl mb-6 text-red-400 animate-pulse">
+            <Frown size={96} className="mx-auto" />
+          </div>
           <h2 className="text-3xl font-bold text-red-400 mb-4">Profil introuvable</h2>
           <p className="text-red-300">Une erreur s'est produite lors du chargement</p>
         </div>
@@ -28,7 +31,7 @@ export default async function ProfilePage() {
     );
   }
 
-  // Calculer les statistiques
+  // Calculate statistics
   let stats = {
     toysCount: 0,
     exchangesCount: 0,

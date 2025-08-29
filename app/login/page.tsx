@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
+import { Lock, Sparkles, Gamepad2, ToyBrick, Gem, Rocket, Sun, Star, Tent, CheckCircle, Loader2 } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -42,17 +43,27 @@ export default function LoginPage() {
               animationDuration: '8s'
             }}
           >
-            {['🔐', '✨', '🎮', '🧸', '💎', '🚀', '💫', '⭐'][i]}
+            {/* Using Lucide React icons instead of emojis */}
+            {i === 0 && <Lock size={24} />}
+            {i === 1 && <Sparkles size={24} />}
+            {i === 2 && <Gamepad2 size={24} />}
+            {i === 3 && <ToyBrick size={24} />}
+            {i === 4 && <Gem size={24} />}
+            {i === 5 && <Rocket size={24} />}
+            {i === 6 && <Sun size={24} />}
+            {i === 7 && <Star size={24} />}
           </div>
         ))}
       </div>
 
       {/* Login form */}
-      <div className="relative z-10 w-full max-w-lg">
+      <div className="relative z-10 w-full max-w-lg pt-15">
         <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 shadow-2xl">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="text-6xl mb-4">🎪</div>
+            <div className="text-6xl mb-4 text-cyan-400">
+              <Tent size={64} className="mx-auto" />
+            </div>
             <h1 className="text-4xl font-black bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-3">
               Bon retour !
             </h1>
@@ -103,7 +114,7 @@ export default function LoginPage() {
                   </>
                 ) : (
                   <>
-                    🚀 Se connecter
+                    <Rocket size={20} /> Se connecter
                   </>
                 )}
               </span>

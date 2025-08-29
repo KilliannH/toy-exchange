@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { Leaf, Gem, Rocket, Pen, Handshake, Gift, Dice5, Palette, Puzzle, ToyBrick, Train, Dices } from "lucide-react";
 
 export default function HomePage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -40,7 +41,7 @@ export default function HomePage() {
         {[...Array(6)].map((_, i) => (
           <div
             key={i}
-            className="absolute text-4xl opacity-20 animate-float"
+            className="absolute text-4xl opacity-20 animate-float text-white/50"
             style={{
               left: `${20 + (i * 15)}%`,
               top: `${30 + (i * 10)}%`,
@@ -48,7 +49,13 @@ export default function HomePage() {
               animationDuration: '6s'
             }}
           >
-            {['🧸', '🚂', '🎨', '🪀', '🎲', '🧩'][i]}
+            {/* Replacing emojis with Lucide React icons */}
+            {i === 0 && <ToyBrick size={48} />}
+            {i === 1 && <Dices size={48} />}
+            {i === 2 && <Palette size={48} />}
+            {i === 3 && <Train size={48} />}
+            {i === 4 && <Dice5 size={48} />}
+            {i === 5 && <Puzzle size={48} />}
           </div>
         ))}
       </div>
@@ -98,19 +105,19 @@ export default function HomePage() {
           <div className="grid gap-8 md:grid-cols-3">
             {[
               {
-                emoji: "🌱",
+                icon: <Leaf size={48} className="text-green-400" />,
                 title: "Planète préservée",
                 description: "Chaque échange évite la production d'un nouveau jouet et réduit l'empreinte carbone de votre famille.",
                 gradient: "from-green-400 to-emerald-600"
               },
               {
-                emoji: "💎",
+                icon: <Gem size={48} className="text-blue-400" />,
                 title: "Budget maîtrisé",
                 description: "Économisez jusqu'à 80% sur les jouets tout en offrant des expériences variées à vos enfants.",
                 gradient: "from-blue-400 to-cyan-600"
               },
               {
-                emoji: "🚀",
+                icon: <Rocket size={48} className="text-purple-400" />,
                 title: "Réseau parents",
                 description: "Rejoignez une communauté engagée de parents qui partagent vos valeurs de durabilité.",
                 gradient: "from-purple-400 to-pink-600"
@@ -125,7 +132,7 @@ export default function HomePage() {
 
                 <div className="relative">
                   <div className="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300">
-                    {feature.emoji}
+                    {feature.icon}
                   </div>
                   <h3 className={`text-2xl font-bold mb-4 bg-gradient-to-r ${feature.gradient} bg-clip-text text-transparent`}>
                     {feature.title}
@@ -149,18 +156,20 @@ export default function HomePage() {
 
           <div className="grid gap-12 md:gap-8 md:grid-cols-3">
             {[
-              { step: "1", title: "Publiez", desc: "Ajoutez les jouets que vous souhaitez échanger" },
-              { step: "2", title: "Négociez", desc: "Discutez avec d'autres parents pour organiser l'échange" },
-              { step: "3", title: "Échangez", desc: "Rencontrez-vous et réalisez l'échange en toute simplicité" }
+              { step: "1", title: "Publiez", icon: <Pen size={32} />, desc: "Ajoutez les jouets que vous souhaitez échanger" },
+              { step: "2", title: "Négociez", icon: <Handshake size={32} />, desc: "Discutez avec d'autres parents pour organiser l'échange" },
+              { step: "3", title: "Échangez", icon: <Gift size={32} />, desc: "Rencontrez-vous et réalisez l'échange en toute simplicité" }
             ].map((item, i) => (
               <div key={i} className="text-center group">
                 <div className="relative inline-block mb-6">
                   <div className="w-20 h-20 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full flex items-center justify-center text-2xl font-black text-white group-hover:scale-110 transition-transform duration-300 shadow-2xl">
-                    {item.step}
+                    <span className="relative z-10">{item.step}</span>
                   </div>
                   <div className="absolute -inset-2 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full blur-lg opacity-0 group-hover:opacity-50 transition-opacity duration-300" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
+                <h3 className="text-xl font-bold text-white mb-3 flex items-center justify-center gap-2">
+                  {item.icon} {item.title}
+                </h3>
                 <p className="text-gray-400">{item.desc}</p>
               </div>
             ))}
@@ -183,7 +192,9 @@ export default function HomePage() {
               href="/register"
               className="relative overflow-hidden bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 text-white font-bold px-12 py-5 rounded-2xl shadow-2xl hover:scale-110 transition-all duration-300 text-xl block"
             >
-              <span className="relative z-10">Démarrer maintenant ✨</span>
+              <span className="relative z-10 flex items-center gap-2 justify-center">
+                Démarrer maintenant <Rocket size={20} />
+              </span>
               <div className="absolute inset-0 bg-gradient-to-r from-pink-600 via-purple-600 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </Link>
             <div className="absolute -inset-4 bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 rounded-2xl blur-xl opacity-0 group-hover:opacity-40 transition-opacity duration-300 -z-10" />

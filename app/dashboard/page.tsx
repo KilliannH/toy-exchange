@@ -95,10 +95,6 @@ export default function DashboardPage() {
         {/* Editing form */}
         {editingToy && (
           <div className="mb-8 bg-black/20 backdrop-blur-xl border border-purple-500/30 rounded-3xl p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="text-3xl">✏️</div>
-              <h2 className="text-2xl font-bold text-white">Modifier le jouet</h2>
-            </div>
             <EditToyForm toy={editingToy} onClose={() => setEditingToy(null)} />
           </div>
         )}

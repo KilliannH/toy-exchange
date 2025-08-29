@@ -1,4 +1,3 @@
-// components/ProfileClient.tsx
 "use client";
 
 import {
@@ -18,7 +17,13 @@ import {
     Edit,
     TrendingUp,
     CheckCircle,
-    AlertTriangle
+    AlertTriangle,
+    Crown,
+    Award,
+    Heart,
+    Book,
+    Lightbulb,
+    Target
 } from "lucide-react";
 
 interface User {
@@ -39,7 +44,7 @@ interface Stats {
 
 interface Badge {
     name: string;
-    icon: string;
+    icon: JSX.Element;
     earned: boolean;
     description: string;
 }
@@ -51,43 +56,42 @@ interface ProfileClientProps {
 
 export default function ProfileClient({ user, stats }: ProfileClientProps) {
 
-    // Calculer les badges basés sur les stats
     const monthsSinceJoin = stats.memberSince !== "Nouveau" ? parseInt(stats.memberSince) : 0;
 
     const badges: Badge[] = [
         {
             name: "Premier échange",
-            icon: "🥇",
+            icon: <Award className="w-6 h-6" />,
             earned: stats.exchangesCount >= 1,
             description: "Réalisez votre premier échange"
         },
         {
             name: "Généreux",
-            icon: "💝",
+            icon: <Heart className="w-6 h-6" />,
             earned: stats.donationsCount >= 3,
             description: "Donnez 3 jouets"
         },
         {
             name: "Collectionneur",
-            icon: "📚",
+            icon: <Book className="w-6 h-6" />,
             earned: stats.toysCount >= 10,
             description: "Postez 10 jouets"
         },
         {
             name: "Ambassadeur",
-            icon: "🌟",
+            icon: <Star className="w-6 h-6" />,
             earned: stats.exchangesCount >= 20,
             description: "Réalisez 20 échanges"
         },
         {
             name: "Expert",
-            icon: "🎯",
+            icon: <Target className="w-6 h-6" />,
             earned: stats.avgRating >= 4.5,
             description: "Obtenez une note moyenne de 4.5+"
         },
         {
             name: "Vétéran",
-            icon: "👑",
+            icon: <Crown className="w-6 h-6" />,
             earned: monthsSinceJoin >= 12,
             description: "Membre depuis plus d'un an"
         }
@@ -266,7 +270,7 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
                                             }`}
                                         title={badge.description}
                                     >
-                                        <div className="text-2xl mb-1 group-hover:scale-110 transition-transform duration-300">
+                                        <div className="text-2xl mb-1 flex justify-center group-hover:scale-110 transition-transform duration-300">
                                             {badge.icon}
                                         </div>
                                         <div className="text-xs font-medium">{badge.name}</div>
@@ -292,7 +296,7 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
 
                         {/* Quick actions */}
                         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6">
-                            <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                            <h3 className="text-xl font-bold text-white flex items-center gap-2">
                                 <Zap className="w-6 h-6" />
                                 Actions rapides
                             </h3>
@@ -329,11 +333,15 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
                 {/* Achievement banner */}
                 <div className="mt-12 bg-gradient-to-r from-emerald-500/10 via-cyan-500/10 to-purple-500/10 backdrop-blur-xl border border-emerald-500/20 rounded-3xl p-8 text-center">
                     <div className="flex items-center justify-center gap-4 mb-4">
-                        <div className="text-4xl animate-bounce">🎉</div>
+                        <div className="text-4xl text-emerald-400 animate-bounce">
+                          <Trophy size={48} className="mx-auto" />
+                        </div>
                         <h3 className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
                             Membre actif de la communauté !
                         </h3>
-                        <div className="text-4xl animate-bounce" style={{ animationDelay: '0.2s' }}>🎊</div>
+                        <div className="text-4xl text-cyan-400 animate-bounce" style={{ animationDelay: '0.2s' }}>
+                            <CheckCircle size={48} className="mx-auto" />
+                        </div>
                     </div>
                     <p className="text-gray-300 mb-6">
                         Merci de contribuer à un monde plus durable grâce au partage de jouets
@@ -357,7 +365,7 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
                             {stats.exchangesCount >= 20
                                 ? `${Math.max(0, 50 - stats.exchangesCount)} échanges pour "Expert"`
                                 : `${Math.max(0, 20 - stats.exchangesCount)} échanges pour "Ambassadeur"`
-                            } 🌟
+                            } <TrendingUp className="inline-block w-4 h-4 text-gray-400" />
                         </div>
                     </div>
                 </div>
@@ -376,7 +384,7 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
                         </p>
                     </div>
                 </div>
-            </div>
+            </div >
         </div >
     );
 }

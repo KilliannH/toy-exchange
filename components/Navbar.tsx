@@ -3,11 +3,17 @@
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
-import { Home, Package, Plus, BarChart3, LogOut, Menu, User } from "lucide-react";
+import useSWR from "swr";
+import { Home, Package, Plus, BarChart3, LogOut, Menu, User, MessageSquare } from "lucide-react";
+
+const fetcher = (url) => fetch(url).then((res) => res.json());
 
 export default function NavBar() {
   const { data: session } = useSession();
   const [scrolled, setScrolled] = useState(false);
+  
+  const { data: unreadData } = useSWR(session ? '/api/messages/unread' : null, fetcher);
+  const unreadCount = unreadData?.count || 0;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,7 +30,6 @@ export default function NavBar() {
         : 'bg-transparent py-4'
     }`}>
       <div className="mx-auto max-w-7xl px-6 flex items-center justify-between">
-        {/* Logo */}
         <Link 
           href="/" 
           className="text-2xl font-black bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent hover:scale-105 transition-transform duration-300"
@@ -32,7 +37,6 @@ export default function NavBar() {
           ToyExchange
         </Link>
 
-        {/* Navigation Links */}
         <div className="hidden md:flex items-center gap-8">
           <Link 
             href="/" 
@@ -52,20 +56,41 @@ export default function NavBar() {
             <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400 group-hover:w-full transition-all duration-300" />
           </Link>
 
-          {/* Authenticated user links */}
           {session?.user && (
             <>
+              {/* Bouton pour poster un jouet */}
               <Link 
                 href="/post" 
-                className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-2 rounded-full font-semibold hover:scale-105 hover:shadow-lg hover:shadow-green-500/25 transition-all duration-300"
+                className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-2 rounded-full font-semibold hover:scale-105 hover:shadow-lg hover:shadow-green-500/25 transition-all duration-300 flex items-center gap-2"
               >
-                + Poster
+                <Plus size={18} />
+                Poster
               </Link>
               
+              {/* Lien pour les messages avec pastille de notification */}
+              <Link 
+                href="/messages" 
+                className="text-white/80 hover:text-white font-medium hover:scale-105 transition-all duration-200 relative group flex items-center gap-2"
+              >
+                <MessageSquare size={18} />
+                Messages
+                {unreadCount > 0 && (
+                    <>
+                        {/* Pastille clignotante */}
+                        <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white animate-ping" />
+                        {/* Pastille pleine */}
+                        <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
+                    </>
+                )}
+                <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400 group-hover:w-full transition-all duration-300" />
+              </Link>
+
+              {/* Lien pour le dashboard */}
               <Link 
                 href="/dashboard" 
-                className="text-white/80 hover:text-white font-medium hover:scale-105 transition-all duration-200 relative group"
+                className="text-white/80 hover:text-white font-medium hover:scale-105 transition-all duration-200 relative group flex items-center gap-2"
               >
+                <BarChart3 size={18} />
                 Dashboard
                 <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400 group-hover:w-full transition-all duration-300" />
               </Link>
@@ -73,11 +98,9 @@ export default function NavBar() {
           )}
         </div>
 
-        {/* User section */}
         <div className="flex items-center gap-4">
           {session ? (
             <div className="flex items-center gap-4">
-              {/* User info - clickable profile */}
               <a
                 href="/profile"
                 className="hidden sm:flex items-center gap-3 bg-white/10 hover:bg-white/15 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20 transition-all duration-300 hover:scale-105 cursor-pointer group"
@@ -90,7 +113,6 @@ export default function NavBar() {
                 </span>
               </a>
               
-              {/* Logout button */}
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
                 className="group text-white/70 hover:text-red-400 transition-colors duration-200 p-2 hover:bg-white/10 rounded-lg"
@@ -117,7 +139,6 @@ export default function NavBar() {
           )}
         </div>
 
-        {/* Mobile menu button (you can expand this for mobile nav) */}
         <button className="md:hidden text-white p-2">
           <Menu size={24} />
         </button>
