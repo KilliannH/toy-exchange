@@ -5,7 +5,8 @@ import { useState, useEffect, useRef } from "react";
 import useSWR, { mutate } from "swr";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, MessageSquare, Send, Loader2, Frown, ToyBrick, User, Star, CheckCircle } from "lucide-react"; // Ajout de CheckCircle
+import ConfirmationBadge from "@/components/ConfirmationBadge";
+import { ArrowLeft, Send, Loader2, Frown, Star, CheckCircle } from "lucide-react"; // Ajout de CheckCircle
 import Link from "next/link";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
@@ -228,40 +229,47 @@ export default function ConversationPage() {
                         </div>
                     </div>
 
-                    {/* Zone de confirmation (échange ou don) */}
-                    {toy.mode === "EXCHANGE" && exchange && exchange.status === "PENDING" && (
-                        <div className="flex items-center gap-4 bg-black/40 backdrop-blur-lg rounded-2xl border border-white/10 px-4 py-2">
-                            <span className="text-white/80">
-                                Confirmer l’échange
-                            </span>
-                            <button
-                                onClick={async () => {
-                                    const res = await fetch(`/api/exchanges/${exchange.id}/confirm`, {
-                                        method: "PATCH",
-                                    });
-                                    if (res.ok) {
-                                        alert("Échange confirmé !");
-                                        mutate(`/api/conversations/${toyId}/messages?partnerId=${partnerId}`);
-                                    } else {
-                                        const err = await res.json();
-                                        alert("Erreur: " + err.error);
-                                    }
-                                }}
-                                disabled={
-                                    (exchange.requesterId === session?.user?.id && exchange.requesterConfirmed) ||
-                                    (toy.userId === session?.user?.id && exchange.ownerConfirmed)
-                                }
-                                className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-full transition-all disabled:opacity-50"
-                            >
-                                <CheckCircle size={20} />
-                                {(exchange.requesterId === session?.user?.id && exchange.requesterConfirmed) ||
-                                    (toy.userId === session?.user?.id && exchange.ownerConfirmed)
-                                    ? "Vous avez confirmé"
-                                    : "Confirmer"}
-                            </button>
-                        </div>
+                    {/* --- Zone d’actions selon le mode --- */}
+
+                    {/* 1) Mode ÉCHANGE */}
+                    {toy.mode === "EXCHANGE" && exchange && (
+                        <>
+                            {exchange.status === "PENDING" ? (
+                                <div className="flex items-center gap-4 bg-black/40 backdrop-blur-lg rounded-2xl border border-white/10 px-4 py-2">
+                                    <span className="text-white/80">Confirmer l’échange</span>
+                                    <button
+                                        onClick={async () => {
+                                            const res = await fetch(`/api/exchanges/${exchange.id}/confirm`, {
+                                                method: "PATCH",
+                                            });
+                                            if (res.ok) {
+                                                alert("Échange confirmé !");
+                                                mutate(`/api/conversations/${toyId}/messages?partnerId=${partnerId}`);
+                                            } else {
+                                                const err = await res.json();
+                                                alert("Erreur: " + err.error);
+                                            }
+                                        }}
+                                        disabled={
+                                            (exchange.requesterId === session?.user?.id && exchange.requesterConfirmed) ||
+                                            (toy.userId === session?.user?.id && exchange.ownerConfirmed)
+                                        }
+                                        className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-full transition-all disabled:opacity-50"
+                                    >
+                                        <CheckCircle size={20} />
+                                        {(exchange.requesterId === session?.user?.id && exchange.requesterConfirmed) ||
+                                            (toy.userId === session?.user?.id && exchange.ownerConfirmed)
+                                            ? "Vous avez confirmé"
+                                            : "Confirmer"}
+                                    </button>
+                                </div>
+                            ) : exchange.status === "COMPLETED" && (
+                                <ConfirmationBadge label="Échange confirmé" />
+                            )}
+                        </>
                     )}
 
+                    {/* 2) Mode DON */}
                     {toy.mode === "DON" && (
                         <>
                             {isOwner && !isDonated && (
@@ -279,14 +287,40 @@ export default function ConversationPage() {
                                 </button>
                             )}
 
-                            {isDonated && (
-                                <span className="flex items-center gap-2 text-green-400 font-semibold px-4 py-2 rounded-full border border-green-400 bg-green-400/10">
-                                    <CheckCircle size={20} /> Don confirmé
-                                </span>
+                            {isDonated && <ConfirmationBadge label="Don confirmé" />}
+                        </>
+                    )}
+
+                    {/* 3) Mode POINTS */}
+                    {toy.mode === "POINTS" && (
+                        <>
+                            {toy.status === "AVAILABLE" && session?.user?.id !== toy.userId ? (
+                                <button
+                                    onClick={async () => {
+                                        if (!window.confirm(`Confirmer l’achat pour ${toy.pointsCost} points ?`)) return;
+
+                                        const res = await fetch(`/api/toys/${toyId}/buy`, { method: "POST" });
+
+                                        if (res.ok) {
+                                            alert("Achat confirmé 🎉");
+                                            mutate(`/api/conversations/${toyId}/messages?partnerId=${partnerId}`);
+                                        } else {
+                                            const err = await res.json();
+                                            alert("Erreur: " + err.error);
+                                        }
+                                    }}
+                                    className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-full transition-all duration-300 disabled:opacity-50"
+                                >
+                                    <CheckCircle size={20} />
+                                    Confirmer l’achat ({toy.pointsCost} pts)
+                                </button>
+                            ) : toy.status === "EXCHANGED" && (
+                                <ConfirmationBadge label={`Achat confirmé (${toy.pointsCost} pts)`} />
                             )}
                         </>
                     )}
                 </div>
+
 
                 <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-black/20 backdrop-blur-lg rounded-3xl border border-white/10 mb-4">
                     {messages.map((msg, index) => (
@@ -319,7 +353,7 @@ export default function ConversationPage() {
                 {/* Affichage conditionnel du formulaire d'avis */}
                 {showReviewForm && (
                     <div className="mt-4">
-                        <ReviewForm exchangeId={exchange.id} partner={conversationPartner} existingReview={exchange.review} />
+                        <ReviewForm exchangeId={exchange.id} partner={conversationPartner} existingReview={exchange.reviews?.[0]} />
                     </div>
                 )}
 
@@ -327,10 +361,9 @@ export default function ConversationPage() {
                     <div className="flex items-center gap-4">
                         <textarea
                             className="flex-1 bg-white/5 border border-white/10 text-white rounded-2xl px-4 py-2 resize-none"
-                            placeholder={isDonated ? `${
-                                toy.mode === "DON" ? "Le don est confirmé, vous ne pouvez plus envoyer de message." 
-                                : toy.mode === "EXCHANGE" ? "L'échange est confirmé, vous ne pouvez plus envoyer de message." 
-                                : "Le don (points) est confirmé, vous ne pouvez plus envoyer de message."}` : "Écrire un message..."}
+                            placeholder={isDonated ? `${toy.mode === "DON" ? "Le don est confirmé, vous ne pouvez plus envoyer de message."
+                                : toy.mode === "EXCHANGE" ? "L'échange est confirmé, vous ne pouvez plus envoyer de message."
+                                    : "Le don (points) est confirmé, vous ne pouvez plus envoyer de message."}` : "Écrire un message..."}
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
                             onKeyDown={(e) => {

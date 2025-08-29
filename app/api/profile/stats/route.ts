@@ -18,7 +18,7 @@ export async function GET() {
       where: { userId }
     });
 
-    // Compter les échanges actifs (si la table Exchange existe)
+    // Compter les échanges actifs
     let exchangesCount = 0;
     try {
       exchangesCount = await prisma.exchange.count({
@@ -31,11 +31,10 @@ export async function GET() {
         }
       });
     } catch (error) {
-      // Table Exchange n'existe pas encore
-      exchangesCount = Math.floor(Math.random() * 5); // Valeur temporaire
+      exchangesCount = 0;
     }
 
-    // Compter les messages non lus (si la table Message existe)
+    // Compter les messages non lus
     let unreadMessages = 0;
     try {
       unreadMessages = await prisma.message.count({
@@ -45,11 +44,10 @@ export async function GET() {
         }
       });
     } catch (error) {
-      // Table Message n'existe pas encore
-      unreadMessages = Math.floor(Math.random() * 15); // Valeur temporaire
+      unreadMessages = 0;
     }
 
-    // Calculer la note moyenne (si la table Review existe)
+    // Calculer la note moyenne
     let avgRating = 0;
     try {
       const result = await prisma.review.aggregate({
@@ -58,17 +56,16 @@ export async function GET() {
       });
       avgRating = result._avg.rating || 0;
     } catch (error) {
-      // Table Review n'existe pas encore
-      avgRating = 4.2 + Math.random() * 0.8; // Valeur temporaire entre 4.2 et 5.0
+      avgRating = 0;
     }
 
-    // Calculer l'ancienneté du compte
+    // Récupérer l’utilisateur avec createdAt et points
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { createdAt: true }
+      select: { createdAt: true, points: true }
     });
 
-    const monthsSinceJoin = user?.createdAt 
+    const monthsSinceJoin = user?.createdAt
       ? Math.floor((Date.now() - user.createdAt.getTime()) / (1000 * 60 * 60 * 24 * 30))
       : 0;
 
@@ -77,7 +74,8 @@ export async function GET() {
       exchangesCount,
       unreadMessages,
       avgRating: Math.round(avgRating * 10) / 10,
-      memberSince: monthsSinceJoin === 0 ? "Nouveau" : `${monthsSinceJoin} mois`
+      memberSince: monthsSinceJoin === 0 ? "Nouveau" : `${monthsSinceJoin} mois`,
+      points: user?.points || 0
     });
 
   } catch (error) {

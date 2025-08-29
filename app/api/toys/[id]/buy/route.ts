@@ -1,3 +1,4 @@
+// app/api/toys/[id]/buy/route.ts
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -52,7 +53,6 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         toyId: toy.id,
         requesterId: buyerId,
         status: "COMPLETED",
-        mode: "POINTS",
       },
     });
 

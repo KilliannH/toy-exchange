@@ -16,6 +16,7 @@ model User {
   lat       Float?
   lng       Float?
   radiusKm  Int?     @default(10)
+  points    Int?     @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -79,7 +80,7 @@ model Exchange {
   requester   User    @relation("ExchangeRequester", fields: [requesterId], references: [id], onDelete: Cascade)
   toy         Toy     @relation(fields: [toyId], references: [id], onDelete: Cascade)
   proposedToy Toy?    @relation("ProposedToy", fields: [proposedToyId], references: [id])
-  review      Review? // 👈 opposé de Review.exchange
+  reviews      Review[]
 
   @@unique([requesterId, toyId])
 }
@@ -107,7 +108,7 @@ model Review {
   id         String   @id @default(cuid())
   reviewerId String
   revieweeId String
-  exchangeId String   @unique
+  exchangeId String
   rating     Int      @db.SmallInt // 1-5
   comment    String?
   createdAt  DateTime @default(now())
@@ -115,6 +116,8 @@ model Review {
   reviewer User     @relation("ReviewGiver", fields: [reviewerId], references: [id], onDelete: Cascade)
   reviewee User     @relation("ReviewReceiver", fields: [revieweeId], references: [id], onDelete: Cascade)
   exchange Exchange @relation(fields: [exchangeId], references: [id], onDelete: Cascade)
+
+  @@unique([exchangeId, reviewerId])
 }
 
 // Nouveau modèle pour les favoris

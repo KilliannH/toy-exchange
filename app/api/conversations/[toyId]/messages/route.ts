@@ -40,6 +40,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ toyI
       select: {
         id: true,
         title: true,
+        pointsCost: true,
         mode: true,
         status: true,
         userId: true, // Pour savoir qui est le propriétaire du jouet
@@ -58,7 +59,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ toyI
           { requesterId: partnerId },
         ],
       },
-      include: { review: true }, // pour savoir si une review existe déjà
+      include: {
+        reviews: {
+          where: { reviewerId: userId }, // 👈 seulement ma review
+        },
+      },
     });
 
     // Mark messages as read for the current user
@@ -145,47 +150,47 @@ export async function POST(request: Request, { params }: { params: { toyId: stri
 
   try {
     const newMessage = await prisma.message.create({
-  data: {
-    senderId: userId,
-    receiverId,
-    toyId,
-    content,
-    proposedToyId: proposedToyId || null,
-  },
-  include: {
-    sender: { select: { id: true, name: true, email: true } },
-    receiver: { select: { id: true, name: true, email: true } },
-    proposedToy: {
-      select: {
-        id: true,
-        title: true,
-        images: { select: { url: true }, take: 1 },
+      data: {
+        senderId: userId,
+        receiverId,
+        toyId,
+        content,
+        proposedToyId: proposedToyId || null,
       },
-    },
-  },
-});
-
-// 👉 on génère aussi la signed URL à la volée
-let signedUrlMessage = newMessage;
-if (newMessage.proposedToy?.images.length > 0) {
-  const fileName = newMessage.proposedToy.images[0].url;
-  if (fileName) {
-    const [signedUrl] = await bucket.file(fileName).getSignedUrl({
-      version: "v4",
-      action: "read",
-      expires: Date.now() + 15 * 60 * 1000,
+      include: {
+        sender: { select: { id: true, name: true, email: true } },
+        receiver: { select: { id: true, name: true, email: true } },
+        proposedToy: {
+          select: {
+            id: true,
+            title: true,
+            images: { select: { url: true }, take: 1 },
+          },
+        },
+      },
     });
-    signedUrlMessage = {
-      ...newMessage,
-      proposedToy: {
-        ...newMessage.proposedToy,
-        images: [{ url: fileName, signedUrl }],
-      },
-    };
-  }
-}
 
-return NextResponse.json(signedUrlMessage, { status: 201 });
+    // 👉 on génère aussi la signed URL à la volée
+    let signedUrlMessage = newMessage;
+    if (newMessage.proposedToy?.images.length > 0) {
+      const fileName = newMessage.proposedToy.images[0].url;
+      if (fileName) {
+        const [signedUrl] = await bucket.file(fileName).getSignedUrl({
+          version: "v4",
+          action: "read",
+          expires: Date.now() + 15 * 60 * 1000,
+        });
+        signedUrlMessage = {
+          ...newMessage,
+          proposedToy: {
+            ...newMessage.proposedToy,
+            images: [{ url: fileName, signedUrl }],
+          },
+        };
+      }
+    }
+
+    return NextResponse.json(signedUrlMessage, { status: 201 });
   } catch (error) {
     console.error('Error sending message:', error);
     return NextResponse.json({ error: "Failed to send message" }, { status: 500 });

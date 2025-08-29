@@ -32,6 +32,8 @@ export default function DashboardPage() {
   );
   const [editingToy, setEditingToy] = useState<any | null>(null);
 
+  console.log(stats);
+
   async function handleDelete(toyId: string) {
     if (!confirm("Supprimer ce jouet ?")) return;
     const res = await fetch(`/api/toys/${toyId}`, { method: "DELETE" });
@@ -81,14 +83,18 @@ export default function DashboardPage() {
         </div>
 
         {/* Stats cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-12">
           {[
             { label: "Mes jouets", value: stats?.toysCount || toys?.length || 0, icon: <Gamepad2 className="w-8 h-8" />, color: "from-blue-500 to-cyan-500" },
             { label: "Échanges actifs", value: stats?.exchangesCount || 0, icon: <RefreshCw className="w-8 h-8" />, color: "from-green-500 to-emerald-500" },
             { label: "Messages", value: stats?.unreadMessages || 0, icon: <MessageSquare className="w-8 h-8" />, color: "from-purple-500 to-pink-500" },
-            { label: "Note moyenne", value: stats?.avgRating ? stats.avgRating.toFixed(1) : "N/A", icon: <Star className="w-8 h-8" />, color: "from-yellow-500 to-orange-500" }
+            { label: "Note moyenne", value: stats?.avgRating ? stats.avgRating.toFixed(1) : "N/A", icon: <Star className="w-8 h-8" />, color: "from-yellow-500 to-orange-500" },
+            { label: "Mes points", value: stats?.points || session?.user?.points || 0, icon: <BarChart3 className="w-8 h-8" />, color: "from-emerald-500 to-green-500" }
           ].map((stat, i) => (
-            <div key={i} className="group bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:scale-105 transition-all duration-300">
+            <div
+              key={i}
+              className="group bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:scale-105 transition-all duration-300"
+            >
               <div className="text-cyan-400 mb-2 group-hover:scale-110 transition-transform duration-300">{stat.icon}</div>
               <div className={`text-2xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
                 {stat.value}
@@ -208,7 +214,7 @@ export default function DashboardPage() {
             </div>
             {/* Section Mes échanges */}
             <div className="mt-16">
-              <h2 className="text-3xl font-bold text-white mb-8">Mes échanges ({exchanges.length})</h2>
+              <h2 className="text-3xl font-bold text-white mb-8">Mes échanges ({exchanges?.length})</h2>
 
               {exchangesLoading ? (
                 <div className="text-center text-gray-400">Chargement de vos échanges...</div>
@@ -219,7 +225,6 @@ export default function DashboardPage() {
               ) : (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {exchanges.map((ex: any) => (
-                    console.log("xxx", ex),
                     <div
                       key={ex.id}
                       className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition-all duration-300"
@@ -248,8 +253,8 @@ export default function DashboardPage() {
 
                       <Link
                         href={`/messages/${ex.toy.id}?partnerId=${ex.requesterId === session?.user.id
-                            ? ex.toy.user.id   // je suis le demandeur → partenaire = propriétaire du jouet
-                            : ex.requesterId  // je suis le propriétaire → partenaire = demandeur
+                          ? ex.toy.user.id   // je suis le demandeur → partenaire = propriétaire du jouet
+                          : ex.requesterId  // je suis le propriétaire → partenaire = demandeur
                           }`}
                         className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors text-sm"
                       >
