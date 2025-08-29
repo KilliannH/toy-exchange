@@ -202,7 +202,6 @@ export default function ConversationPage() {
     const isOwner = session?.user?.id === toy.userId;
     const isDonated = toy.status === "EXCHANGED";
     const showReviewForm = exchange?.status === 'COMPLETED';
-
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative">
             <div className="absolute inset-0 opacity-20">
@@ -212,37 +211,80 @@ export default function ConversationPage() {
 
             <div className="relative z-10 pt-24 pb-12 px-6 max-w-4xl mx-auto flex flex-col h-screen">
                 <div className="flex items-center justify-between p-4 bg-black/50 backdrop-blur-lg rounded-3xl border border-white/10 mb-4">
+                    {/* Header gauche : retour + partenaire */}
                     <div className="flex items-center gap-4">
-                        <Link href="/messages" className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-all duration-300">
+                        <Link
+                            href="/messages"
+                            className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-all duration-300"
+                        >
                             <ArrowLeft size={24} className="text-white" />
                         </Link>
+
                         <div>
                             <h1 className="text-xl font-bold text-white">
                                 {conversationPartner?.name || conversationPartner?.email?.split('@')[0]}
                             </h1>
-                            <p className="text-sm text-gray-400">
-                                À propos de: {toyTitle}
-                            </p>
+                            <p className="text-sm text-gray-400">À propos de: {toyTitle}</p>
                         </div>
                     </div>
-                    {isOwner && !isDonated && (
-                        <button
-                            onClick={handleConfirmDonation}
-                            disabled={isConfirmingDonation || isDonated}
-                            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {isConfirmingDonation ? (
-                                <Loader2 size={20} className="animate-spin" />
-                            ) : (
+
+                    {/* Zone de confirmation (échange ou don) */}
+                    {toy.mode === "EXCHANGE" && exchange && exchange.status === "PENDING" && (
+                        <div className="flex items-center gap-4 bg-black/40 backdrop-blur-lg rounded-2xl border border-white/10 px-4 py-2">
+                            <span className="text-white/80">
+                                Confirmer l’échange
+                            </span>
+                            <button
+                                onClick={async () => {
+                                    const res = await fetch(`/api/exchanges/${exchange.id}/confirm`, {
+                                        method: "PATCH",
+                                    });
+                                    if (res.ok) {
+                                        alert("Échange confirmé !");
+                                        mutate(`/api/conversations/${toyId}/messages?partnerId=${partnerId}`);
+                                    } else {
+                                        const err = await res.json();
+                                        alert("Erreur: " + err.error);
+                                    }
+                                }}
+                                disabled={
+                                    (exchange.requesterId === session?.user?.id && exchange.requesterConfirmed) ||
+                                    (toy.userId === session?.user?.id && exchange.ownerConfirmed)
+                                }
+                                className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-full transition-all disabled:opacity-50"
+                            >
                                 <CheckCircle size={20} />
-                            )}
-                            Confirmer le don
-                        </button>
+                                {(exchange.requesterId === session?.user?.id && exchange.requesterConfirmed) ||
+                                    (toy.userId === session?.user?.id && exchange.ownerConfirmed)
+                                    ? "Vous avez confirmé"
+                                    : "Confirmer"}
+                            </button>
+                        </div>
                     )}
-                    {isDonated && (
-                        <span className="flex items-center gap-2 text-green-400 font-semibold px-4 py-2 rounded-full border border-green-400 bg-green-400/10">
-                            <CheckCircle size={20} /> Don confirmé
-                        </span>
+
+                    {toy.mode === "DON" && (
+                        <>
+                            {isOwner && !isDonated && (
+                                <button
+                                    onClick={handleConfirmDonation}
+                                    disabled={isConfirmingDonation || isDonated}
+                                    className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {isConfirmingDonation ? (
+                                        <Loader2 size={20} className="animate-spin" />
+                                    ) : (
+                                        <CheckCircle size={20} />
+                                    )}
+                                    Confirmer le don
+                                </button>
+                            )}
+
+                            {isDonated && (
+                                <span className="flex items-center gap-2 text-green-400 font-semibold px-4 py-2 rounded-full border border-green-400 bg-green-400/10">
+                                    <CheckCircle size={20} /> Don confirmé
+                                </span>
+                            )}
+                        </>
                     )}
                 </div>
 
@@ -285,7 +327,10 @@ export default function ConversationPage() {
                     <div className="flex items-center gap-4">
                         <textarea
                             className="flex-1 bg-white/5 border border-white/10 text-white rounded-2xl px-4 py-2 resize-none"
-                            placeholder={isDonated ? "Le don est confirmé, vous ne pouvez plus envoyer de message." : "Écrire un message..."}
+                            placeholder={isDonated ? `${
+                                toy.mode === "DON" ? "Le don est confirmé, vous ne pouvez plus envoyer de message." 
+                                : toy.mode === "EXCHANGE" ? "L'échange est confirmé, vous ne pouvez plus envoyer de message." 
+                                : "La transaction est confirmée, vous ne pouvez plus envoyer de message."}` : "Écrire un message..."}
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
                             onKeyDown={(e) => {

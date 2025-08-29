@@ -40,6 +40,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ toyI
       select: {
         id: true,
         title: true,
+        mode: true,
         status: true,
         userId: true, // Pour savoir qui est le propriétaire du jouet
       },

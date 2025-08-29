@@ -72,6 +72,8 @@ model Exchange {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   completedAt   DateTime?
+  requesterConfirmed Boolean @default(false)
+  ownerConfirmed     Boolean @default(false)
 
   requester   User    @relation("ExchangeRequester", fields: [requesterId], references: [id], onDelete: Cascade)
   toy         Toy     @relation(fields: [toyId], references: [id], onDelete: Cascade)
