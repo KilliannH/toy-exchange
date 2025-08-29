@@ -266,7 +266,7 @@ export default function ConversationPage() {
                     <div ref={messagesEndRef} />
                 </div>
 
-                {/* NOUVELLE PARTIE : Affichage conditionnel du formulaire d'avis */}
+                {/* Affichage conditionnel du formulaire d'avis */}
                 {exchange && (
                   <div className="mt-4">
                     <ReviewForm exchangeId={exchange.id} partner={conversationPartner} existingReview={exchange.review} />

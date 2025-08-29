@@ -6,7 +6,8 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { 
   Heart, MessageSquare, Share2, AlertTriangle, ArrowLeft, RotateCcw, Handshake, Gem, Star, 
-  ThumbsUp, Wrench, Package, Frown, ToyBrick, Send, Loader2, Gift
+  ThumbsUp, Wrench, Package, Frown, ToyBrick, Send, Loader2, Gift,
+  Bolt
 } from "lucide-react";
 import Link from "next/link";
 
@@ -155,11 +156,11 @@ export default function ToyDetailPage() {
 
   const getModeIcon = (mode: string) => {
     switch (mode) {
-      case "exchange":
+      case "EXCHANGE":
         return <RotateCcw size={18} />;
-      case "lend":
-        return <Handshake size={18} />;
-      case "gift":
+      case "POINTS":
+        return <Bolt size={18} />;
+      case "DON":
         return <Gift size={18} />;
       default:
         return null;
@@ -298,13 +299,13 @@ export default function ToyDetailPage() {
                     {toy.title}
                   </h1>
                   <div className="flex items-center gap-3">
-                    <span className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${toy.mode === "exchange"
+                    <span className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${toy.mode === "EXCHANGE"
                       ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
-                      : toy.mode === "lend"
+                      : toy.mode === "POINTS"
                         ? "bg-green-500/20 text-green-300 border border-green-500/30"
                         : "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"
                       }`}>
-                      {getModeIcon(toy.mode)} {toy.mode === "exchange" ? "Échange" : toy.mode === "lend" ? "Prêt" : "Don"}
+                      {getModeIcon(toy.mode)} {toy.mode === "EXCHANGE" ? "Échange" : toy.mode === "POINTS" ? "Points" : "Don"}
                     </span>
                   </div>
                 </div>
