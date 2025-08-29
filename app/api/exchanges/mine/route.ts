@@ -41,7 +41,7 @@ export async function GET() {
             images: { select: { url: true }, take: 1 },
           },
         },
-        review: true,
+        reviews: true,
       },
     });
 

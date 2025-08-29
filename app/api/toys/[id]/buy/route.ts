@@ -33,27 +33,43 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 
   // Transaction : débiter / créditer / update toy
   const result = await prisma.$transaction(async (tx) => {
+    // Débiter l’acheteur
     await tx.user.update({
       where: { id: buyerId },
       data: { points: { decrement: toy.pointsCost } },
     });
 
+    // Créditer le propriétaire
     await tx.user.update({
       where: { id: toy.userId },
-      data: { points: { increment: toy.pointsCost } }, // si tu veux créditer le donateur
+      data: { points: { increment: toy.pointsCost } },
     });
 
+    // Marquer le jouet comme échangé
     await tx.toy.update({
       where: { id: toyId },
       data: { status: "EXCHANGED" },
     });
 
+    // Créer l’exchange en mode POINTS
     const exchange = await tx.exchange.create({
       data: {
         toyId: toy.id,
         requesterId: buyerId,
         status: "COMPLETED",
+        mode: "POINTS",         // 👈 important
+        completedAt: new Date(), // si tu as ce champ
       },
+    });
+
+    // Annuler tous les autres échanges actifs liés à ce jouet
+    await tx.exchange.updateMany({
+      where: {
+        toyId,
+        id: { not: exchange.id },
+        status: { in: ["PENDING", "ACCEPTED"] },
+      },
+      data: { status: "CANCELLED" },
     });
 
     return exchange;

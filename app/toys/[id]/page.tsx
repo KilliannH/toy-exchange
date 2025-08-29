@@ -309,10 +309,10 @@ export default function ToyDetailPage() {
                   <div className="flex items-center gap-3">
                     <span
                       className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${toy.mode === "EXCHANGE"
-                          ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
-                          : toy.mode === "POINTS"
-                            ? "bg-green-500/20 text-green-300 border border-green-500/30"
-                            : "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"
+                        ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                        : toy.mode === "POINTS"
+                          ? "bg-green-500/20 text-green-300 border border-green-500/30"
+                          : "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"
                         }`}
                     >
                       {getModeIcon(toy.mode)}{" "}
@@ -329,6 +329,22 @@ export default function ToyDetailPage() {
                         {toy.pointsCost ?? 0} pts
                       </span>
                     )}
+
+                    {/* Status badge */}
+                    <span
+                      className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${toy.status === "AVAILABLE"
+                          ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                          : toy.status === "RESERVED"
+                            ? "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"
+                            : "bg-red-500/20 text-red-300 border border-red-500/30"
+                        }`}
+                    >
+                      {toy.status === "AVAILABLE"
+                        ? "Disponible"
+                        : toy.status === "RESERVED"
+                          ? "Réservé"
+                          : "Échangé"}
+                    </span>
                   </div>
                 </div>
 

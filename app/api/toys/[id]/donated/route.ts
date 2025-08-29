@@ -6,17 +6,16 @@ import { prisma } from '@/lib/prisma';
 
 export async function PATCH(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { toyId: string } }
 ) {
   const session = await getServerSession(authOptions);
 
-  if (!session || !session.user) {
+  if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const requestParams = await params;
-  const toyId = requestParams.id;
-   const { partnerId } = await request.json();
+  const toyId = params.toyId;
+  const { partnerId } = await request.json();
 
   if (!toyId) {
     return NextResponse.json(
@@ -25,19 +24,17 @@ export async function PATCH(
     );
   }
 
-  const userId = session.user.id;
-
   try {
     const toy = await prisma.toy.findUnique({
       where: { id: toyId },
-      select: { userId: true, status: true },
+      select: { id: true, userId: true, status: true },
     });
 
     if (!toy) {
       return NextResponse.json({ error: "Toy not found" }, { status: 404 });
     }
 
-    if (toy.userId !== userId) {
+    if (toy.userId !== session.user.id) {
       return NextResponse.json(
         { error: "Forbidden: You are not the owner of this toy" },
         { status: 403 }
@@ -51,21 +48,38 @@ export async function PATCH(
       );
     }
 
-    const updatedToy = await prisma.toy.update({
-      where: { id: toyId },
-      data: { status: "EXCHANGED" }, // 👈 mieux d’utiliser ton enum Status plutôt qu’un booléen
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Marquer le jouet comme échangé
+      const updatedToy = await tx.toy.update({
+        where: { id: toyId },
+        data: { status: "EXCHANGED" },
+      });
+
+      // 2. Créer l'exchange associé
+      const exchange = await tx.exchange.create({
+        data: {
+          requesterId: partnerId,
+          toyId: toyId,
+          status: "COMPLETED",
+          mode: "DON",
+          completedAt: new Date(),
+        },
+      });
+
+      // 3. Annuler tous les autres échanges encore actifs liés à ce jouet
+      await tx.exchange.updateMany({
+        where: {
+          toyId,
+          id: { not: exchange.id },
+          status: { in: ["PENDING", "ACCEPTED"] },
+        },
+        data: { status: "CANCELLED" },
+      });
+
+      return { updatedToy, exchange };
     });
 
-    await prisma.exchange.create({
-  data: {
-    requesterId: partnerId, // celui qui reçoit le jouet
-    toyId: toyId,
-    status: "COMPLETED", // ou "ACCEPTED" + set completedAt
-    completedAt: new Date(),
-  }
-});
-
-    return NextResponse.json(updatedToy, { status: 200 });
+    return NextResponse.json(result, { status: 200 });
   } catch (error) {
     console.error("Error confirming donation:", error);
     return NextResponse.json(

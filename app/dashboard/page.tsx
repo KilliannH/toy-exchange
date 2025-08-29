@@ -1,6 +1,6 @@
 "use client";
 
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import Link from "next/link";
 import { useState } from "react";
 import EditToyForm from "@/components/EditToyForm";
@@ -38,7 +38,20 @@ export default function DashboardPage() {
   async function handleDelete(toyId: string) {
     if (!confirm("Supprimer ce jouet ?")) return;
     const res = await fetch(`/api/toys/${toyId}`, { method: "DELETE" });
-    if (!res.ok) toast.error("Erreur lors de la suppression");
+    if (!res.ok) {
+      toast.error("Erreur lors de la suppression");
+    } else {
+      toast.success("Jouet supprimé !");
+      // 1️⃣ re-fetch depuis le serveur
+      // mutate("/api/toys/mine");
+
+      // 2️⃣ ou mise à jour locale optimiste
+      mutate(
+        "/api/toys/mine",
+        (prev: any) => prev?.filter((toy: any) => toy.id !== toyId),
+        false // false = ne refait pas de refetch tout de suite
+      );
+    }
   }
 
   if (error) {

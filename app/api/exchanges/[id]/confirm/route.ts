@@ -29,20 +29,20 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  // on met d'abord à jour la confirmation
+  // Met à jour la confirmation
   const updated = await prisma.exchange.update({
     where: { id: exchangeId },
     data: updateData,
   });
 
-  // puis on re-vérifie les 2 flags
+  // Si les 2 parties ont confirmé
   if (updated.requesterConfirmed && updated.ownerConfirmed && updated.status !== "COMPLETED") {
     await prisma.exchange.update({
       where: { id: exchangeId },
       data: { status: "COMPLETED" },
     });
 
-    // on met à jour le statut des jouets
+    // Marquer les deux jouets comme échangés
     await prisma.toy.update({
       where: { id: exchange.toyId },
       data: { status: "EXCHANGED" },
@@ -50,6 +50,21 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     await prisma.toy.update({
       where: { id: exchange.proposedToyId },
       data: { status: "EXCHANGED" },
+    });
+
+    // ❌ Annuler tous les autres échanges liés à ces jouets
+    await prisma.exchange.updateMany({
+      where: {
+        id: { not: exchangeId },
+        status: { in: ["PENDING", "ACCEPTED"] },
+        OR: [
+          { toyId: exchange.toyId },
+          { toyId: exchange.proposedToyId },
+          { proposedToyId: exchange.toyId },
+          { proposedToyId: exchange.proposedToyId },
+        ],
+      },
+      data: { status: "CANCELLED" },
     });
   }
 
