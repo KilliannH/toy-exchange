@@ -107,7 +107,7 @@ export default function PostToyForm() {
 
   const canProceed = () => {
     switch (currentStep) {
-      case 1: return title.length > 0 && description.length > 10;
+      case 1: return title.length > 0 && description.length > 10 && description.length <= 300;
       case 2: return ageMin >= 0 && ageMax > ageMin;
       case 3: return true; // Category and condition always valid
       case 4: return true; // Images optional
@@ -121,15 +121,6 @@ export default function PostToyForm() {
         case "VERY_GOOD": return <Star size={24} />;
         case "GOOD": return <ThumbsUp size={24} />;
         case "USED": return <Wrench size={24} />;
-        default: return null;
-    }
-  };
-
-  const getModeIcon = (mode: string) => {
-    switch (mode) {
-        case "DON": return <Gift size={24} />;
-        case "EXCHANGE": return <Handshake size={24} />;
-        case "POINTS": return <Bolt size={24} />;
         default: return null;
     }
   };
@@ -240,7 +231,7 @@ export default function PostToyForm() {
                       required
                     />
                     <div className="text-xs text-gray-400 mt-1">
-                      {description.length}/500 caractères
+                      {description.length}/300 caractères
                     </div>
                   </div>
                 </div>
