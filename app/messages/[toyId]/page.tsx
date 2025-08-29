@@ -8,6 +8,8 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import ConfirmationBadge from "@/components/ConfirmationBadge";
 import { ArrowLeft, Send, Loader2, Frown, Star, CheckCircle } from "lucide-react"; // Ajout de CheckCircle
 import Link from "next/link";
+import toast from "react-hot-toast";
+
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -18,7 +20,7 @@ function ReviewForm({ exchangeId, partner, existingReview }) {
 
     const handleSubmit = async () => {
         if (rating === 0) {
-            alert("Veuillez donner une note de 1 à 5 étoiles.");
+            toast.error("Veuillez donner une note de 1 à 5 étoiles.");
             return;
         }
         setIsSubmitting(true);
@@ -27,7 +29,7 @@ function ReviewForm({ exchangeId, partner, existingReview }) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ rating, comment }),
         });
-        alert("Merci pour votre avis !");
+        toast.success("Merci pour votre avis !");
         setIsSubmitting(false);
         mutate(`/api/conversations/${exchangeId}/messages`);
     };
@@ -132,11 +134,11 @@ export default function ConversationPage() {
                 mutate(`/api/conversations/${toyId}/messages?partnerId=${partnerId}`);
             } else {
                 const errorData = await res.json();
-                alert(`Erreur lors de l'envoi du message: ${errorData.error || res.statusText}`);
+                toast.error(`Erreur lors de l'envoi du message: ${errorData.error || res.statusText}`);
             }
         } catch (err) {
             console.error(err);
-            alert("Erreur réseau.");
+            toast.error("Erreur réseau.");
         } finally {
             setIsSending(false);
         }
@@ -158,15 +160,15 @@ export default function ConversationPage() {
             });
 
             if (res.ok) {
-                alert("Don du jouet confirmé avec succès !");
+                toast.success("Don du jouet confirmé avec succès !");
                 mutate(`/api/conversations/${toyId}/messages?partnerId=${partnerId}`);
             } else {
                 const errorData = await res.json();
-                alert(`Erreur lors de la confirmation du don: ${errorData.error || res.statusText}`);
+                toast.error(`Erreur lors de la confirmation du don: ${errorData.error || res.statusText}`);
             }
         } catch (err) {
             console.error(err);
-            alert("Erreur réseau lors de la confirmation du don.");
+            toast.error("Erreur réseau lors de la confirmation du don.");
         } finally {
             setIsConfirmingDonation(false);
         }
@@ -243,11 +245,11 @@ export default function ConversationPage() {
                                                 method: "PATCH",
                                             });
                                             if (res.ok) {
-                                                alert("Échange confirmé !");
+                                                toast.success("Échange confirmé !");
                                                 mutate(`/api/conversations/${toyId}/messages?partnerId=${partnerId}`);
                                             } else {
                                                 const err = await res.json();
-                                                alert("Erreur: " + err.error);
+                                                toast.error("Erreur: " + err.error);
                                             }
                                         }}
                                         disabled={
@@ -302,11 +304,11 @@ export default function ConversationPage() {
                                         const res = await fetch(`/api/toys/${toyId}/buy`, { method: "POST" });
 
                                         if (res.ok) {
-                                            alert("Achat confirmé 🎉");
+                                            toast.success("Achat confirmé 🎉");
                                             mutate(`/api/conversations/${toyId}/messages?partnerId=${partnerId}`);
                                         } else {
                                             const err = await res.json();
-                                            alert("Erreur: " + err.error);
+                                            toast.error("Erreur: " + err.error);
                                         }
                                     }}
                                     className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-full transition-all duration-300 disabled:opacity-50"

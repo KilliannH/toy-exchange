@@ -10,6 +10,7 @@ import {
   Bolt
 } from "lucide-react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -87,12 +88,12 @@ export default function ToyDetailPage() {
   // New function to send a message
   const handleSendMessage = async () => {
     if (!session) {
-      alert("Vous devez être connecté pour envoyer un message.");
+      toast.error("Vous devez être connecté pour envoyer un message.");
       return;
     }
 
     if (!messageContent.trim()) {
-      alert("Le message ne peut pas être vide.");
+      toast.error("Le message ne peut pas être vide.");
       return;
     }
 
@@ -109,15 +110,15 @@ export default function ToyDetailPage() {
       });
 
       if (res.ok) {
-        alert("Message envoyé avec succès!");
+        toast.success("Message envoyé avec succès!");
         setMessageContent("");
         setShowContactForm(false);
       } else {
         const data = await res.json();
-        alert(`Erreur lors de l'envoi du message: ${data.error}`);
+        toast.error(`Erreur lors de l'envoi du message: ${data.error}`);
       }
     } catch (err) {
-      alert("Une erreur inattendue est survenue.");
+      toast.error("Une erreur inattendue est survenue.");
       console.error(err);
     } finally {
       setIsSendingMessage(false);
@@ -448,7 +449,7 @@ export default function ToyDetailPage() {
                     onSubmit={async (e) => {
                       e.preventDefault();
                       if (!selectedToyId) {
-                        alert("Veuillez choisir un jouet à proposer.");
+                        toast.error("Veuillez choisir un jouet à proposer.");
                         return;
                       }
 
@@ -469,12 +470,12 @@ export default function ToyDetailPage() {
 
                       setIsSendingMessage(false);
                       if (res.ok) {
-                        alert("Votre proposition d’échange a été envoyée !");
+                        toast.success("Votre proposition d’échange a été envoyée !");
                         form.reset();
                         setSelectedToyId(null);
                       } else {
                         const err = await res.json();
-                        alert("Erreur : " + err.error);
+                        toast.error("Erreur : " + err.error);
                       }
                     }}
                     className="space-y-4"

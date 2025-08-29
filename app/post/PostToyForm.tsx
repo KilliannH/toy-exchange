@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Sparkles, FileText, Baby, Settings, Camera, Check, X, ArrowLeft, ArrowRight, UploadCloud, Send, PartyPopper, Home, Gauge, Construction, Dices, Car, Book, Gem, Star, ThumbsUp, Wrench, Handshake, Gift, Bolt } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function PostToyForm() {
   const [title, setTitle] = useState("");
@@ -65,14 +66,14 @@ export default function PostToyForm() {
     if (res.ok) {
       setCurrentStep(5); // Success step
       setTimeout(() => {
-        alert("Jouet ajouté avec images !");
+        toast.success("Jouet ajouté avec images !");
         setTitle("");
         setDescription("");
         setFiles([]);
         setCurrentStep(1);
       }, 2500);
     } else {
-      alert("Erreur lors de l'ajout du jouet.");
+      toast.error("Erreur lors de l'ajout du jouet.");
     }
 
     setLoading(false);
@@ -96,7 +97,7 @@ export default function PostToyForm() {
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const droppedFiles = Array.from(e.dataTransfer.files);
       if (droppedFiles.length > 5) {
-        alert("Maximum 5 images par jouet");
+        toast.error("Maximum 5 images par jouet");
         return;
       }
       setFiles(droppedFiles);
@@ -439,7 +440,7 @@ export default function PostToyForm() {
                       onChange={(e) => {
                         const selected = Array.from(e.target.files || []);
                         if (selected.length > 5) {
-                          alert("Maximum 5 images par jouet");
+                          toast.error("Maximum 5 images par jouet");
                           return;
                         }
                         setFiles(selected);

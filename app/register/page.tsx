@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { User, Mail, Lock, CheckCircle, ArrowRight, ArrowLeft, Loader2, Sparkles, Trophy, Gift, Handshake, Gamepad2, Tent, Star } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function RegisterPage() {
     const [name, setName] = useState("");
@@ -23,7 +24,7 @@ export default function RegisterPage() {
         if (res.ok) {
             setStep(3); // Success step
             setTimeout(() => {
-                alert("Compte créé 🎉 vous pouvez maintenant vous connecter");
+                toast.success("Compte créé 🎉 vous pouvez maintenant vous connecter");
                 setName("");
                 setEmail("");
                 setPassword("");
@@ -31,7 +32,7 @@ export default function RegisterPage() {
             }, 2000);
         } else {
             const data = await res.json();
-            alert(data.error || "Erreur lors de l'inscription");
+            toast.error(data.error || "Erreur lors de l'inscription");
         }
 
         setLoading(false);

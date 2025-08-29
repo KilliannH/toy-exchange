@@ -19,6 +19,7 @@ import {
   ChevronRight
 } from "lucide-react";
 import { useSession } from "next-auth/react";
+import toast from "react-hot-toast";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -37,7 +38,7 @@ export default function DashboardPage() {
   async function handleDelete(toyId: string) {
     if (!confirm("Supprimer ce jouet ?")) return;
     const res = await fetch(`/api/toys/${toyId}`, { method: "DELETE" });
-    if (!res.ok) alert("Erreur lors de la suppression");
+    if (!res.ok) toast.error("Erreur lors de la suppression");
   }
 
   if (error) {

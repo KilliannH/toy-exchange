@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { mutate } from "swr";
 import { Pen, FileText, Baby, Camera, UploadCloud, X, Save, Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () => void }) {
     const [title, setTitle] = useState(toy.title);
@@ -58,7 +59,7 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
             mutate("/api/toys/mine");
             onClose();
         } else {
-            alert("Erreur lors de la mise à jour");
+            toast.error("Erreur lors de la mise à jour");
         }
 
         setLoading(false);
@@ -83,7 +84,7 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
             const droppedFiles = Array.from(e.dataTransfer.files);
             const already = toy.images.length - removeImages.length;
             if (droppedFiles.length + already > 5) {
-                alert(`Vous ne pouvez pas dépasser 5 images par jouet (il reste ${5 - already} slot(s))`);
+                toast.error(`Vous ne pouvez pas dépasser 5 images par jouet (il reste ${5 - already} slot(s))`);
                 return;
             }
             setNewFiles(droppedFiles);
@@ -262,7 +263,7 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
                                         const selected = Array.from(e.target.files || []);
                                         const already = toy.images.length - removeImages.length;
                                         if (selected.length + already > 5) {
-                                            alert(`Vous ne pouvez pas dépasser 5 images par jouet (il reste ${5 - already} slot(s))`);
+                                            toast.error(`Vous ne pouvez pas dépasser 5 images par jouet (il reste ${5 - already} slot(s))`);
                                             return;
                                         }
                                         setNewFiles(selected);
