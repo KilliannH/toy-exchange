@@ -15,7 +15,7 @@ export async function GET() {
 
     // Compter les jouets de l'utilisateur
     const toysCount = await prisma.toy.count({
-      where: { userId }
+      where: { userId, status: { not: "ARCHIVED"} }
     });
 
     // Compter les échanges actifs

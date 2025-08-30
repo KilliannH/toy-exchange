@@ -20,7 +20,7 @@ export async function GET() {
   }
 
   const toys = await prisma.toy.findMany({
-    where: { userId: session.user.id },
+    where: { userId: session.user.id, status: { not: "ARCHIVED" } },
     include: { images: true },
     orderBy: { createdAt: "desc" },
   });

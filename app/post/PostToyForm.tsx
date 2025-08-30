@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Sparkles, FileText, Baby, Settings, Camera, Check, X, ArrowLeft, ArrowRight, UploadCloud, Send, PartyPopper, Home, Gauge, Construction, Dices, Car, Book, Gem, Star, ThumbsUp, Wrench, Handshake, Gift, Bolt } from "lucide-react";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export default function PostToyForm() {
   const [title, setTitle] = useState("");
@@ -17,7 +18,8 @@ export default function PostToyForm() {
   const [files, setFiles] = useState<File[]>([]);
   const [currentStep, setCurrentStep] = useState(1);
   const [dragActive, setDragActive] = useState(false);
-  const [pointsCost, setPointsCost] = useState<number>(0);
+  const [pointsCost, setPointsCost] = useState<number>(1);
+  const router = useRouter()
 
   const totalSteps = 4;
   const progressWidth = `${(currentStep / totalSteps) * 100}%`;
@@ -64,14 +66,15 @@ export default function PostToyForm() {
     });
 
     if (res.ok) {
+      const newToy = await res.json();
       setCurrentStep(5); // Success step
       setTimeout(() => {
         toast.success("Jouet ajouté avec images !");
         setTitle("");
         setDescription("");
         setFiles([]);
-        setCurrentStep(1);
-      }, 2500);
+        router.push(`/toys/${newToy.id}`);
+      }, 2000);
     } else {
       toast.error("Erreur lors de l'ajout du jouet.");
     }
@@ -397,6 +400,7 @@ export default function PostToyForm() {
                         <input
                           type="number"
                           min={1}
+                          max={500}
                           value={pointsCost}
                           onChange={(e) => setPointsCost(Number(e.target.value))}
                           placeholder="Ex: 50"

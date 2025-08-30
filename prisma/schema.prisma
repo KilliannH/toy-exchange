@@ -160,6 +160,7 @@ enum Status {
   AVAILABLE
   RESERVED
   EXCHANGED
+  ARCHIVED
 }
 
 // Nouveaux enums

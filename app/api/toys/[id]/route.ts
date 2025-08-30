@@ -22,32 +22,39 @@ export async function DELETE(
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
 
-  const toy = await prisma.toy.findUnique({
-    where: { id: params.id },
-    include: { images: true },
-  });
-
-  if (!toy) {
-    return NextResponse.json({ error: "Jouet introuvable" }, { status: 404 });
+  const toyId = params.id;
+  if (!toyId) {
+    return NextResponse.json({ error: "Toy ID is missing" }, { status: 400 });
   }
 
-  if (toy.userId !== session.user.id) {
-    return NextResponse.json({ error: "Accès interdit" }, { status: 403 });
-  }
+  try {
+    const toy = await prisma.toy.findUnique({
+      where: { id: toyId },
+      select: { userId: true },
+    });
 
-  // 🔥 Supprimer les images dans GCS
-  for (const img of toy.images) {
-    try {
-      await bucket.file(img.url).delete(); // ici `url` = fileName
-    } catch (err) {
-      console.warn(`Erreur suppression image ${img.url}`, err);
+    if (!toy) {
+      return NextResponse.json({ error: "Jouet introuvable" }, { status: 404 });
     }
+
+    if (toy.userId !== session.user.id) {
+      return NextResponse.json({ error: "Accès interdit" }, { status: 403 });
+    }
+
+    // Suppression douce : on met à jour le statut en ARCHIVED
+    await prisma.toy.update({
+      where: { id: toyId },
+      data: { status: "ARCHIVED" },
+    });
+
+    // ⚠️ Pas besoin de supprimer les messages, images, etc.
+    // Car le jouet n'est pas physiquement supprimé.
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error archiving toy:', error);
+    return NextResponse.json({ error: "Failed to archive toy" }, { status: 500 });
   }
-
-  // Supprimer le jouet + ses entrées images en DB
-  await prisma.toy.delete({ where: { id: toy.id } });
-
-  return NextResponse.json({ success: true });
 }
 
 export async function PUT(
@@ -67,17 +74,17 @@ export async function PUT(
   });
 
   const existingCount = await prisma.toyImage.count({
-  where: { toyId: toy.id },
-});
+    where: { toyId: toy.id },
+  });
 
-const spaceLeft = Math.max(0, 5 - existingCount);
+  const spaceLeft = Math.max(0, 5 - existingCount);
 
-if (body.newImages?.length > spaceLeft) {
-  return NextResponse.json(
-    { error: `Maximum 5 images par jouet (vous avez déjà ${existingCount}).` },
-    { status: 400 }
-  );
-}
+  if (body.newImages?.length > spaceLeft) {
+    return NextResponse.json(
+      { error: `Maximum 5 images par jouet (vous avez déjà ${existingCount}).` },
+      { status: 400 }
+    );
+  }
 
   if (!toy) return NextResponse.json({ error: "Introuvable" }, { status: 404 });
   if (toy.userId !== session.user.id) {
@@ -100,13 +107,13 @@ if (body.newImages?.length > spaceLeft) {
 
   // 🔥 ajout d’images en DB
   if (body.newImages?.length) {
-  await prisma.toyImage.createMany({
-    data: body.newImages.slice(0, spaceLeft).map((fileName: string) => ({
-      toyId: toy.id,
-      url: fileName,
-    })),
-  });
-}
+    await prisma.toyImage.createMany({
+      data: body.newImages.slice(0, spaceLeft).map((fileName: string) => ({
+        toyId: toy.id,
+        url: fileName,
+      })),
+    });
+  }
 
   // 🔄 update infos texte
   const updated = await prisma.toy.update({
