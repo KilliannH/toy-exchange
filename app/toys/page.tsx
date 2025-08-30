@@ -43,6 +43,38 @@ export default function ToysPage() {
         keepPreviousData: true,
     });
 
+    // Appelle mutate() au chargement initial
+    useEffect(() => {
+        // Si nous n'avons pas encore de données, on ne fait rien
+        if (!data) return;
+
+        // Récupérer les URLs signées et les autres données de la première page
+        const firstPage = data[0];
+        const toysWithCurrentUrls = firstPage.items.map(toy => {
+            const imagesWithCurrentSignedUrls = toy.images.map(image => ({
+                ...image,
+                signedUrl: image.signedUrl, // Utilisez l'URL signée existante
+            }));
+            return {
+                ...toy,
+                images: imagesWithCurrentSignedUrls,
+            };
+        });
+
+        // Appeler mutate pour mettre à jour localement le cache avec les URLs signées
+        mutate(
+            (prevData) => {
+                if (!prevData) return prevData;
+                return [
+                    { ...prevData[0], items: toysWithCurrentUrls },
+                    ...prevData.slice(1)
+                ];
+            },
+            { revalidate: true } // Vraiment revalider après la mise à jour locale
+        );
+
+    }, []); // S'exécute uniquement au montage
+
     const pages = data || [];
     const toysArray = pages.flatMap(p => p?.items || []);
     const total = pages[0]?.total ?? 0;
@@ -189,19 +221,21 @@ export default function ToysPage() {
 
                 {/* Results count */}
                 <div className="flex items-center justify-between mb-8">
-                    {filteredToys.length &&
+                    {filteredToys.length > 0 &&
                         <p className="text-gray-300">
                             <span className="text-cyan-400 font-bold text-lg">{filteredToys.length}</span> résultat{filteredToys.length !== 1 ? "s" : ""} affiché{filteredToys.length !== 1 ? "s" : ""} sur <span className="text-purple-300">{total}</span>
                         </p>
                     }
-                    <div className="flex gap-2">
-                        <button
-                            className="p-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all duration-300 hover:scale-105"
-                            title="Vue grille"
-                        >
-                            <Grid2X2 size={20} className="text-white" />
-                        </button>
-                    </div>
+                    {filteredToys.length > 0 &&
+                        <div className="flex gap-2">
+                            <button
+                                className="p-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all duration-300 hover:scale-105"
+                                title="Vue grille"
+                            >
+                                <Grid2X2 size={20} className="text-white" />
+                            </button>
+                        </div>
+                    }
                 </div>
 
                 {/* Toys grid */}
