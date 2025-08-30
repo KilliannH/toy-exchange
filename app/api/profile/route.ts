@@ -50,6 +50,8 @@ export async function PATCH(req: NextRequest) {
     data: {
       name: body.name,
       city: body.city,
+      lat: body.lat,
+      lng: body.lng,
       radiusKm: body.radiusKm,
     },
   });

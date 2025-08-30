@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import { Providers } from "./providers";
 import NavBar from "@/components/Navbar";
 import { Toaster } from "react-hot-toast"
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,6 +16,14 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
+      <head>
+        {/* Script pour l'API Google Maps JavaScript */}
+        <Script
+          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.GOOGLE_PLACES_APIKEY}&libraries=places`}
+          strategy="beforeInteractive"
+        />
+        {/* Autres balises meta, link, etc. */}
+      </head>
       <body className={inter.className}>
         <Providers>
           <NavBar />

@@ -28,38 +28,68 @@ const storage = new Storage({
 const bucket = storage.bucket(process.env.GCP_BUCKET_NAME!);
 
 // GET /api/toys : liste avec signed URLs
-export async function GET() {
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
   const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
-    }
+  if (!session?.user) {
+    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  }
 
-  const user = await prisma.user.findUnique({where: {id: session.user.id}});
-  const lat = user.lat;
-  const lng = user.lng;
-  const radiusKm = user.radiusKm;
+  // Params de pagination
+  let limit = parseInt(searchParams.get("limit") || "20", 10);
+  if (!Number.isFinite(limit) || limit <= 0) limit = 20;
+  if (limit > 50) limit = 50;
 
+  let page = parseInt(searchParams.get("page") || "1", 10);
+  if (!Number.isFinite(page) || page <= 0) page = 1;
+
+  // Récup user + coords
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { lat: true, lng: true, radiusKm: true },
+  });
+
+  const userHasGeo =
+    user?.lat != null && user?.lng != null && user?.radiusKm != null;
+
+  // On récupère les jouets triés par fraîcheur (createdAt desc)
+  // (on pourrait réduire avec une bounding box si besoin perf, mais on reste simple)
   const toys = await prisma.toy.findMany({
-    where: { 
+    where: {
       status: "AVAILABLE",
-      lat: { not: null },
-      lng: { not: null },
-     },
+      // si tu veux inclure aussi ceux sans coords quand pas de filtre geo:
+      ...(userHasGeo
+        ? { lat: { not: null }, lng: { not: null } }
+        : {}),
+    },
     include: { images: true, user: true },
     orderBy: { createdAt: "desc" },
   });
 
-  const nearbyToys = toys.filter((toy) => {
-    if (!toy.lat || !toy.lng) return false;
-    const distance = getDistanceFromLatLonInKm(lat, lng, toy.lat, toy.lng);
-    return distance <= radiusKm;
-  });
+  // Filtre géo si l'utilisateur a des coords + radius
+  let filtered = toys;
+  if (userHasGeo) {
+    const { lat, lng, radiusKm } = user!;
+    filtered = toys.filter((toy) => {
+      if (toy.lat == null || toy.lng == null) return false;
+      const distance = getDistanceFromLatLonInKm(lat!, lng!, toy.lat, toy.lng);
+      return distance <= (radiusKm as number);
+    });
+  }
 
-  const toysWithSignedUrls = await Promise.all(
-    nearbyToys.map(async (toy) => {
+  // Pagination en mémoire (simple & efficace pour un volume raisonnable)
+  const total = filtered.length;
+  const start = (page - 1) * limit;
+  const end = start + limit;
+  const slice = filtered.slice(start, end);
+  const hasMore = end < total;
+
+  // Génération des signed URLs uniquement pour la page courante
+  const items = await Promise.all(
+    slice.map(async (toy) => {
       const signedImages = await Promise.all(
         toy.images.map(async (img) => {
-          const file = bucket.file(img.url); // ici `img.url` = fileName
+          const file = bucket.file(img.url); // img.url = fileName
           const [signedUrl] = await file.getSignedUrl({
             version: "v4",
             action: "read",
@@ -72,7 +102,13 @@ export async function GET() {
     })
   );
 
-  return NextResponse.json(toysWithSignedUrls);
+  return NextResponse.json({
+    items,
+    page,
+    limit,
+    total,
+    hasMore,
+  });
 }
 
 // POST /api/toys : créer un jouet
@@ -81,8 +117,17 @@ export async function POST(req: NextRequest) {
   if (!session?.user) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
-  const lat = session.user.lat;
-  const lng = session.user.lng;
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { lat: true, lng: true, radiusKm: true },
+  });
+
+  const userHasGeo =
+    user?.lat != null && user?.lng != null && user?.radiusKm != null;
+  
+  const lat = userHasGeo ? user.lat : null;
+  const lng = userHasGeo ? user.lng : null;
 
   const body = await req.json();
 

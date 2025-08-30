@@ -1,16 +1,91 @@
 "use client";
 
 import Link from "next/link";
-import useSWR from "swr";
-import { useState } from "react";
-import { Search, RotateCcw, Handshake, Gem, ToyBrick, X, ListFilter, Grid2X2, Gift, Bolt } from "lucide-react";
+import useSWR, { mutate } from "swr";
+import { useMemo, useState, useEffect, useRef } from "react";
+import useSWRInfinite from "swr/infinite";
+import { Search, RotateCcw, Gem, ToyBrick, X, ListFilter, Grid2X2, Gift, Bolt, Plus, Sparkles } from "lucide-react";
+
+type ToyImage = { signedUrl?: string; url?: string; offsetYPercentage?: number };
+type Toy = {
+    id: string;
+    title: string;
+    description: string;
+    mode: "EXCHANGE" | "POINTS" | "DON";
+    ageMin?: number;
+    ageMax?: number;
+    condition?: string;
+    images: ToyImage[];
+};
+
+type ToysResponse = {
+    items: Toy[];
+    page: number;
+    limit: number;
+    total: number;
+    hasMore: boolean;
+};
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function ToysPage() {
-    const { data: toys, error, isLoading } = useSWR("/api/toys", fetcher);
-    const [filter, setFilter] = useState("all");
+    const [filter, setFilter] = useState<"all" | "EXCHANGE" | "POINTS" | "DON">("all");
     const [searchTerm, setSearchTerm] = useState("");
+    const limit = 20;
+
+    const getKey = (pageIndex: number, previousPageData: ToysResponse | null) => {
+        if (previousPageData && !previousPageData.hasMore) return null;
+        return `/api/toys?page=${pageIndex + 1}&limit=${limit}`;
+    };
+
+    const { data, error, isLoading, isValidating, setSize } = useSWRInfinite<ToysResponse>(getKey, fetcher, {
+        revalidateFirstPage: false,
+        keepPreviousData: true,
+    });
+
+    const pages = data || [];
+    const toysArray = pages.flatMap(p => p?.items || []);
+    const total = pages[0]?.total ?? 0;
+    const isReachingEnd = !!pages[pages.length - 1] && !pages[pages.length - 1]?.hasMore;
+
+    const loaderRef = useRef<HTMLDivElement | null>(null);
+    useEffect(() => {
+        if (isReachingEnd) return;
+        const el = loaderRef.current;
+        if (!el) return;
+        const io = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && !isValidating) {
+                setSize((s) => s + 1);
+            }
+        }, { rootMargin: "400px" });
+        io.observe(el);
+        return () => io.disconnect();
+    }, [setSize, isReachingEnd, isValidating]);
+
+    const filteredToys = useMemo(() => {
+        const term = searchTerm.trim().toLowerCase();
+        return toysArray.filter((toy) => {
+            const matchesSearch =
+                !term ||
+                toy.title?.toLowerCase().includes(term) ||
+                toy.description?.toLowerCase().includes(term);
+            const matchesFilter = filter === "all" || toy.mode === filter;
+            return matchesSearch && matchesFilter;
+        });
+    }, [toysArray, searchTerm, filter]);
+
+    const getModeIcon = (mode: string) => {
+        switch (mode) {
+            case "EXCHANGE":
+                return <RotateCcw size={14} />;
+            case "POINTS":
+                return <Bolt size={14} />;
+            case "DON":
+                return <Gift size={14} />;
+            default:
+                return null;
+        }
+    };
 
     if (error) {
         return (
@@ -22,7 +97,7 @@ export default function ToysPage() {
                     <h2 className="text-3xl font-bold text-red-400 mb-4">Oups !</h2>
                     <p className="text-red-300">Impossible de charger les jouets</p>
                     <button
-                        onClick={() => window.location.reload()}
+                        onClick={() => mutate()}
                         className="mt-6 bg-red-500/20 hover:bg-red-500/30 text-red-300 px-6 py-3 rounded-xl transition-all duration-300"
                     >
                         Réessayer
@@ -32,7 +107,7 @@ export default function ToysPage() {
         );
     }
 
-    if (isLoading || !toys) {
+    if (isLoading && !data) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
                 <div className="text-center">
@@ -47,26 +122,6 @@ export default function ToysPage() {
             </div>
         );
     }
-
-    const filteredToys = toys.filter((toy: any) => {
-        const matchesSearch = toy.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            toy.description.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesFilter = filter === "all" || toy.mode === filter;
-        return matchesSearch && matchesFilter;
-    });
-
-    const getModeIcon = (mode: string) => {
-        switch (mode) {
-            case "EXCHANGE":
-                return <RotateCcw size={14} />;
-            case "POINTS":
-                return <Bolt size={14} />;
-            case "DON":
-                return <Gift size={14} />;
-            default:
-                return null;
-        }
-    };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative">
@@ -84,7 +139,7 @@ export default function ToysPage() {
                         Galerie des Trésors
                     </h1>
                     <p className="text-xl text-gray-300 font-light max-w-2xl mx-auto">
-                        Découvrez {toys.length} jouets extraordinaires prêts à être échangés
+                        Découvrez {total} jouet{total !== 1 ? "s" : ""} prêt{total !== 1 ? "s" : ""} à être échangé{total !== 1 ? "s" : ""}
                     </p>
                 </div>
 
@@ -100,7 +155,9 @@ export default function ToysPage() {
                                 type="text"
                                 placeholder="Rechercher un jouet..."
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                onChange={(e) => {
+                                    setSearchTerm(e.target.value);
+                                }}
                                 className="w-full bg-white/5 border border-white/20 text-white placeholder-gray-400 pl-14 pr-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-300 group-hover:border-white/30"
                             />
                             <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
@@ -112,11 +169,11 @@ export default function ToysPage() {
                                 { key: "all", label: "Tout", icon: <ListFilter size={18} /> },
                                 { key: "EXCHANGE", label: "Échange", icon: <RotateCcw size={18} /> },
                                 { key: "POINTS", label: "Points", icon: <Bolt size={18} /> },
-                                { key: "DON", label: "Don", icon: <Gift size={18} /> }
+                                { key: "DON", label: "Don", icon: <Gift size={18} /> },
                             ].map((filterOption) => (
                                 <button
                                     key={filterOption.key}
-                                    onClick={() => setFilter(filterOption.key)}
+                                    onClick={() => setFilter(filterOption.key as any)}
                                     className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 flex items-center gap-2 hover:scale-105 ${filter === filterOption.key
                                         ? "bg-gradient-to-r from-cyan-500 to-purple-500 text-white shadow-lg"
                                         : "bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white border border-white/20"
@@ -132,11 +189,16 @@ export default function ToysPage() {
 
                 {/* Results count */}
                 <div className="flex items-center justify-between mb-8">
-                    <p className="text-gray-300">
-                        <span className="text-cyan-400 font-bold text-lg">{filteredToys.length}</span> jouet{filteredToys.length !== 1 ? 's' : ''} trouvé{filteredToys.length !== 1 ? 's' : ''}
-                    </p>
+                    {filteredToys.length &&
+                        <p className="text-gray-300">
+                            <span className="text-cyan-400 font-bold text-lg">{filteredToys.length}</span> résultat{filteredToys.length !== 1 ? "s" : ""} affiché{filteredToys.length !== 1 ? "s" : ""} sur <span className="text-purple-300">{total}</span>
+                        </p>
+                    }
                     <div className="flex gap-2">
-                        <button className="p-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all duration-300 hover:scale-105" title="Vue grille">
+                        <button
+                            className="p-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all duration-300 hover:scale-105"
+                            title="Vue grille"
+                        >
                             <Grid2X2 size={20} className="text-white" />
                         </button>
                     </div>
@@ -154,99 +216,122 @@ export default function ToysPage() {
                         </p>
                     </div>
                 ) : (
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                        {filteredToys.map((toy: any, index: number) => (
-                            <div
-                                key={toy.id}
-                                className="group bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden hover:bg-white/10 hover:border-white/20 hover:scale-105 transition-all duration-500 relative"
-                                style={{ animationDelay: `${index * 50}ms` }}
-                            >
-                                {/* Card glow effect */}
-                                <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 rounded-3xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500" />
+                    <>
+                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                            {filteredToys.map((toy: Toy, index: number) => (
+                                <div
+                                    key={toy.id}
+                                    className="group bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden hover:bg-white/10 hover:border-white/20 hover:scale-105 transition-all duration-500 relative"
+                                    style={{ animationDelay: `${index * 50}ms` }}
+                                >
+                                    {/* Card glow effect */}
+                                    <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 rounded-3xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500" />
 
-                                <div className="relative z-10">
-                                    {/* Image section */}
-                                    <div className="relative h-48 bg-gradient-to-br from-purple-500/20 to-pink-500/20 overflow-hidden">
-                                        {toy.images?.[0] ? (
-                                            <div className="relative h-full">
-                                                <img
-                                                    src={toy.images[0].signedUrl}
-                                                    alt={toy.title}
-                                                    className="h-full w-full group-hover:scale-110 transition-transform duration-500" // `object-cover` removed
-                                                    style={{
-                                                        // Use object-position with the percentage value
-                                                        objectFit: 'cover',
-                                                        objectPosition: `center ${toy.images[0].offsetYPercentage || 0}%`,
-                                                    }}
-                                                />
-                                                {toy.images[1] && (
+                                    <div className="relative z-10">
+                                        {/* Image section */}
+                                        <div className="relative h-48 bg-gradient-to-br from-purple-500/20 to-pink-500/20 overflow-hidden">
+                                            {toy.images?.[0]?.signedUrl ? (
+                                                <div className="relative h-full">
                                                     <img
-                                                        src={toy.images[1].signedUrl}
+                                                        src={toy.images[0].signedUrl as string}
                                                         alt={toy.title}
-                                                        className="absolute inset-0 h-full w-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                                                        className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                                        style={{
+                                                            objectFit: "cover",
+                                                            objectPosition: `center ${toy.images[0].offsetYPercentage || 0}%`,
+                                                        }}
                                                     />
-                                                )}
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                                            </div>
-                                        ) : (
-                                            <div className="h-full flex items-center justify-center">
-                                                <div className="text-6xl group-hover:scale-110 transition-transform duration-300 text-gray-400">
-                                                    <ToyBrick size={64} />
+                                                    {toy.images[1]?.signedUrl && (
+                                                        <img
+                                                            src={toy.images[1].signedUrl as string}
+                                                            alt={toy.title}
+                                                            className="absolute inset-0 h-full w-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                                                        />
+                                                    )}
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                                 </div>
+                                            ) : (
+                                                <div className="h-full flex items-center justify-center">
+                                                    <div className="text-6xl group-hover:scale-110 transition-transform duration-300 text-gray-400">
+                                                        <ToyBrick size={64} />
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Mode badge */}
+                                            <div className="absolute top-4 right-4">
+                                                <span
+                                                    className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm border flex items-center gap-1 ${toy.mode === "EXCHANGE"
+                                                        ? "bg-blue-500/80 text-blue-100 border-blue-400/50"
+                                                        : toy.mode === "POINTS"
+                                                            ? "bg-green-500/80 text-green-100 border-green-400/50"
+                                                            : "bg-yellow-500/80 text-yellow-100 border-yellow-400/50"
+                                                        }`}
+                                                >
+                                                    {getModeIcon(toy.mode)}
+                                                    <span className="text-white hidden sm:inline">
+                                                        {toy.mode === "EXCHANGE" ? "Échange" : toy.mode === "POINTS" ? "Points" : "Don"}
+                                                    </span>
+                                                </span>
                                             </div>
-                                        )}
-
-                                        {/* Mode badge */}
-                                        <div className="absolute top-4 right-4">
-                                            <span className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm border flex items-center gap-1 ${toy.mode === "EXCHANGE"
-                                                ? "bg-blue-500/80 text-blue-100 border-blue-400/50"
-                                                : toy.mode === "POINTS"
-                                                    ? "bg-green-500/80 text-green-100 border-green-400/50"
-                                                    : "bg-yellow-500/80 text-yellow-100 border-yellow-400/50"
-                                                }`}>
-                                                {getModeIcon(toy.mode)}
-                                                <span className="text-white hidden sm:inline">{toy.mode === "EXCHANGE" ? "Échange" : toy.mode === "POINTS" ? "Points" : "Don"}</span>
-                                            </span>
                                         </div>
-                                    </div>
 
-                                    {/* Content */}
-                                    <div className="p-6">
-                                        <h2 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-300 transition-colors duration-300 line-clamp-2">
-                                            <Link href={`/toys/${toy.id}`} className="hover:underline">
-                                                {toy.title}
+                                        {/* Content */}
+                                        <div className="p-6">
+                                            <h2 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-300 transition-colors duration-300 line-clamp-2">
+                                                <Link href={`/toys/${toy.id}`} className="hover:underline">
+                                                    {toy.title}
+                                                </Link>
+                                            </h2>
+
+                                            <p className="text-gray-400 text-sm mb-4 line-clamp-2 leading-relaxed">
+                                                {toy.description}
+                                            </p>
+
+                                            {/* Age and condition tags */}
+                                            <div className="flex items-center gap-2 mb-4">
+                                                {(toy.ageMin != null || toy.ageMax != null) && (
+                                                    <span className="bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full text-xs font-medium border border-purple-500/30 flex items-center gap-1">
+                                                        <Gem size={12} /> {toy.ageMin ?? "?"}-{toy.ageMax ?? "?"} ans
+                                                    </span>
+                                                )}
+                                                {toy.condition && (
+                                                    <span className={"px-3 py-1 rounded-full text-xs font-medium border flex items-center gap-1 bg-green-500/20 text-green-300 border-green-500/30"}>
+                                                        {toy.condition}
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            {/* Action button */}
+                                            <Link
+                                                href={`/toys/${toy.id}`}
+                                                className="group/btn w-full bg-gradient-to-r from-cyan-600 to-purple-600 text-white font-semibold px-6 py-3 rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-cyan-500/25 flex items-center justify-center gap-2"
+                                            >
+                                                <span>Voir les détails</span>
+                                                <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                                </svg>
                                             </Link>
-                                        </h2>
-
-                                        <p className="text-gray-400 text-sm mb-4 line-clamp-2 leading-relaxed">
-                                            {toy.description}
-                                        </p>
-
-                                        {/* Age and condition tags */}
-                                        <div className="flex items-center gap-2 mb-4">
-                                            <span className="bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full text-xs font-medium border border-purple-500/30 flex items-center gap-1">
-                                                <Gem size={12} /> {toy.ageMin}-{toy.ageMax} ans
-                                            </span>
-                                            <span className={"px-3 py-1 rounded-full text-xs font-medium border flex items-center gap-1 bg-green-500/20 text-green-300 border-green-500/30"}>
-                                                {toy.condition}
-                                            </span>
                                         </div>
-
-                                        {/* Action button */}
-                                        <Link
-                                            href={`/toys/${toy.id}`}
-                                            className="group/btn w-full bg-gradient-to-r from-cyan-600 to-purple-600 text-white font-semibold px-6 py-3 rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-cyan-500/25 flex items-center justify-center gap-2"
-                                        >
-                                            <span>Voir les détails</span>
-                                            <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                            </svg>
-                                        </Link>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+
+                        {/* Sentinel Infinite Scroll */}
+                        <div ref={loaderRef} className="flex items-center justify-center py-8">
+                            {!isReachingEnd && (
+                                <div className="w-8 h-8 border-4 border-purple-400 border-t-transparent rounded-full animate-spin" />
+                            )}
+                            {isReachingEnd && (
+                                <p className="text-gray-400 text-sm flex items-center gap-2">
+                                    <Sparkles className="w-4 h-4 text-purple-400" />
+                                    Tu es arrivé au bout de la liste
+                                    <Sparkles className="w-4 h-4 text-purple-400" />
+                                </p>
+                            )}
+                        </div>
+                    </>
                 )}
             </div>
 
@@ -265,13 +350,13 @@ export default function ToysPage() {
 
             {/* Custom styles */}
             <style jsx>{`
-                .line-clamp-2 {
-                    display: -webkit-box;
-                    -webkit-line-clamp: 2;
-                    -webkit-box-orient: vertical;
-                    overflow: hidden;
-                }
-            `}</style>
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+      `}</style>
         </div>
     );
 }

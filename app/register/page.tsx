@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { User, Mail, Lock, CheckCircle, ArrowRight, ArrowLeft, Loader2, Sparkles, Trophy, Gift, Handshake, Gamepad2, Tent, Star } from "lucide-react";
 import toast from "react-hot-toast";
+import usePlacesAutocomplete, { getGeocode, getLatLng } from "use-places-autocomplete";
+import { Combobox } from "@headlessui/react";
 
 export default function RegisterPage() {
     const [name, setName] = useState("");
@@ -11,6 +13,38 @@ export default function RegisterPage() {
     const [loading, setLoading] = useState(false);
     const [step, setStep] = useState(1);
 
+    const [city, setCity] = useState("");
+    const [lat, setLat] = useState<number | null>(null);
+    const [lng, setLng] = useState<number | null>(null);
+
+    const {
+        ready,
+        value,
+        suggestions: { status, data },
+        setValue,
+        clearSuggestions,
+    } = usePlacesAutocomplete({
+        requestOptions: {
+            types: ["(cities)"],
+            componentRestrictions: { country: "fr" },
+        },
+    });
+
+    const handleSelect = async (address: string) => {
+        setValue(address, false);
+        setCity(address);
+        clearSuggestions();
+        try {
+            const results = await getGeocode({ address });
+            const { lat, lng } = getLatLng(results[0]);
+            setLat(lat);
+            setLng(lng);
+        } catch (error) {
+            console.error("Erreur lors de la récupération des coordonnées :", error);
+            toast.error("Ville non trouvée. Veuillez réessayer.");
+        }
+    };
+
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setLoading(true);
@@ -18,16 +52,19 @@ export default function RegisterPage() {
         const res = await fetch("/api/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, email, password }),
+            body: JSON.stringify({ name, email, password, city, lat, lng }),
         });
 
         if (res.ok) {
-            setStep(3); // Success step
+            setStep(3);
             setTimeout(() => {
                 toast.success("Compte créé 🎉 vous pouvez maintenant vous connecter");
                 setName("");
                 setEmail("");
                 setPassword("");
+                setCity("");
+                setLat(null);
+                setLng(null);
                 setStep(1);
             }, 2000);
         } else {
@@ -40,10 +77,10 @@ export default function RegisterPage() {
 
     const progressWidth = step === 1 ? "33%" : step === 2 ? "66%" : "100%";
 
-    const passwordStrength = 
+    const passwordStrength =
         password.length < 4 ? '🔴 Faible' :
-        password.length < 6 ? '🟡 Moyen' :
-        password.length < 8 ? '🟢 Bon' : '💪 Excellent';
+            password.length < 6 ? '🟡 Moyen' :
+                password.length < 8 ? '🟢 Bon' : '💪 Excellent';
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative flex items-center justify-center p-6">
@@ -67,7 +104,6 @@ export default function RegisterPage() {
                             animationDuration: `${6 + (i % 3)}s`
                         }}
                     >
-                        {/* Using Lucide React icons instead of emojis */}
                         {i === 0 && <CheckCircle className="text-emerald-400" />}
                         {i === 1 && <Sparkles className="text-cyan-400" />}
                         {i === 2 && <Trophy className="text-purple-400" />}
@@ -89,7 +125,7 @@ export default function RegisterPage() {
                 <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
                     {/* Progress bar */}
                     <div className="h-1 bg-white/10">
-                        <div 
+                        <div
                             className="h-full bg-gradient-to-r from-emerald-400 to-cyan-500 transition-all duration-700 ease-out"
                             style={{ width: progressWidth }}
                         />
@@ -114,17 +150,15 @@ export default function RegisterPage() {
                                 {/* Step indicators */}
                                 <div className="flex justify-center gap-3 mb-8">
                                     {[1, 2].map((stepNum) => (
-                                        <div 
+                                        <div
                                             key={stepNum}
-                                            className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${
-                                                step >= stepNum 
-                                                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' 
+                                            className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${step >= stepNum
+                                                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                                                     : 'bg-white/5 text-gray-400 border border-white/10'
-                                            }`}
+                                                }`}
                                         >
-                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
-                                                step >= stepNum ? 'bg-emerald-500' : 'bg-white/20'
-                                            }`}>
+                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${step >= stepNum ? 'bg-emerald-500' : 'bg-white/20'
+                                                }`}>
                                                 {stepNum}
                                             </div>
                                             <span className="text-sm font-medium">
@@ -153,6 +187,38 @@ export default function RegisterPage() {
                                                 <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
                                             </div>
 
+                                            {/* City Combobox */}
+                                            <div className="relative group">
+                                                <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                                                    <Tent size={16} /> Votre ville
+                                                </label>
+                                                <Combobox value={city} onChange={handleSelect}>
+                                                    <Combobox.Input
+                                                        as="input"
+                                                        className="w-full bg-white/5 border border-white/20 text-white placeholder-gray-400 px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all duration-300 group-hover:border-white/30"
+                                                        displayValue={(city: string) => city}
+                                                        onChange={(event) => setValue(event.target.value)}
+                                                        placeholder="Rechercher une ville..."
+                                                        disabled={!ready}
+                                                    />
+                                                    <Combobox.Options className="absolute mt-2 z-10 w-full rounded-2xl bg-black/80 backdrop-blur-lg border border-white/20 text-white shadow-lg max-h-60 overflow-y-auto">
+                                                        {status === "OK" && data.map(({ place_id, description }) => (
+                                                            <Combobox.Option
+                                                                key={place_id}
+                                                                value={description}
+                                                                className="p-3 cursor-pointer rounded-xl hover:bg-white/10 transition-colors"
+                                                            >
+                                                                {description}
+                                                            </Combobox.Option>
+                                                        ))}
+                                                        {status === "OK" && data.length === 0 && (
+                                                            <p className="p-3 text-gray-400">Aucun résultat</p>
+                                                        )}
+                                                    </Combobox.Options>
+                                                </Combobox>
+                                                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                                            </div>
+
                                             {/* Email field */}
                                             <div className="relative group">
                                                 <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
@@ -169,10 +235,10 @@ export default function RegisterPage() {
                                                 <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
                                             </div>
 
-                                            <button 
-                                                onClick={() => name && email ? setStep(2) : null}
+                                            <button
+                                                onClick={() => name && email && city ? setStep(2) : null}
                                                 className="w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold px-6 py-4 rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-emerald-500/25 disabled:opacity-50 disabled:hover:scale-100"
-                                                disabled={!name || !email}
+                                                disabled={!name || !email || !city}
                                             >
                                                 Suivant <ArrowRight size={16} className="inline-block ml-1" />
                                             </button>
@@ -202,13 +268,12 @@ export default function RegisterPage() {
                                             <div className="space-y-2">
                                                 <div className="flex gap-1">
                                                     {[...Array(4)].map((_, i) => (
-                                                        <div 
+                                                        <div
                                                             key={i}
-                                                            className={`flex-1 h-2 rounded-full transition-all duration-300 ${
-                                                                password.length > i * 2 
-                                                                    ? 'bg-gradient-to-r from-emerald-400 to-cyan-400' 
+                                                            className={`flex-1 h-2 rounded-full transition-all duration-300 ${password.length > i * 2
+                                                                    ? 'bg-gradient-to-r from-emerald-400 to-cyan-400'
                                                                     : 'bg-white/10'
-                                                            }`}
+                                                                }`}
                                                         />
                                                     ))}
                                                 </div>
@@ -218,14 +283,14 @@ export default function RegisterPage() {
                                             </div>
 
                                             <div className="flex gap-3">
-                                                <button 
+                                                <button
                                                     onClick={() => setStep(1)}
                                                     className="flex-1 bg-white/10 border border-white/20 text-white font-semibold px-6 py-4 rounded-2xl hover:bg-white/15 transition-all duration-300"
                                                 >
                                                     <ArrowLeft size={16} className="inline-block mr-1" /> Retour
                                                 </button>
-                                                
-                                                <button 
+
+                                                <button
                                                     onClick={handleSubmit}
                                                     disabled={loading || password.length < 8}
                                                     className="group relative overflow-hidden flex-2 bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold px-6 py-4 rounded-2xl shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100"

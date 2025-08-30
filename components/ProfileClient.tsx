@@ -132,7 +132,7 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
         setIsDeleting(true);
         
         try {
-            const response = await fetch("/api/user/delete", {
+            const response = await fetch("/api/users/delete", {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",

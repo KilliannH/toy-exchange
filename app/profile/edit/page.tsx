@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { ArrowLeft, Edit, Check, User, MapPin, Search, Lightbulb, Target, Home, Ruler, ShieldCheck, Save, Loader2 } from "lucide-react";
+import usePlacesAutocomplete, { getGeocode, getLatLng } from "use-places-autocomplete";
+import { Combobox } from "@headlessui/react";
+import toast from "react-hot-toast";
 
 export default function EditProfilePage() {
     const [name, setName] = useState("");
@@ -10,6 +13,23 @@ export default function EditProfilePage() {
     const [loading, setLoading] = useState(false);
     const [initialLoading, setInitialLoading] = useState(true);
     const [saved, setSaved] = useState(false);
+    const [lat, setLat] = useState<number | null>(null);
+    const [lng, setLng] = useState<number | null>(null);
+
+    // Google Places Autocomplete hook
+    const {
+        ready,
+        value,
+        suggestions: { status, data },
+        setValue,
+        clearSuggestions,
+    } = usePlacesAutocomplete({
+        requestOptions: {
+            types: ["(cities)"],
+            componentRestrictions: { country: "fr" },
+        },
+        debounce: 300, // Ajoute un petit délai pour éviter des appels API trop fréquents
+    });
 
     useEffect(() => {
         fetch("/api/profile")
@@ -18,9 +38,28 @@ export default function EditProfilePage() {
                 setName(data.name || "");
                 setCity(data.city || "");
                 setRadiusKm(data.radiusKm || 10);
+                setLat(data.lat || null);
+                setLng(data.lng || null);
                 setInitialLoading(false);
+                // Mettre à jour l'input de la Combobox avec la ville par défaut
+                setValue(data.city || ""); 
             });
-    }, []);
+    }, [setValue]);
+
+    const handleSelect = async (address: string) => {
+        setValue(address, false);
+        setCity(address);
+        clearSuggestions();
+        try {
+            const results = await getGeocode({ address });
+            const { lat, lng } = getLatLng(results[0]);
+            setLat(lat);
+            setLng(lng);
+        } catch (error) {
+            console.error("Erreur lors de la récupération des coordonnées :", error);
+            toast.error("Ville non trouvée. Veuillez réessayer.");
+        }
+    };
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -29,7 +68,7 @@ export default function EditProfilePage() {
         await fetch("/api/profile", {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, city, radiusKm }),
+            body: JSON.stringify({ name, city, radiusKm, lat, lng }),
         });
         
         setSaved(true);
@@ -111,19 +150,40 @@ export default function EditProfilePage() {
                                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
                             </div>
 
-                            {/* City field */}
+                            {/* City Combobox */}
                             <div className="relative group">
-                                <label className="block text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
-                                    <Home className="w-5 h-5 text-gray-400" />
-                                    Ville
+                                <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                                    <Home className="w-5 h-5 text-gray-400" /> Ville
                                 </label>
-                                <input
-                                    type="text"
-                                    placeholder="Dans quelle ville habitez-vous ?"
-                                    value={city}
-                                    onChange={(e) => setCity(e.target.value)}
-                                    className="w-full bg-white/5 border border-white/20 text-white placeholder-gray-400 px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-300 group-hover:border-white/30"
-                                />
+                                <Combobox value={city} onChange={handleSelect}>
+                                    <Combobox.Input
+                                        as="input"
+                                        className="w-full bg-white/5 border border-white/20 text-white placeholder-gray-400 px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-300 group-hover:border-white/30"
+                                        displayValue={(city: string) => city}
+                                        onChange={(event) => {
+                                            setValue(event.target.value);
+                                            setCity(event.target.value);
+                                            setLat(null);
+                                            setLng(null);
+                                        }}
+                                        placeholder="Rechercher une ville..."
+                                        disabled={!ready}
+                                    />
+                                    <Combobox.Options className="absolute mt-2 z-10 w-full rounded-2xl bg-black/80 backdrop-blur-lg border border-white/20 text-white shadow-lg max-h-60 overflow-y-auto">
+                                        {status === "OK" && data.map(({ place_id, description }) => (
+                                            <Combobox.Option
+                                                key={place_id}
+                                                value={description}
+                                                className="p-3 cursor-pointer rounded-xl hover:bg-white/10 transition-colors"
+                                            >
+                                                {description}
+                                            </Combobox.Option>
+                                        ))}
+                                        {status === "OK" && data.length === 0 && (
+                                            <p className="p-3 text-gray-400">Aucun résultat</p>
+                                        )}
+                                    </Combobox.Options>
+                                </Combobox>
                                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
                             </div>
 
@@ -161,7 +221,7 @@ export default function EditProfilePage() {
                             {/* Save button */}
                             <button 
                                 onClick={handleSubmit}
-                                disabled={loading}
+                                disabled={loading || !name || !city}
                                 className="group relative overflow-hidden w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold px-6 py-5 rounded-2xl shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100"
                             >
                                 <span className="relative z-10 flex items-center justify-center gap-3 text-lg">
