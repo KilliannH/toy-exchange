@@ -42,6 +42,8 @@ export async function GET() {
       },
     });
 
+    // TODO -- bug quand on supprime un jouet, ça ne supprime pas les messages liés à ce jouet. ça devrait
+
     if (messages.length === 0) {
       console.log("⚠️ Aucun message trouvé pour cet utilisateur");
       return NextResponse.json([]);

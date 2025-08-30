@@ -35,14 +35,14 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     data: updateData,
   });
 
-  // Si les 2 parties ont confirmé
+  // If both parties have confirmed
   if (updated.requesterConfirmed && updated.ownerConfirmed && updated.status !== "COMPLETED") {
     await prisma.exchange.update({
       where: { id: exchangeId },
       data: { status: "COMPLETED" },
     });
 
-    // Marquer les deux jouets comme échangés
+    // Mark the two toys as exchanged
     await prisma.toy.update({
       where: { id: exchange.toyId },
       data: { status: "EXCHANGED" },
@@ -52,7 +52,18 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       data: { status: "EXCHANGED" },
     });
 
-    // ❌ Annuler tous les autres échanges liés à ces jouets
+    // gamification give +10 points to both users
+    // We use `increment` to safely add points without race conditions
+    await prisma.user.update({
+      where: { id: updated.requesterId },
+      data: { points: { increment: 10 } },
+    });
+    await prisma.user.update({
+      where: { id: exchange.toy.userId },
+      data: { points: { increment: 10 } },
+    });
+
+    // Cancel all other exchanges related to these toys
     await prisma.exchange.updateMany({
       where: {
         id: { not: exchangeId },

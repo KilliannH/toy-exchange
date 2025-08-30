@@ -12,7 +12,6 @@ const fetcher = (url: string) => fetch(url).then((r) => r.json());
 export default function MessagesPage() {
     const { data: session } = useSession();
     const { data: conversations, error, isLoading } = useSWR(session ? "/api/conversations" : null, fetcher);
-
     if (!session) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-6">

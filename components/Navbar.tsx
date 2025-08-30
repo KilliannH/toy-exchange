@@ -5,15 +5,23 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import useSWR from "swr";
 import { Home, Package, Plus, BarChart3, LogOut, Menu, User, MessageSquare } from "lucide-react";
+import { useRouter } from 'next/navigation';
 
 const fetcher = (url) => fetch(url).then((res) => res.json());
 
 export default function NavBar() {
   const { data: session } = useSession();
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   
   const { data: unreadData } = useSWR(session ? '/api/messages/unread' : null, fetcher);
   const unreadCount = unreadData?.count || 0;
+
+  const handleSignOut = async () => {
+    // Call signOut, then force a hard refresh to clear all state
+    await signOut({ redirect: false }); // Prevents NextAuth from doing its own redirect
+    router.push('/'); // Manually push to the homepage
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -101,7 +109,7 @@ export default function NavBar() {
         <div className="flex items-center gap-4">
           {session ? (
             <div className="flex items-center gap-4">
-              <a
+              <Link
                 href="/profile"
                 className="hidden sm:flex items-center gap-3 bg-white/10 hover:bg-white/15 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20 transition-all duration-300 hover:scale-105 cursor-pointer group"
               >
@@ -111,10 +119,10 @@ export default function NavBar() {
                 <span className="text-white font-medium text-sm group-hover:text-cyan-300 transition-colors duration-300">
                   {session.user?.name || session.user?.email?.split('@')[0]}
                 </span>
-              </a>
+              </Link>
               
               <button
-                onClick={() => signOut({ callbackUrl: "/" })}
+                onClick={handleSignOut}
                 className="group text-white/70 hover:text-red-400 transition-colors duration-200 p-2 hover:bg-white/10 rounded-lg"
                 title="Se déconnecter"
               >

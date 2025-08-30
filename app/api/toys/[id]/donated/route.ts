@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma';
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { toyId: string } }
+  { params }: { params: { id: string } }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -14,7 +14,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const toyId = params.toyId;
+  const toyId = params.id;
   const { partnerId } = await request.json();
 
   if (!toyId) {
@@ -61,7 +61,6 @@ export async function PATCH(
           requesterId: partnerId,
           toyId: toyId,
           status: "COMPLETED",
-          mode: "DON",
           completedAt: new Date(),
         },
       });
@@ -75,6 +74,12 @@ export async function PATCH(
         },
         data: { status: "CANCELLED" },
       });
+
+      // 4. Augmenter le donnateur de +10 points
+      await prisma.user.update({
+      where: { id: toy.userId },
+      data: { points: { increment: 10 } },
+    });
 
       return { updatedToy, exchange };
     });
