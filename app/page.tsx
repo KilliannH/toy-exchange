@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -184,7 +184,7 @@ export default function HomePage() {
             Rejoignez la révolution du partage
           </h2>
           <p className="text-xl text-gray-300 mb-10 font-light">
-            Commencez aujourd’hui à échanger vos jouets et découvrez de nouveaux trésors pour vos enfants
+            Commencez aujourd'hui à échanger vos jouets et découvrez de nouveaux trésors pour vos enfants
           </p>
 
           <div className="relative inline-block group">
@@ -201,6 +201,69 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="relative z-10 bg-black/30 backdrop-blur-md border-t border-white/10 py-12 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid gap-8 md:grid-cols-4">
+            {/* Logo et description */}
+            <div className="md:col-span-2">
+              <Link href="/" className="inline-block mb-4">
+                <span className="text-2xl font-black bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                  ToyExchange
+                </span>
+              </Link>
+              <p className="text-gray-400 max-w-md leading-relaxed">
+                La plateforme qui révolutionne l'échange de jouets entre parents. 
+                Moins de gaspillage, plus de partage, pour un avenir durable.
+              </p>
+            </div>
+
+            {/* Liens rapides */}
+            <div>
+              <h4 className="text-white font-semibold mb-4">Liens rapides</h4>
+              <div className="space-y-2">
+                <Link href="/toys" className="block text-gray-400 hover:text-cyan-400 transition-colors">
+                  Parcourir les jouets
+                </Link>
+                <Link href="/post" className="block text-gray-400 hover:text-cyan-400 transition-colors">
+                  Ajouter un jouet
+                </Link>
+                <Link href="/dashboard" className="block text-gray-400 hover:text-cyan-400 transition-colors">
+                  Mon tableau de bord
+                </Link>
+                <Link href="/profile" className="block text-gray-400 hover:text-cyan-400 transition-colors">
+                  Mon profil
+                </Link>
+              </div>
+            </div>
+
+            {/* Légal */}
+            <div>
+              <h4 className="text-white font-semibold mb-4">Légal</h4>
+              <div className="space-y-2">
+                <Link href="/legal/privacy" className="block text-gray-400 hover:text-cyan-400 transition-colors">
+                  Politique de confidentialité
+                </Link>
+                <Link href="/legal/terms" className="block text-gray-400 hover:text-cyan-400 transition-colors">
+                  Conditions générales
+                </Link>
+                <Link href="/legal/mentions" className="block text-gray-400 hover:text-cyan-400 transition-colors">
+                  Mentions légales
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Séparateur */}
+          <div className="w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-8" />
+
+          {/* Copyright */}
+          <div className="text-center text-gray-500 text-sm">
+            <p>© 2025 ToyExchange. Tous droits réservés. Fait avec 💚 pour une planète plus verte.</p>
+          </div>
+        </div>
+      </footer>
 
       {/* Custom animations */}
       <style jsx>{`
