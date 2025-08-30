@@ -84,7 +84,7 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
     useEffect(() => {
         async function fetchActivities() {
             try {
-                const response = await fetch('/api/user/activities');
+                const response = await fetch('/api/profile/activity');
                 if (response.ok) {
                     const data = await response.json();
                     setActivities(data);
@@ -608,7 +608,7 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
                             }}
                             className="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors"
                         >
-                            <X className="w-6 h-6" />
+                            <X className="w-6 h-6" /> 
                         </button>
 
                         <div className="text-center mb-6">
