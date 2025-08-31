@@ -6,15 +6,16 @@ import { prisma } from "@/lib/prisma";
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const paramsId = await params;
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { id } = params;
+  const { id } = paramsId;
   const { status } = await request.json();
 
   if (!["ACCEPTED", "REJECTED", "CANCELLED", "COMPLETED"].includes(status)) {
