@@ -4,8 +4,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { getBucket } from "@/lib/storage";
 
-const bucket = getBucket();
-
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -55,6 +53,7 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const bucket = getBucket();
   const paramsId = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) {
@@ -132,6 +131,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const bucket = getBucket();
   const paramsId = await params;
   const toy = await prisma.toy.findUnique({
     where: { id: paramsId.id },

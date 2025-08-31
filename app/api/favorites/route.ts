@@ -5,9 +5,8 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
 import { getBucket } from "@/lib/storage";
 
-const bucket = getBucket();
-
 export async function GET() {
+    const bucket = getBucket();
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user) {

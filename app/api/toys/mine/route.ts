@@ -4,9 +4,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { getBucket } from "@/lib/storage";
 
-const bucket = getBucket();
-
 export async function GET() {
+  const bucket = getBucket();
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
