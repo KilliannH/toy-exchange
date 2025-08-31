@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Rate limiting - limiter à 3 tentatives par 15 minutes par IP
-    const identifier = req.ip || 'anonymous';
+    const identifier = req.headers.get("x-forwarded-for")?.split(",")[0] || "anonymous";
     const { success, remaining } = await rateLimit({
       identifier: `resend-verification:${identifier}`,
       limit: 3,
