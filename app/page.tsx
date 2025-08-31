@@ -86,7 +86,7 @@ export default function HomePage() {
               <div className="absolute inset-0 bg-gradient-to-r from-purple-700 to-pink-700 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
             </Link>
             <Link
-              href="/toys"
+              href="/register"
               className="group bg-white/10 backdrop-blur-md border border-white/20 text-white font-semibold px-8 py-4 rounded-2xl hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl"
             >
               <span className="group-hover:text-cyan-300 transition-colors">Découvrir les jouets</span>
