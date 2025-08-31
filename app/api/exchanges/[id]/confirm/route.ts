@@ -4,14 +4,15 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const idParams = await params;
   const userId = session.user.id;
-  const exchangeId = params.id;
+  const exchangeId = idParams.id;
 
   const exchange = await prisma.exchange.findUnique({
     where: { id: exchangeId },
