@@ -6,14 +6,15 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const paramsId = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const exchangeId = params.id;
+  const exchangeId = paramsId.id;
   const userId = session.user.id;
   const { rating, comment } = await request.json();
 
