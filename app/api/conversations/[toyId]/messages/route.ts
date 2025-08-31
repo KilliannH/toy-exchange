@@ -132,15 +132,16 @@ export async function GET(request: Request, { params }: { params: Promise<{ toyI
 }
 
 // POST a new message to a specific conversation
-export async function POST(request: Request, { params }: { params: { toyId: string } }) {
+export async function POST(request: Request, { params }: { params: Promise<{ toyId: string }> }) {
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const toyParams = await params;
   const userId = session.user.id;
-  const toyId = params.toyId;
+  const toyId = toyParams.toyId;
   const { content, receiverId, proposedToyId } = await request.json();
 
   if (!content || !receiverId) {
