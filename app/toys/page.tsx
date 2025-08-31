@@ -6,7 +6,7 @@ import { useMemo, useState, useEffect, useRef } from "react";
 import useSWRInfinite from "swr/infinite";
 import { Search, RotateCcw, Gem, ToyBrick, X, ListFilter, Grid2X2, Gift, Bolt, Plus, Sparkles } from "lucide-react";
 
-type ToyImage = { signedUrl?: string; url?: string; offsetYPercentage?: number };
+type ToyImage = { signedUrl?: string; url?: string; };
 type Toy = {
     id: string;
     title: string;
@@ -272,7 +272,6 @@ export default function ToysPage() {
                                                         className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500"
                                                         style={{
                                                             objectFit: "cover",
-                                                            objectPosition: `center ${toy.images[0].offsetYPercentage || 0}%`,
                                                         }}
                                                     />
                                                     {toy.images[1]?.signedUrl && (

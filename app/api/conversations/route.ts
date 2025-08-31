@@ -61,7 +61,7 @@ export async function GET() {
             id: true,
             title: true,
             images: {
-              select: { url: true, offsetYPercentage: true },
+              select: { url: true, },
               take: 1,
             },
           },

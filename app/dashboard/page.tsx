@@ -299,7 +299,6 @@ export default function DashboardPage() {
               {favoritesArr.map((fav: any) => {
                 const img0 = fav?.toy?.images?.[0];
                 const signedUrl = img0?.signedUrl;
-                const offsetY = img0?.offsetYPercentage ?? 0;
                 const title = fav?.toy?.title ?? "Jouet";
                 const ownerName = fav?.toy?.user?.name || fav?.toy?.user?.email || "Membre";
                 const toyId = fav?.toy?.id;
@@ -316,7 +315,6 @@ export default function DashboardPage() {
                             src={signedUrl}
                             alt={title}
                             className="w-full h-full object-cover"
-                            style={{ objectPosition: `center ${offsetY}%` }}
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-gray-500">

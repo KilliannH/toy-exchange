@@ -29,7 +29,7 @@ export async function GET() {
                     include: {
                         user: { select: { name: true, city: true } },
                         images: {
-                            select: { id: true, url: true, offsetYPercentage: true },
+                            select: { id: true, url: true, },
                             take: 1, // Get only the first image for the thumbnail
                         },
                     },

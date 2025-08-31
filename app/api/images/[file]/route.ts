@@ -27,22 +27,3 @@ export async function GET(
 
   return NextResponse.json({ url: signedUrl });
 }
-
-export async function PATCH(
-  request: Request,
-  { params }: { params: { file: string } }
-) {
-  const { offsetYPercentage } = await request.json(); // New property name
-
-  // Basic validation to ensure the value is a number and within a reasonable range
-  if (typeof offsetYPercentage !== 'number' || offsetYPercentage < -100 || offsetYPercentage > 100) {
-    return NextResponse.json({ error: 'Invalid offsetYPercentage value' }, { status: 400 });
-  }
-  
-  await prisma.toyImage.update({
-    where: { id: params.file },
-    data: { offsetYPercentage } // Update the new field in your database model
-  });
-
-  return NextResponse.json({ success: true });
-}
