@@ -20,7 +20,7 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   emailVerified DateTime?
-  notifyByEmail Boolean @default(true)
+  notifyByEmail Boolean   @default(true)
 
   // Relations existantes
   toys     Toy[]
@@ -35,6 +35,7 @@ model User {
   receivedReviews        Review[]                 @relation("ReviewReceiver")
   favorites              Favorite[]
   EmailVerificationToken EmailVerificationToken[]
+  Report                 Report[]
 }
 
 model Toy {
@@ -64,6 +65,7 @@ model Toy {
   messages                Message[]
   favorites               Favorite[]
   messagesWithProposedToy Message[]  @relation("MessageProposedToy")
+  Report                  Report[]
 }
 
 // Nouveau modèle pour les échanges
@@ -176,11 +178,11 @@ enum ExchangeStatus {
 }
 
 model ToyImage {
-  id                String @id @default(cuid())
-  toyId             String
-  toy               Toy    @relation(fields: [toyId], references: [id], onDelete: Cascade)
-  url               String // nom du fichier dans GCS (ex: "abc123.png")
-  order             Int    @default(0)
+  id    String @id @default(cuid())
+  toyId String
+  toy   Toy    @relation(fields: [toyId], references: [id], onDelete: Cascade)
+  url   String // nom du fichier dans GCS (ex: "abc123.png")
+  order Int    @default(0)
 
   // ⚠️ n'est jamais stocké en DB, juste calculé côté API
   signedUrl String? @ignore
@@ -230,10 +232,33 @@ model EmailVerificationToken {
 
 model RateLimitLog {
   id         String   @id @default(cuid())
-  identifier String   // IP, email, userId, etc.
+  identifier String // IP, email, userId, etc.
   createdAt  DateTime @default(now())
-  
+
   // Index pour optimiser les requêtes
   @@index([identifier, createdAt])
   @@index([createdAt]) // Pour le cleanup
+}
+
+model Report {
+  id            String    @id @default(cuid())
+  toyId         String
+  reason        String // 'scam', 'inappropriate', 'condition', 'fake', 'other'
+  message       String    @db.Text
+  reporterId    String? // Null pour les signalements anonymes
+  reporterEmail String?
+  status        String    @default("PENDING") // 'PENDING', 'REVIEWED', 'RESOLVED', 'DISMISSED'
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  reviewedAt    DateTime?
+  reviewedBy    String? // ID de l'admin qui a traité
+  adminNotes    String?   @db.Text
+
+  // Relations
+  toy      Toy   @relation(fields: [toyId], references: [id], onDelete: Cascade)
+  reporter User? @relation(fields: [reporterId], references: [id], onDelete: SetNull)
+
+  @@index([toyId])
+  @@index([status])
+  @@index([createdAt])
 }

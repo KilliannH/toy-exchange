@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 import {
   Heart, MessageSquare, Share2, AlertTriangle, ArrowLeft, RotateCcw, Handshake, Gem, Star,
   ThumbsUp, Wrench, Package, Frown, ToyBrick, Send, Loader2, Gift,
-  Bolt
+  Bolt, X, Copy, CheckCircle, Facebook, Mail, Link as LinkIcon
 } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -32,6 +32,11 @@ export default function ToyDetailPage() {
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showContactForm, setShowContactForm] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [reportMessage, setReportMessage] = useState("");
+  const [isReporting, setIsReporting] = useState(false);
 
   const { data: myToysData, isLoading: isLoadingMyToys } = useSWR(
     session ? "/api/toys/mine" : null,
@@ -122,6 +127,69 @@ export default function ToyDetailPage() {
     }
   };
 
+  // Share functions
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const shareTitle = `Découvrez ce jouet: ${toy?.title || 'Jouet sur ToyExchange'}`;
+
+  const handleShare = (platform: string) => {
+    const encodedUrl = encodeURIComponent(shareUrl);
+    const encodedTitle = encodeURIComponent(shareTitle);
+    
+    switch (platform) {
+      case 'facebook':
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`, '_blank');
+        break;
+      case 'copy':
+        navigator.clipboard.writeText(shareUrl);
+        toast.success("Lien copié dans le presse-papier!");
+        break;
+      default:
+        break;
+    }
+  };
+
+  // Report function
+  const handleReport = async () => {
+    if (!reportReason) {
+      toast.error("Veuillez sélectionner une raison de signalement.");
+      return;
+    }
+
+    if (!reportMessage.trim()) {
+      toast.error("Veuillez décrire le problème.");
+      return;
+    }
+
+    setIsReporting(true);
+
+    try {
+      const res = await fetch('/api/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          toyId: toy.id,
+          reason: reportReason,
+          message: reportMessage,
+          reporterEmail: session?.user?.email
+        })
+      });
+
+      if (res.ok) {
+        toast.success("Signalement envoyé avec succès. Notre équipe va examiner votre demande.");
+        setShowReportModal(false);
+        setReportReason("");
+        setReportMessage("");
+      } else {
+        const data = await res.json();
+        toast.error(`Erreur: ${data.error}`);
+      }
+    } catch (err) {
+      toast.error("Une erreur est survenue lors de l'envoi du signalement.");
+    } finally {
+      setIsReporting(false);
+    }
+  };
+
   // Now, early return conditions
   if (error) {
     return (
@@ -186,427 +254,611 @@ export default function ToyDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative">
-      {/* Dynamic background */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-1/4 left-1/6 w-96 h-96 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/6 w-80 h-80 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-3xl animate-bounce" style={{ animationDuration: '3s' }} />
-      </div>
+    <>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative">
+        {/* Dynamic background */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-1/4 left-1/6 w-96 h-96 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/6 w-80 h-80 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-3xl animate-bounce" style={{ animationDuration: '3s' }} />
+        </div>
 
-      <div className="relative z-10 pt-24 pb-12 px-6 max-w-6xl mx-auto">
-        {/* Back button */}
-        <button
-          onClick={() => window.history.back()}
-          className="mb-8 group flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105"
-        >
-          <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform duration-200" />
-          Retour à la galerie
-        </button>
+        <div className="relative z-10 pt-24 pb-12 px-6 max-w-6xl mx-auto">
+          {/* Back button */}
+          <button
+            onClick={() => window.history.back()}
+            className="mb-8 group flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105"
+          >
+            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform duration-200" />
+            Retour à la galerie
+          </button>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
-          {/* Image gallery */}
-          <div className="space-y-4">
-            {/* Main image */}
-            <div id="main-image-container" className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden group">
-              <div className="aspect-square relative">
-                {images.length > 0 ? (
-                  <>
-                    <div
-                      className={`aspect-square relative overflow-hidden`}
+          <div className="grid lg:grid-cols-2 gap-12 items-start">
+            {/* Image gallery */}
+            <div className="space-y-4">
+              {/* Main image */}
+              <div id="main-image-container" className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden group">
+                <div className="aspect-square relative">
+                  {images.length > 0 ? (
+                    <>
+                      <div
+                        className={`aspect-square relative overflow-hidden`}
+                      >
+                        <img
+                          src={images[currentImageIndex]?.signedUrl}
+                          alt={toy.title}
+                          className="w-full h-auto min-h-full object-cover transition-transform duration-100"
+                          style={{
+                            transform: 'scale(1.05)',
+                            userSelect: 'none'
+                          }}
+                          draggable={false}
+                        />
+                        {/* Overlay that only appears on hover */}
+                        <div className={`absolute inset-0 bg-gradient-to-t from-black/30 to-transparent transition-opacity duration-300 opacity-0 group-hover:opacity-100'
+                          }`} />
+                        {/* Image navigation */}
+                        {images.length > 1 && (
+                          <>
+                            <button
+                              onClick={() => setCurrentImageIndex(prev => prev > 0 ? prev - 1 : images.length - 1)}
+                              className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full backdrop-blur-sm transition-all duration-300 opacity-0 group-hover:opacity-100"
+                            >
+                              <ArrowLeft size={20} />
+                            </button>
+                            <button
+                              onClick={() => setCurrentImageIndex(prev => prev < images.length - 1 ? prev + 1 : 0)}
+                              className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full backdrop-blur-sm transition-all duration-300 opacity-0 group-hover:opacity-100"
+                            >
+                              <ArrowLeft size={20} className="transform rotate-180" />
+                            </button>
+
+                            {/* Image indicator */}
+                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                              {images.map((_, index) => (
+                                <div
+                                  key={index}
+                                  className={`w-2 h-2 rounded-full transition-all duration-200 ${index === currentImageIndex ? "bg-white" : "bg-white/50"
+                                    }`}
+                                />
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-500/20 to-pink-500/20">
+                      <div className="text-8xl animate-bounce text-gray-400">
+                        <ToyBrick size={96} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Thumbnail strip */}
+              {images.length > 1 && (
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  {images.map((image, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden transition-all duration-300 ${index === currentImageIndex
+                        ? "ring-2 ring-cyan-400 scale-105"
+                        : "opacity-70 hover:opacity-100 hover:scale-105"
+                        }`}
                     >
                       <img
-                        src={images[currentImageIndex]?.signedUrl}
-                        alt={toy.title}
-                        className="w-full h-auto min-h-full object-cover transition-transform duration-100"
-                        style={{
-                          transform: 'scale(1.05)',
-                          userSelect: 'none'
-                        }}
-                        draggable={false}
+                        src={image.signedUrl}
+                        alt={`${toy.title} ${index + 1}`}
+                        className="w-full h-full object-cover"
                       />
-                      {/* Overlay that only appears on hover */}
-                      <div className={`absolute inset-0 bg-gradient-to-t from-black/30 to-transparent transition-opacity duration-300 opacity-0 group-hover:opacity-100'
-                        }`} />
-                      {/* Image navigation */}
-                      {images.length > 1 && (
-                        <>
-                          <button
-                            onClick={() => setCurrentImageIndex(prev => prev > 0 ? prev - 1 : images.length - 1)}
-                            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full backdrop-blur-sm transition-all duration-300 opacity-0 group-hover:opacity-100"
-                          >
-                            <ArrowLeft size={20} />
-                          </button>
-                          <button
-                            onClick={() => setCurrentImageIndex(prev => prev < images.length - 1 ? prev + 1 : 0)}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full backdrop-blur-sm transition-all duration-300 opacity-0 group-hover:opacity-100"
-                          >
-                            <ArrowLeft size={20} className="transform rotate-180" />
-                          </button>
-
-                          {/* Image indicator */}
-                          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            {images.map((_, index) => (
-                              <div
-                                key={index}
-                                className={`w-2 h-2 rounded-full transition-all duration-200 ${index === currentImageIndex ? "bg-white" : "bg-white/50"
-                                  }`}
-                              />
-                            ))}
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </>
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-500/20 to-pink-500/20">
-                    <div className="text-8xl animate-bounce text-gray-400">
-                      <ToyBrick size={96} />
-                    </div>
-                  </div>
-                )}
-              </div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Thumbnail strip */}
-            {images.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto pb-2">
-                {images.map((image, index) => (
+            {/* Toy details */}
+            <div className="space-y-6">
+              {/* Header */}
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
+                <div className="flex items-start justify-between mb-6">
+                  <div className="flex-1">
+                    <h1 className="text-4xl font-black bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent mb-3 leading-tight">
+                      {toy.title}
+                    </h1>
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${toy.mode === "EXCHANGE"
+                          ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                          : toy.mode === "POINTS"
+                            ? "bg-green-500/20 text-green-300 border border-green-500/30"
+                            : "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"
+                          }`}
+                      >
+                        {getModeIcon(toy.mode)}{" "}
+                        {toy.mode === "EXCHANGE"
+                          ? "Échange"
+                          : toy.mode === "POINTS"
+                            ? "Points"
+                            : "Don"}
+                      </span>
+
+                      {/* 👇 Badge supplémentaire si mode = POINTS */}
+                      {toy.mode === "POINTS" && (
+                        <span className="px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
+                          {toy.pointsCost ?? 0} pts
+                        </span>
+                      )}
+
+                      {/* Status badge */}
+                      <span
+                        className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${toy.status === "AVAILABLE"
+                          ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                          : toy.status === "RESERVED"
+                            ? "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"
+                            : "bg-red-500/20 text-red-300 border border-red-500/30"
+                          }`}
+                      >
+                        {toy.status === "AVAILABLE"
+                          ? "Disponible"
+                          : toy.status === "RESERVED"
+                            ? "Réservé"
+                            : "Échangé"}
+                      </span>
+                    </div>
+                  </div>
+
                   <button
-                    key={index}
-                    onClick={() => setCurrentImageIndex(index)}
-                    className={`relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden transition-all duration-300 ${index === currentImageIndex
-                      ? "ring-2 ring-cyan-400 scale-105"
-                      : "opacity-70 hover:opacity-100 hover:scale-105"
+                    onClick={() => handleLike()}
+                    className={`p-4 rounded-2xl transition-all duration-300 hover:scale-110 ${isLiked
+                      ? "bg-red-500/20 text-red-400 border border-red-500/30"
+                      : "bg-white/10 text-gray-400 border border-white/20 hover:text-red-400"
                       }`}
                   >
-                    <img
-                      src={image.signedUrl}
-                      alt={`${toy.title} ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
+                    <Heart size={24} fill={isLiked ? "currentColor" : "none"} strokeWidth={1.5} />
                   </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Toy details */}
-          <div className="space-y-6">
-            {/* Header */}
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
-              <div className="flex items-start justify-between mb-6">
-                <div className="flex-1">
-                  <h1 className="text-4xl font-black bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent mb-3 leading-tight">
-                    {toy.title}
-                  </h1>
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${toy.mode === "EXCHANGE"
-                        ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
-                        : toy.mode === "POINTS"
-                          ? "bg-green-500/20 text-green-300 border border-green-500/30"
-                          : "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"
-                        }`}
-                    >
-                      {getModeIcon(toy.mode)}{" "}
-                      {toy.mode === "EXCHANGE"
-                        ? "Échange"
-                        : toy.mode === "POINTS"
-                          ? "Points"
-                          : "Don"}
-                    </span>
-
-                    {/* 👇 Badge supplémentaire si mode = POINTS */}
-                    {toy.mode === "POINTS" && (
-                      <span className="px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
-                        {toy.pointsCost ?? 0} pts
-                      </span>
-                    )}
-
-                    {/* Status badge */}
-                    <span
-                      className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${toy.status === "AVAILABLE"
-                        ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                        : toy.status === "RESERVED"
-                          ? "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"
-                          : "bg-red-500/20 text-red-300 border border-red-500/30"
-                        }`}
-                    >
-                      {toy.status === "AVAILABLE"
-                        ? "Disponible"
-                        : toy.status === "RESERVED"
-                          ? "Réservé"
-                          : "Échangé"}
-                    </span>
-                  </div>
                 </div>
 
-                <button
-                  onClick={() => handleLike()}
-                  className={`p-4 rounded-2xl transition-all duration-300 hover:scale-110 ${isLiked
-                    ? "bg-red-500/20 text-red-400 border border-red-500/30"
-                    : "bg-white/10 text-gray-400 border border-white/20 hover:text-red-400"
-                    }`}
-                >
-                  <Heart size={24} fill={isLiked ? "currentColor" : "none"} strokeWidth={1.5} />
-                </button>
-              </div>
+                <p className="text-gray-300 text-lg leading-relaxed mb-6">
+                  {toy.description}
+                </p>
 
-              <p className="text-gray-300 text-lg leading-relaxed mb-6">
-                {toy.description}
-              </p>
-
-              {/* Key details */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="bg-purple-500/10 border border-purple-500/20 rounded-2xl p-4">
-                  <div className="text-2xl mb-2 text-purple-300">
-                    <Gem size={32} />
+                {/* Key details */}
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="bg-purple-500/10 border border-purple-500/20 rounded-2xl p-4">
+                    <div className="text-2xl mb-2 text-purple-300">
+                      <Gem size={32} />
+                    </div>
+                    <div className="text-purple-300 font-semibold">Âge conseillé</div>
+                    <div className="text-white text-xl font-bold">{toy.ageMin}-{toy.ageMax} ans</div>
                   </div>
-                  <div className="text-purple-300 font-semibold">Âge conseillé</div>
-                  <div className="text-white text-xl font-bold">{toy.ageMin}-{toy.ageMax} ans</div>
-                </div>
-                <div className={`rounded-2xl p-4 border ${toy.condition === "Excellent"
-                  ? "bg-green-500/10 border-green-500/20"
-                  : toy.condition === "Bon"
-                    ? "bg-blue-500/10 border-blue-500/20"
-                    : "bg-orange-500/10 border-orange-500/20"
-                  }`}>
-                  <div className="text-2xl mb-2 text-white">
-                    {getConditionIcon(toy.condition)}
-                  </div>
-                  <div className={`font-semibold ${toy.condition === "Excellent" ? "text-green-300" :
-                    toy.condition === "Bon" ? "text-blue-300" : "text-orange-300"
+                  <div className={`rounded-2xl p-4 border ${toy.condition === "Excellent"
+                    ? "bg-green-500/10 border-green-500/20"
+                    : toy.condition === "Bon"
+                      ? "bg-blue-500/10 border-blue-500/20"
+                      : "bg-orange-500/10 border-orange-500/20"
                     }`}>
-                    État
+                    <div className="text-2xl mb-2 text-white">
+                      {getConditionIcon(toy.condition)}
+                    </div>
+                    <div className={`font-semibold ${toy.condition === "Excellent" ? "text-green-300" :
+                      toy.condition === "Bon" ? "text-blue-300" : "text-orange-300"
+                      }`}>
+                      État
+                    </div>
+                    <div className="text-white text-xl font-bold">{toy.condition}</div>
                   </div>
-                  <div className="text-white text-xl font-bold">{toy.condition}</div>
+                </div>
+
+                {/* Owner info */}
+                <Link href={`/user/${toy.user?.id}`}>
+                    <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-2xl p-6 hover:bg-cyan-500/15 hover:border-cyan-500/30 transition-all duration-300 cursor-pointer group">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full flex items-center justify-center text-white font-bold text-xl group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                          {toy.user?.name?.charAt(0) || toy.user?.email?.charAt(0) || "?"}
+                        </div>
+                        <div className="flex-1">
+                          <div className="text-cyan-300 font-semibold">Proposé par</div>
+                          <div className="text-white font-bold group-hover:text-cyan-300 transition-colors">
+                            {toy.user?.name || toy.user?.email?.split('@')[0] || "Utilisateur anonyme"}
+                          </div>
+                          <div className="text-xs text-gray-400 mt-1">
+                            Cliquez pour voir le profil
+                          </div>
+                        </div>
+                        <div className="text-2xl text-cyan-400 animate-pulse group-hover:scale-110 transition-transform duration-300">
+                          <ToyBrick size={32} />
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+              </div>
+
+              {/* Action buttons */}
+              <div className="space-y-4">
+                {/* Le bouton de contact n'est affiché que si l'utilisateur est connecté et n'est pas l'auteur */}
+                {session && !isAuthor && toy.mode !== "EXCHANGE" && (
+                  <button
+                    onClick={() => setShowContactForm(!showContactForm)}
+                    className="group relative overflow-hidden w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold px-8 py-6 rounded-3xl shadow-2xl hover:scale-105 transition-all duration-300"
+                  >
+                    <span className="relative z-10 flex items-center justify-center gap-3 text-xl">
+                      <MessageSquare size={28} />
+                      {showContactForm ? "Masquer le contact" : "Contacter le propriétaire"}
+                    </span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-700 to-cyan-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </button>
+                )}
+                {/* Le bouton s'inscrire s'il n'y a pas de session active */}
+                {!session && (
+                  <Link
+                    href="/register"
+                    className="group relative overflow-hidden w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold px-8 py-6 rounded-3xl shadow-2xl hover:scale-105 transition-all duration-300 text-center flex items-center justify-center"
+                  >
+                    <span className="relative z-10 flex items-center justify-center gap-3 text-xl">
+                      <MessageSquare size={28} />
+                      S'inscrire pour contacter
+                    </span>
+                  </Link>
+                )}
+
+                <div className="grid grid-cols-2 gap-4">
+                  <button 
+                    onClick={() => setShowShareModal(true)}
+                    className="group bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-6 py-4 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
+                  >
+                    <Share2 size={20} className="group-hover:scale-110 transition-transform duration-200" />
+                    Partager
+                  </button>
+
+                  <button 
+                    onClick={() => setShowReportModal(true)}
+                    className="group bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-6 py-4 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
+                  >
+                    <AlertTriangle size={20} className="group-hover:scale-110 transition-transform duration-200" />
+                    Signaler
+                  </button>
                 </div>
               </div>
 
-              {/* Owner info */}
-              <Link href={`/user/${toy.user?.id}`}>
-                  <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-2xl p-6 hover:bg-cyan-500/15 hover:border-cyan-500/30 transition-all duration-300 cursor-pointer group">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full flex items-center justify-center text-white font-bold text-xl group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                        {toy.user?.name?.charAt(0) || toy.user?.email?.charAt(0) || "?"}
+              {session && !isAuthor && toy.mode === "EXCHANGE" && (
+                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 space-y-4">
+                  <h3 className="text-lg font-semibold text-white">Proposer un échange</h3>
+
+                  {isLoadingMyToys ? (
+                    <p className="text-gray-400 text-sm">Chargement de vos jouets...</p>
+                  ) : availableToys.length === 0 ? (
+                    <p className="text-gray-400 text-sm">
+                      Vous n'avez aucun jouet disponible pour échanger.
+                    </p>
+                  ) : (
+                    <form
+                      onSubmit={async (e) => {
+                        e.preventDefault();
+                        if (!selectedToyId) {
+                          toast.error("Veuillez choisir un jouet à proposer.");
+                          return;
+                        }
+
+                        setIsSendingMessage(true);
+
+                        const form = e.currentTarget as HTMLFormElement;
+                        const message = (form.elements.namedItem("exchangeMessage") as HTMLInputElement).value;
+
+                        const res = await fetch("/api/exchanges", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            toyId: toy.id,
+                            proposedToyId: selectedToyId,
+                            message,
+                          }),
+                        });
+
+                        setIsSendingMessage(false);
+                        if (res.ok) {
+                          toast.success("Votre proposition d'échange a été envoyée !");
+                          form.reset();
+                          setSelectedToyId(null);
+                        } else {
+                          const err = await res.json();
+                          toast.error("Erreur : " + err.error);
+                        }
+                      }}
+                      className="space-y-4"
+                    >
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        {availableToys.map((t: any) => (
+                          <button
+                            type="button"
+                            key={t.id}
+                            onClick={() => setSelectedToyId(t.id)}
+                            className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${selectedToyId === t.id
+                              ? "border-cyan-400 bg-cyan-500/10"
+                              : "border-white/20 hover:border-cyan-300"
+                              }`}
+                          >
+                            <img
+                              src={t?.images?.[0]?.signedUrl ?? "/placeholder.png"}
+                              alt={t.title}
+                              className="w-12 h-12 rounded-lg object-cover"
+                            />
+                            <span className="text-white">{t.title}</span>
+                          </button>
+                        ))}
                       </div>
-                      <div className="flex-1">
-                        <div className="text-cyan-300 font-semibold">Proposé par</div>
-                        <div className="text-white font-bold group-hover:text-cyan-300 transition-colors">
-                          {toy.user?.name || toy.user?.email?.split('@')[0] || "Utilisateur anonyme"}
-                        </div>
-                        <div className="text-xs text-gray-400 mt-1">
-                          Cliquez pour voir le profil
-                        </div>
-                      </div>
-                      <div className="text-2xl text-cyan-400 animate-pulse group-hover:scale-110 transition-transform duration-300">
+
+                      <input
+                        type="text"
+                        name="exchangeMessage"
+                        placeholder="Message optionnel..."
+                        className="w-full bg-white/5 border border-white/20 text-white px-4 py-2 rounded-xl"
+                      />
+
+                      <button
+                        type="submit"
+                        disabled={isSendingMessage}
+                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:scale-105 transition-all disabled:opacity-50"
+                      >
+                        {isSendingMessage ? "Envoi..." : "Envoyer la proposition"}
+                      </button>
+                    </form>
+                  )}
+                </div>
+              )}
+
+              {/* Contact form */}
+              {showContactForm && (
+                <div className="bg-black/20 backdrop-blur-xl border border-emerald-500/30 rounded-3xl p-8 space-y-6 animate-slide-down">
+                  <div className="text-center">
+                    <div className="text-4xl mb-3 text-emerald-400">
+                      <MessageSquare size={48} className="mx-auto" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-white mb-2">Contactez {toy.user?.name || "le propriétaire"}</h3>
+                    <p className="text-gray-400">Envoyez un message pour proposer un échange</p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="relative group">
+                      <textarea
+                        placeholder="Bonjour ! Je suis intéressé(e) par votre jouet..."
+                        rows={4}
+                        value={messageContent}
+                        onChange={(e) => setMessageContent(e.target.value)}
+                        className="w-full bg-white/5 border border-white/20 text-white placeholder-gray-400 px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all duration-300 resize-none"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                    </div>
+
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setShowContactForm(false)}
+                        className="flex-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-6 py-3 rounded-2xl transition-all duration-300"
+                      >
+                        Annuler
+                      </button>
+                      <button
+                        onClick={handleSendMessage}
+                        disabled={isSendingMessage}
+                        className="group relative overflow-hidden flex-2 bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold px-6 py-3 rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl disabled:opacity-50 disabled:hover:scale-100"
+                      >
+                        <span className="relative z-10 flex items-center justify-center gap-2">
+                          {isSendingMessage ? (
+                            <Loader2 size={20} className="animate-spin" />
+                          ) : (
+                            <Send size={20} />
+                          )}
+                          {isSendingMessage ? "Envoi..." : "Envoyer le message"}
+                        </span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-emerald-700 to-cyan-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Related toys suggestion */}
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6">
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                  <ToyBrick size={24} />
+                  Jouets similaires
+                </h3>
+                <div className="grid grid-cols-3 gap-3">
+                  {/* Placeholder similar toys */}
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="group aspect-square bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl flex items-center justify-center hover:scale-105 transition-all duration-300 cursor-pointer">
+                      <div className="text-2xl group-hover:scale-110 transition-transform duration-300">
                         <ToyBrick size={32} />
                       </div>
                     </div>
-                  </div>
-                </Link>
-            </div>
-
-            {/* Action buttons */}
-            <div className="space-y-4">
-              {/* Le bouton de contact n'est affiché que si l'utilisateur est connecté et n'est pas l'auteur */}
-              {session && !isAuthor && toy.mode !== "EXCHANGE" && (
-                <button
-                  onClick={() => setShowContactForm(!showContactForm)}
-                  className="group relative overflow-hidden w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold px-8 py-6 rounded-3xl shadow-2xl hover:scale-105 transition-all duration-300"
-                >
-                  <span className="relative z-10 flex items-center justify-center gap-3 text-xl">
-                    <MessageSquare size={28} />
-                    {showContactForm ? "Masquer le contact" : "Contacter le propriétaire"}
-                  </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-700 to-cyan-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </button>
-              )}
-              {/* Le bouton s'inscrire s'il n'y a pas de session active */}
-              {!session && (
-                <Link
-                  href="/register"
-                  className="group relative overflow-hidden w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold px-8 py-6 rounded-3xl shadow-2xl hover:scale-105 transition-all duration-300 text-center flex items-center justify-center"
-                >
-                  <span className="relative z-10 flex items-center justify-center gap-3 text-xl">
-                    <MessageSquare size={28} />
-                    S'inscrire pour contacter
-                  </span>
-                </Link>
-              )}
-
-              <div className="grid grid-cols-2 gap-4">
-                <button className="group bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-6 py-4 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2">
-                  <Share2 size={20} className="group-hover:scale-110 transition-transform duration-200" />
-                  Partager
-                </button>
-
-                <button className="group bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-6 py-4 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2">
-                  <AlertTriangle size={20} className="group-hover:scale-110 transition-transform duration-200" />
-                  Signaler
-                </button>
-              </div>
-            </div>
-
-            {session && !isAuthor && toy.mode === "EXCHANGE" && (
-              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 space-y-4">
-                <h3 className="text-lg font-semibold text-white">Proposer un échange</h3>
-
-                {isLoadingMyToys ? (
-                  <p className="text-gray-400 text-sm">Chargement de vos jouets...</p>
-                ) : availableToys.length === 0 ? (
-                  <p className="text-gray-400 text-sm">
-                    Vous n’avez aucun jouet disponible pour échanger.
-                  </p>
-                ) : (
-                  <form
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-                      if (!selectedToyId) {
-                        toast.error("Veuillez choisir un jouet à proposer.");
-                        return;
-                      }
-
-                      setIsSendingMessage(true);
-
-                      const form = e.currentTarget as HTMLFormElement;
-                      const message = (form.elements.namedItem("exchangeMessage") as HTMLInputElement).value;
-
-                      const res = await fetch("/api/exchanges", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          toyId: toy.id,
-                          proposedToyId: selectedToyId,
-                          message,
-                        }),
-                      });
-
-                      setIsSendingMessage(false);
-                      if (res.ok) {
-                        toast.success("Votre proposition d’échange a été envoyée !");
-                        form.reset();
-                        setSelectedToyId(null);
-                      } else {
-                        const err = await res.json();
-                        toast.error("Erreur : " + err.error);
-                      }
-                    }}
-                    className="space-y-4"
-                  >
-                    <div className="grid sm:grid-cols-2 gap-3">
-                      {availableToys.map((t: any) => (
-                        <button
-                          type="button"
-                          key={t.id}
-                          onClick={() => setSelectedToyId(t.id)}
-                          className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${selectedToyId === t.id
-                            ? "border-cyan-400 bg-cyan-500/10"
-                            : "border-white/20 hover:border-cyan-300"
-                            }`}
-                        >
-                          <img
-                            src={t?.images?.[0]?.signedUrl ?? "/placeholder.png"}
-                            alt={t.title}
-                            className="w-12 h-12 rounded-lg object-cover"
-                          />
-                          <span className="text-white">{t.title}</span>
-                        </button>
-                      ))}
-                    </div>
-
-                    <input
-                      type="text"
-                      name="exchangeMessage"
-                      placeholder="Message optionnel..."
-                      className="w-full bg-white/5 border border-white/20 text-white px-4 py-2 rounded-xl"
-                    />
-
-                    <button
-                      type="submit"
-                      disabled={isSendingMessage}
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:scale-105 transition-all disabled:opacity-50"
-                    >
-                      {isSendingMessage ? "Envoi..." : "Envoyer la proposition"}
-                    </button>
-                  </form>
-                )}
-              </div>
-            )}
-
-            {/* Contact form */}
-            {showContactForm && (
-              <div className="bg-black/20 backdrop-blur-xl border border-emerald-500/30 rounded-3xl p-8 space-y-6 animate-slide-down">
-                <div className="text-center">
-                  <div className="text-4xl mb-3 text-emerald-400">
-                    <MessageSquare size={48} className="mx-auto" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-white mb-2">Contactez {toy.user?.name || "le propriétaire"}</h3>
-                  <p className="text-gray-400">Envoyez un message pour proposer un échange</p>
+                  ))}
                 </div>
-
-                <div className="space-y-4">
-                  <div className="relative group">
-                    <textarea
-                      placeholder="Bonjour ! Je suis intéressé(e) par votre jouet..."
-                      rows={4}
-                      value={messageContent}
-                      onChange={(e) => setMessageContent(e.target.value)}
-                      className="w-full bg-white/5 border border-white/20 text-white placeholder-gray-400 px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all duration-300 resize-none"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                  </div>
-
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => setShowContactForm(false)}
-                      className="flex-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-6 py-3 rounded-2xl transition-all duration-300"
-                    >
-                      Annuler
-                    </button>
-                    <button
-                      onClick={handleSendMessage}
-                      disabled={isSendingMessage}
-                      className="group relative overflow-hidden flex-2 bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold px-6 py-3 rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl disabled:opacity-50 disabled:hover:scale-100"
-                    >
-                      <span className="relative z-10 flex items-center justify-center gap-2">
-                        {isSendingMessage ? (
-                          <Loader2 size={20} className="animate-spin" />
-                        ) : (
-                          <Send size={20} />
-                        )}
-                        {isSendingMessage ? "Envoi..." : "Envoyer le message"}
-                      </span>
-                      <div className="absolute inset-0 bg-gradient-to-r from-emerald-700 to-cyan-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    </button>
-                  </div>
-                </div>
+                <button className="w-full mt-4 text-cyan-400 hover:text-cyan-300 font-medium transition-colors duration-200 text-sm">
+                  Voir tous les jouets similaires →
+                </button>
               </div>
-            )}
-
-            {/* Related toys suggestion */}
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6">
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <ToyBrick size={24} />
-                Jouets similaires
-              </h3>
-              <div className="grid grid-cols-3 gap-3">
-                {/* Placeholder similar toys */}
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="group aspect-square bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl flex items-center justify-center hover:scale-105 transition-all duration-300 cursor-pointer">
-                    <div className="text-2xl group-hover:scale-110 transition-transform duration-300">
-                      <ToyBrick size={32} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <button className="w-full mt-4 text-cyan-400 hover:text-cyan-300 font-medium transition-colors duration-200 text-sm">
-                Voir tous les jouets similaires →
-              </button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-cyan-500/30 rounded-3xl p-8 max-w-md w-full relative">
+            <button
+              onClick={() => setShowShareModal(false)}
+              className="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            <div className="text-center mb-6">
+              <div className="text-6xl text-cyan-400 mb-4">
+                <Share2 size={64} className="mx-auto" />
+              </div>
+              <h3 className="text-2xl font-bold text-cyan-400 mb-2">
+                Partager ce jouet
+              </h3>
+              <p className="text-gray-300 text-sm">
+                Faites découvrir ce trésor à vos amis
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <button
+                onClick={() => handleShare('facebook')}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-2xl transition-all duration-300 shadow-xl flex items-center justify-center gap-2"
+              >
+                <Facebook className="w-5 h-5" />
+                Partager sur Facebook
+              </button>
+
+              <button
+                onClick={() => handleShare('copy')}
+                className="w-full bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-2xl transition-all duration-300 shadow-xl flex items-center justify-center gap-2"
+              >
+                <Copy className="w-5 h-5" />
+                Copier le lien
+              </button>
+
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <LinkIcon className="w-4 h-4 text-gray-400" />
+                  <span className="text-sm text-gray-400">Lien direct :</span>
+                </div>
+                <div className="text-xs text-gray-300 font-mono bg-black/20 p-2 rounded-lg break-all">
+                  {shareUrl}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Report Modal */}
+      {showReportModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-slate-900 border border-red-500/30 rounded-3xl p-6 max-w-md w-full relative my-8 max-h-[90vh] flex flex-col">
+            <button
+              onClick={() => {
+                setShowReportModal(false);
+                setReportReason("");
+                setReportMessage("");
+              }}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors z-10"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Header */}
+            <div className="text-center mb-4 flex-shrink-0">
+              <div className="text-4xl text-red-400 mb-3">
+                <AlertTriangle size={48} className="mx-auto animate-pulse" />
+              </div>
+              <h3 className="text-xl font-bold text-red-400 mb-1">
+                Signaler un problème
+              </h3>
+              <p className="text-gray-300 text-xs">
+                Aidez-nous à maintenir une communauté sûre
+              </p>
+            </div>
+
+            {/* Scrollable content */}
+            <div className="space-y-4 overflow-y-auto flex-1 pr-2">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Raison du signalement *
+                </label>
+                <div className="space-y-2">
+                  {[
+                    { value: 'scam', label: 'Arnaque / Escroquerie' },
+                    { value: 'inappropriate', label: 'Contenu inapproprié' },
+                    { value: 'condition', label: 'Jouet en mauvais état' },
+                    { value: 'fake', label: 'Fausse annonce' },
+                    { value: 'other', label: 'Autre raison' }
+                  ].map((reason) => (
+                    <button
+                      key={reason.value}
+                      type="button"
+                      onClick={() => setReportReason(reason.value)}
+                      className={`w-full text-left p-2.5 rounded-xl border transition-all text-sm ${
+                        reportReason === reason.value
+                          ? "border-red-400 bg-red-500/10 text-red-300"
+                          : "border-white/20 hover:border-red-300 text-gray-300"
+                      }`}
+                    >
+                      {reason.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Décrivez le problème *
+                </label>
+                <textarea
+                  value={reportMessage}
+                  onChange={(e) => setReportMessage(e.target.value)}
+                  placeholder="Donnez plus de détails..."
+                  rows={3}
+                  className="w-full bg-slate-800 border border-gray-600 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 resize-none"
+                />
+              </div>
+
+              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3">
+                <div className="flex items-start gap-2">
+                  <Mail className="w-4 h-4 text-red-300 mt-0.5 flex-shrink-0" />
+                  <div className="text-xs text-red-200">
+                    <p className="font-medium mb-1">Signalement confidentiel</p>
+                    <p className="text-red-200/80">
+                      Envoyé à <span className="font-mono text-red-300">support@toy-exchange.org</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Fixed footer buttons */}
+            <div className="flex gap-3 mt-4 pt-4 border-t border-white/10 flex-shrink-0">
+              <button
+                onClick={() => {
+                  setShowReportModal(false);
+                  setReportReason("");
+                  setReportMessage("");
+                }}
+                className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2.5 rounded-xl transition-colors text-sm"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleReport}
+                disabled={!reportReason || !reportMessage.trim() || isReporting}
+                className={`flex-1 font-semibold py-2.5 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-sm ${
+                  reportReason && reportMessage.trim() && !isReporting
+                    ? "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-xl"
+                    : "bg-gray-600 text-gray-400 cursor-not-allowed"
+                }`}
+              >
+                {isReporting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Envoi...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    Envoyer
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Custom animations */}
       <style jsx>{`
@@ -629,6 +881,6 @@ export default function ToyDetailPage() {
           flex: 2;
         }
       `}</style>
-    </div>
+    </>
   );
 }

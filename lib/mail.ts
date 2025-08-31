@@ -8,10 +8,6 @@ const transporter = nodemailer.createTransport({
     user: process.env.SMTP_USER!,
     pass: process.env.SMTP_PASS!,
   },
-  // Optionnel: harden TLS si 587
-  /*tls: {
-    rejectUnauthorized: true,
-  },*/
 });
 
 const FROM = process.env.EMAIL_FROM!;
@@ -31,6 +27,22 @@ export async function sendNewMessageEmail(opts: {
 }) {
   const subject = `Nouveau message à propos de “${opts.toyTitle}”`;
   const html = newMessageTemplateHTML(opts.name ?? "Bonjour", opts.toyTitle, opts.preview, opts.conversationUrl);
+  return transporter.sendMail({ from: FROM, to: opts.to, subject, html });
+}
+
+export async function sendReportEmail(opts: {
+  to: string;
+  toyTitle: string;
+  toyId: string;
+  ownerName?: string | null;
+  ownerEmail: string;
+  reason: string;
+  message: string;
+  reporterName?: string | null;
+  reporterEmail: string;
+}) {
+  const subject = `🚨 Signalement : ${opts.reason} – ${opts.toyTitle}`;
+  const html = reportTemplateHTML(opts);
   return transporter.sendMail({ from: FROM, to: opts.to, subject, html });
 }
 
@@ -84,6 +96,40 @@ function newMessageTemplateHTML(name: string, toyTitle: string, preview: string,
   `);
 }
 
-function escapeHTML(s: string) {
-  return s.replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]!));
+function reportTemplateHTML(opts: {
+  toyTitle: string;
+  toyId: string;
+  ownerName?: string | null;
+  ownerEmail: string;
+  reason: string;
+  message: string;
+  reporterName?: string | null;
+  reporterEmail: string;
+}) {
+  return baseWrap(`
+    <h2 style="color:#fff;margin:0 0 12px 0;font-size:18px;">🚨 Nouveau signalement</h2>
+    <p style="color:#c3c7d3;font-size:14px;margin:0 0 12px 0;">
+      Un utilisateur a signalé le jouet <b>“${escapeHTML(opts.toyTitle)}”</b>.
+    </p>
+    <div style="background:#0f1427;padding:12px;border-radius:8px;margin:12px 0;">
+      <p style="color:#adb2c3;font-size:14px;margin:0"><b>Raison :</b> ${escapeHTML(opts.reason)}</p>
+      <p style="color:#adb2c3;font-size:14px;margin:8px 0 0 0"><b>Détails :</b><br>${escapeHTML(opts.message)}</p>
+    </div>
+    <h4 style="color:#fff;margin:16px 0 8px 0;font-size:16px;">📦 Jouet</h4>
+    <p style="color:#adb2c3;font-size:14px;margin:0">
+      Propriétaire : ${opts.ownerName || "Nom inconnu"} (${opts.ownerEmail})<br>
+      Lien : <a href="${process.env.NEXT_PUBLIC_APP_URL}/toys/${opts.toyId}" style="color:#06b6d4">${process.env.NEXT_PUBLIC_APP_URL}/toys/${opts.toyId}</a>
+    </p>
+    <h4 style="color:#fff;margin:16px 0 8px 0;font-size:16px;">👤 Signaleur</h4>
+    <p style="color:#adb2c3;font-size:14px;margin:0">
+      ${opts.reporterName || "Utilisateur anonyme"} (${opts.reporterEmail})
+    </p>
+  `);
+}
+
+function escapeHTML(s?: string) {
+  if (!s) return "";
+  return s.replace(/[&<>"']/g, (c) => (
+    { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]!
+  ));
 }
