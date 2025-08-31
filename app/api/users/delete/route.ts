@@ -5,9 +5,8 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { getBucket } from "@/lib/storage";
 
-const bucket = getBucket();
-
 export async function deleteImageFile(imageUrl: string): Promise<void> {
+  const bucket = getBucket();
   try {
     // Extraire le nom du fichier depuis l'URL
     // Exemple : https://storage.googleapis.com/bucket-name/images/user123/toy456.jpg

@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
 import { getBucket } from "@/lib/storage";
 
-const bucket = getBucket();
-
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ file: string }> }
 ) {
+  const bucket = getBucket();
   const fileParams = await params;
   const file = bucket.file(fileParams.file);
 

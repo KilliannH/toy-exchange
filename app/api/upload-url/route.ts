@@ -1,18 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Storage } from "@google-cloud/storage";
 import { v4 as uuid } from "uuid";
-
-const storage = new Storage({
-  projectId: process.env.GCP_PROJECT_ID,
-  credentials: {
-    client_email: process.env.GCP_CLIENT_EMAIL,
-    private_key: process.env.GCP_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-  },
-});
-
-const bucket = storage.bucket(process.env.GCP_BUCKET_NAME!);
+import { getBucket } from "@/lib/storage";
 
 export async function GET(req: NextRequest) {
+  const bucket = getBucket();
   const type = req.nextUrl.searchParams.get("type") || "image/jpeg";
   const fileName = `${uuid()}.${type.split("/")[1]}`;
   const file = bucket.file(fileName);

@@ -18,10 +18,9 @@ function getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon
   return R * c;
 }
 
-const bucket = getBucket();
-
 // GET /api/toys : liste avec signed URLs
 export async function GET(req: Request) {
+  const bucket = getBucket();
   const { searchParams } = new URL(req.url);
   const session = await getServerSession(authOptions);
   if (!session?.user) {

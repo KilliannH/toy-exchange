@@ -6,10 +6,9 @@ import { prisma } from '@/lib/prisma';
 import { sendNewMessageEmail } from "@/lib/mail"; // 👈 helper Nodemailer (Mailtrap/Namecheap)
 import { getBucket } from "@/lib/storage";
 
-const bucket = getBucket();
-
 // GET all messages in a specific conversation
 export async function GET(request: Request, { params }: { params: Promise<{ toyId: string }> }) {
+  const bucket = getBucket();
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user) {
@@ -126,6 +125,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ toyI
 
 // POST a new message to a specific conversation
 export async function POST(request: Request, { params }: { params: Promise<{ toyId: string }> }) {
+  const bucket = getBucket();
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user) {
