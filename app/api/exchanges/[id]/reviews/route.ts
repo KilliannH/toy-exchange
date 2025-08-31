@@ -75,11 +75,12 @@ export async function POST(
 // Optionnel : GET pour voir les reviews d'un échange
 export async function GET(
   _request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const paramsId = await params;
   try {
     const reviews = await prisma.review.findMany({
-      where: { exchangeId: params.id },
+      where: { exchangeId: paramsId.id },
       include: {
         reviewer: { select: { id: true, name: true, email: true } },
         reviewee: { select: { id: true, name: true, email: true } },
