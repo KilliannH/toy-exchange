@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { Storage } from "@google-cloud/storage";
+import { getBucket } from "@/lib/storage";
 
 function getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon2: number) {
   const R = 6371; // Rayon de la terre en km
@@ -18,14 +18,7 @@ function getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon
   return R * c;
 }
 
-const storage = new Storage({
-  projectId: process.env.GCP_PROJECT_ID,
-  credentials: {
-    client_email: process.env.GCP_CLIENT_EMAIL,
-    private_key: process.env.GCP_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-  },
-});
-const bucket = storage.bucket(process.env.GCP_BUCKET_NAME!);
+const bucket = getBucket();
 
 // GET /api/toys : liste avec signed URLs
 export async function GET(req: Request) {
