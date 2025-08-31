@@ -15,14 +15,15 @@ const bucket = storage.bucket(process.env.GCP_BUCKET_NAME!);
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const paramsId = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
 
-  const toyId = params.id;
+  const toyId = paramsId.id;
   if (!toyId) {
     return NextResponse.json({ error: "Toy ID is missing" }, { status: 400 });
   }
@@ -59,8 +60,9 @@ export async function DELETE(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const paramsId = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -69,7 +71,7 @@ export async function PUT(
   const body = await req.json();
 
   const toy = await prisma.toy.findUnique({
-    where: { id: params.id },
+    where: { id: paramsId.id },
     include: { images: true },
   });
 
@@ -135,10 +137,11 @@ export async function PUT(
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const paramsId = await params;
   const toy = await prisma.toy.findUnique({
-    where: { id: params.id },
+    where: { id: paramsId.id },
     include: { images: true, user: true },
   });
 

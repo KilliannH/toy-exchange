@@ -5,7 +5,8 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { sendNewMessageEmail } from "@/lib/mail";
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const paramsId = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -18,7 +19,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
   }
 
   const toy = await prisma.toy.findUnique({
-    where: { id: params.id },
+    where: { id: paramsId.id },
     select: { id: true, userId: true, title: true }
   });
 

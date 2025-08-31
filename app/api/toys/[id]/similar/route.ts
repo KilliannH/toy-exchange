@@ -2,9 +2,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const paramsId = await params;
   const toy = await prisma.toy.findUnique({
-    where: { id: params.id },
+    where: { id: paramsId.id },
     select: { category: true, ageMin: true, ageMax: true }
   });
 
@@ -15,7 +16,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
   const similarToys = await prisma.toy.findMany({
     where: {
       AND: [
-        { id: { not: params.id } },
+        { id: { not: paramsId.id } },
         { category: toy.category },
         {
           OR: [

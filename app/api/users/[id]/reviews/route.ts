@@ -4,11 +4,12 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   _request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const paramsId = await params;
   try {
     const reviews = await prisma.review.findMany({
-      where: { revieweeId: params.id },
+      where: { revieweeId: paramsId.id },
       include: {
         reviewer: { select: { id: true, name: true, email: true } },
       },
