@@ -11,8 +11,29 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { prisma } from "@/lib/prisma";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
+
+export async function generateMetadata({ params }: { params: { id: string } }) {
+  const toy = await prisma.toy.findUnique({
+    where: { id: params.id },
+    select: { id: true, title: true, description: true, images: { select: { signedUrl: true }, take: 1 } },
+  });
+  if (!toy) return { title: "Jouet introuvable" };
+
+  const title = `${toy.title} — Jouet à ${/* ville si tu l'as */ "échanger / donner"}`;
+  const desc  = toy.description?.slice(0, 160) || "Jouet à échanger / donner sur ToyExchange.";
+  const img   = "/og-default.png";
+
+  return {
+    title,
+    description: desc,
+    alternates: { canonical: `/toys/${toy.id}` },
+    openGraph: { title, description: desc, images: [{ url: img, width: 1200, height: 630 }] },
+    twitter:   { title, description: desc, images: [img] },
+  };
+}
 
 export default function ToyDetailPage() {
   const params = useParams();

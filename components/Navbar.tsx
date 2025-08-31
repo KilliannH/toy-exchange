@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import useSWR from "swr";
 import { Home, Package, Plus, BarChart3, LogOut, Menu, User, MessageSquare } from "lucide-react";
 import { useRouter } from 'next/navigation';
+import Image from "next/image";
 
 const fetcher = (url) => fetch(url).then((res) => res.json());
 
@@ -39,9 +40,17 @@ export default function NavBar() {
       <div className="mx-auto max-w-7xl px-6 flex items-center justify-between">
         <Link
           href="/"
-          className="text-2xl font-black bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent hover:scale-105 transition-transform duration-300"
+          className="flex items-center gap-3 hover:scale-105 transition-transform duration-300"
+          aria-label="ToyExchange - Accueil"
         >
-          ToyExchange
+          <Image
+            src="/logo-cropped-inverted.png"
+            alt="ToyExchange"
+            width={420}
+            height={420}
+            priority
+            className="h-9 w-9"
+          />
         </Link>
 
         <div className="hidden md:flex items-center gap-8">

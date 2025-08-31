@@ -16,15 +16,16 @@ const storage = new Storage({
 const bucket = storage.bucket(process.env.GCP_BUCKET_NAME!);
 
 // GET all messages in a specific conversation
-export async function GET(request: Request, { params }: { params: { toyId: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ toyId: string }> }) {
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const toyParams = await params;
   const userId = session.user.id;
-  const toyId = params.toyId;
+  const toyId = toyParams.toyId;
 
   try {
     const { searchParams } = new URL(request.url);

@@ -5,12 +5,33 @@ import { Providers } from "./providers";
 import NavBar from "@/components/Navbar";
 import { Toaster } from "react-hot-toast"
 import Script from "next/script";
+import CookieNotice from "@/components/CookieNotice";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "ToyExchange",
-  description: "Échange de jouets entre parents",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://example.com"),
+  title: {
+    default: "ToyExchange — Échange & don de jouets près de chez vous",
+    template: "%s | ToyExchange",
+  },
+  description: "Trouvez, échangez ou donnez des jouets facilement. Une communauté locale, des jouets heureux.",
+  alternates: { canonical: "/" },
+  robots: { index: true, follow: true },
+  openGraph: {
+    type: "website",
+    siteName: "ToyExchange",
+    url: "/",
+    title: "ToyExchange — Échange & don de jouets",
+    description: "Trouvez, échangez ou donnez des jouets facilement.",
+    images: [{ url: "/og-default.png", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ToyExchange — Échange & don de jouets",
+    description: "Trouvez, échangez ou donnez des jouets facilement.",
+    images: ["/og-default.png"],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -28,6 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           <NavBar />
           <main className="min-h-screen bg-gray-50">{children}</main>
+          <CookieNotice />
           <Toaster
           position="top-right"
           toastOptions={{
