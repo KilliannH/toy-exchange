@@ -384,22 +384,27 @@ export default function ToyDetailPage() {
               </div>
 
               {/* Owner info */}
-              <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-2xl p-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                    {toy.user?.name?.charAt(0) || toy.user?.email?.charAt(0) || "?"}
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-cyan-300 font-semibold">Proposé par</div>
-                    <div className="text-white font-bold">
-                      {toy.user?.name || toy.user?.email?.split('@')[0] || "Utilisateur anonyme"}
+              <Link href={`/user/${toy.user?.id}`}>
+                  <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-2xl p-6 hover:bg-cyan-500/15 hover:border-cyan-500/30 transition-all duration-300 cursor-pointer group">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full flex items-center justify-center text-white font-bold text-xl group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                        {toy.user?.name?.charAt(0) || toy.user?.email?.charAt(0) || "?"}
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-cyan-300 font-semibold">Proposé par</div>
+                        <div className="text-white font-bold group-hover:text-cyan-300 transition-colors">
+                          {toy.user?.name || toy.user?.email?.split('@')[0] || "Utilisateur anonyme"}
+                        </div>
+                        <div className="text-xs text-gray-400 mt-1">
+                          Cliquez pour voir le profil
+                        </div>
+                      </div>
+                      <div className="text-2xl text-cyan-400 animate-pulse group-hover:scale-110 transition-transform duration-300">
+                        <ToyBrick size={32} />
+                      </div>
                     </div>
                   </div>
-                  <div className="text-2xl text-cyan-400 animate-pulse">
-                    <ToyBrick size={32} />
-                  </div>
-                </div>
-              </div>
+                </Link>
             </div>
 
             {/* Action buttons */}
