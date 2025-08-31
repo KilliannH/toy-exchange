@@ -270,9 +270,6 @@ export default function ToysPage() {
                                                         src={toy.images[0].signedUrl as string}
                                                         alt={toy.title}
                                                         className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                                        style={{
-                                                            objectFit: "cover",
-                                                        }}
                                                     />
                                                     {toy.images[1]?.signedUrl && (
                                                         <img
