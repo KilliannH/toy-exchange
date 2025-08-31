@@ -36,11 +36,18 @@ export default function ToyDetailPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [lastMouseY, setLastMouseY] = useState(0);
 
-  const { data: myToys, isLoading: isLoadingMyToys } = useSWR(
+  const { data: myToysData, isLoading: isLoadingMyToys } = useSWR(
     session ? "/api/toys/mine" : null,
     fetcher
   );
-  const availableToys = myToys?.filter((t: any) => t.status === "AVAILABLE") || [];
+
+  // Normalise la réponse en tableau quelles que soient la forme/valeur
+  const myToysArr = Array.isArray(myToysData)
+    ? myToysData
+    : Array.isArray(myToysData?.items)
+      ? myToysData.items
+      : [];
+  const availableToys = myToysArr.filter((t: any) => t?.status === "AVAILABLE");
   const [selectedToyId, setSelectedToyId] = useState<string | null>(null);
 
   // New state for messaging
@@ -488,7 +495,7 @@ export default function ToyDetailPage() {
               <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 space-y-4">
                 <h3 className="text-lg font-semibold text-white">Proposer un échange</h3>
 
-                {!availableToys ? (
+                {isLoadingMyToys ? (
                   <p className="text-gray-400 text-sm">Chargement de vos jouets...</p>
                 ) : availableToys.length === 0 ? (
                   <p className="text-gray-400 text-sm">
@@ -542,7 +549,7 @@ export default function ToyDetailPage() {
                             }`}
                         >
                           <img
-                            src={t.images[0]?.signedUrl || "/placeholder.png"}
+                            src={t?.images?.[0]?.signedUrl ?? "/placeholder.png"}
                             alt={t.title}
                             className="w-12 h-12 rounded-lg object-cover"
                           />

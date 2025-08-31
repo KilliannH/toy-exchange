@@ -9,7 +9,8 @@ declare module "next-auth" {
       image?: string | null;
       lat?: Float | null;
       lng?: Float | null;
-      radiusKm?: Int | null
+      radiusKm?: Int | null;
+      notifyByEmail: Boolean;
     };
   }
 }
