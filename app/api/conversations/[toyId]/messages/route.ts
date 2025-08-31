@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
 import { Storage } from "@google-cloud/storage";
+import { sendNewMessageEmail } from "@/lib/mail"; // 👈 helper Nodemailer (Mailtrap/Namecheap)
 
 const storage = new Storage({
   projectId: process.env.GCP_PROJECT_ID,
@@ -15,16 +16,15 @@ const storage = new Storage({
 const bucket = storage.bucket(process.env.GCP_BUCKET_NAME!);
 
 // GET all messages in a specific conversation
-export async function GET(request: Request, { params }: { params: Promise<{ toyId: string }> }) {
+export async function GET(request: Request, { params }: { params: { toyId: string } }) {
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const toyIdParams = await params;
   const userId = session.user.id;
-  const toyId = toyIdParams.toyId;
+  const toyId = params.toyId;
 
   try {
     const { searchParams } = new URL(request.url);
@@ -78,7 +78,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ toyI
     });
 
     // Fetch messages without including toy details for each message
-    // GET
     const messages = await prisma.message.findMany({
       where: {
         toyId: toyId,
@@ -104,22 +103,21 @@ export async function GET(request: Request, { params }: { params: Promise<{ toyI
     // On génère les signed URLs
     const messagesWithSignedUrls = await Promise.all(
       messages.map(async (msg) => {
-        if (msg.proposedToy?.images.length > 0) {
-          const fileName = msg.proposedToy.images[0].url;
-          if (fileName) {
-            const [signedUrl] = await bucket.file(fileName).getSignedUrl({
-              version: "v4",
-              action: "read",
-              expires: Date.now() + 15 * 60 * 1000,
-            });
-            return {
-              ...msg,
-              proposedToy: {
-                ...msg.proposedToy,
-                images: [{ url: fileName, signedUrl }],
-              },
-            };
-          }
+        const img0 = msg.proposedToy?.images?.[0];
+        const fileName = img0?.url;
+        if (fileName) {
+          const [signedUrl] = await bucket.file(fileName).getSignedUrl({
+            version: "v4",
+            action: "read",
+            expires: Date.now() + 15 * 60 * 1000,
+          });
+          return {
+            ...msg,
+            proposedToy: {
+              ...msg.proposedToy,
+              images: [{ url: fileName, signedUrl }],
+            },
+          };
         }
         return msg;
       })
@@ -156,6 +154,7 @@ export async function POST(request: Request, { params }: { params: { toyId: stri
         toyId,
         content,
         proposedToyId: proposedToyId || null,
+        isRead: false,
       },
       include: {
         sender: { select: { id: true, name: true, email: true } },
@@ -170,24 +169,49 @@ export async function POST(request: Request, { params }: { params: { toyId: stri
       },
     });
 
+    // on notifie par email
+    try {
+      const toy = await prisma.toy.findUnique({
+        where: { id: toyId },
+        select: { id: true, title: true },
+      });
+
+      const toEmail = newMessage.receiver?.email;
+      if (toEmail) {
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL!;
+        const conversationUrl = `${appUrl}/messages/${toyId}?partnerId=${userId}`;
+        const preview = (content || "").slice(0, 160);
+
+        await sendNewMessageEmail({
+          to: toEmail,
+          name: newMessage.receiver?.name,
+          toyTitle: toy?.title ?? "Votre jouet",
+          preview,
+          conversationUrl,
+        });
+      }
+    } catch (mailErr) {
+      console.warn("⚠️ Email notification failed:", mailErr);
+      // on ne jette pas : l'envoi de mail ne doit pas casser l'API
+    }
+
     // 👉 on génère aussi la signed URL à la volée
     let signedUrlMessage = newMessage;
-    if (newMessage.proposedToy?.images.length > 0) {
-      const fileName = newMessage.proposedToy.images[0].url;
-      if (fileName) {
-        const [signedUrl] = await bucket.file(fileName).getSignedUrl({
-          version: "v4",
-          action: "read",
-          expires: Date.now() + 15 * 60 * 1000,
-        });
-        signedUrlMessage = {
-          ...newMessage,
-          proposedToy: {
-            ...newMessage.proposedToy,
-            images: [{ url: fileName, signedUrl }],
-          },
-        };
-      }
+    const img0 = newMessage.proposedToy?.images?.[0];
+    const fileName = img0?.url;
+    if (fileName) {
+      const [signedUrl] = await bucket.file(fileName).getSignedUrl({
+        version: "v4",
+        action: "read",
+        expires: Date.now() + 15 * 60 * 1000,
+      });
+      signedUrlMessage = {
+        ...newMessage,
+        proposedToy: {
+          ...newMessage.proposedToy,
+          images: [{ url: fileName, signedUrl }],
+        },
+      };
     }
 
     return NextResponse.json(signedUrlMessage, { status: 201 });

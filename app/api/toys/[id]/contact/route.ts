@@ -46,6 +46,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
       where: { id: toy.userId },
       select: { email: true, name: true , notifyByEmail: true }
     });
+    console.log(owner);
 
     if (owner?.email && owner.notifyByEmail) {
       const appUrl = process.env.NEXT_PUBLIC_APP_URL!;

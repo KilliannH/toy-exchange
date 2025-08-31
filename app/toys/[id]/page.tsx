@@ -2,7 +2,7 @@
 
 import useSWR from "swr";
 import { useParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSession } from "next-auth/react";
 import {
   Heart, MessageSquare, Share2, AlertTriangle, ArrowLeft, RotateCcw, Handshake, Gem, Star,
@@ -32,9 +32,6 @@ export default function ToyDetailPage() {
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showContactForm, setShowContactForm] = useState(false);
-  const [dragY, setDragY] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const [lastMouseY, setLastMouseY] = useState(0);
 
   const { data: myToysData, isLoading: isLoadingMyToys } = useSWR(
     session ? "/api/toys/mine" : null,
@@ -56,47 +53,6 @@ export default function ToyDetailPage() {
 
   const images = toy?.images || [];
   const isAuthor = session?.user?.id === toy?.userId;
-
-  useEffect(() => {
-    const mainImageContainer = document.getElementById('main-image-container');
-    if (images[currentImageIndex]?.offsetYPercentage !== undefined && mainImageContainer) {
-      const containerHeight = mainImageContainer.offsetHeight;
-      const pixelOffset = (images[currentImageIndex].offsetYPercentage / 100) * containerHeight;
-      setDragY(pixelOffset);
-    } else {
-      setDragY(0);
-    }
-  }, [currentImageIndex, images]);
-
-  // Drag functions - only available to the author
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!isAuthor) return;
-    setIsDragging(true);
-    setLastMouseY(e.clientY);
-    e.preventDefault();
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    const deltaY = e.clientY - lastMouseY;
-    setDragY(prev => prev + deltaY);
-    setLastMouseY(e.clientY);
-  };
-
-  const handleMouseUp = async (e: React.MouseEvent | React.DragEvent) => {
-    if (isDragging && images[currentImageIndex]) {
-      const imageElement = e.target as HTMLElement;
-      const containerHeight = imageElement.parentElement?.offsetHeight || 1;
-      const newOffsetPercentage = (dragY / containerHeight) * 100;
-
-      await fetch(`/api/images/${images[currentImageIndex].id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ offsetYPercentage: newOffsetPercentage })
-      });
-    }
-    setIsDragging(false);
-  };
 
   const handleLike = async () => {
     if (!session) {
@@ -256,27 +212,23 @@ export default function ToyDetailPage() {
                 {images.length > 0 ? (
                   <>
                     <div
-                      className={`aspect-square relative overflow-hidden ${isAuthor ? 'cursor-grab active:cursor-grabbing' : ''}`}
-                      onMouseDown={isAuthor ? handleMouseDown : undefined}
-                      onMouseMove={isAuthor ? handleMouseMove : undefined}
-                      onMouseUp={isAuthor ? handleMouseUp : undefined}
-                      onMouseLeave={isAuthor ? handleMouseUp : undefined}
+                      className={`aspect-square relative overflow-hidden`}
                     >
                       <img
                         src={images[currentImageIndex]?.signedUrl}
                         alt={toy.title}
                         className="w-full h-auto min-h-full object-cover transition-transform duration-100"
                         style={{
-                          transform: `translateY(${dragY}px) ${isDragging ? '' : 'scale(1.05)'}`,
+                          transform: 'scale(1.05)',
                           userSelect: 'none'
                         }}
                         draggable={false}
                       />
-                      {/* Overlay that only appears on hover, not during drag */}
-                      <div className={`absolute inset-0 bg-gradient-to-t from-black/30 to-transparent transition-opacity duration-300 ${isDragging ? 'opacity-0' : 'opacity-0 group-hover:opacity-100'
+                      {/* Overlay that only appears on hover */}
+                      <div className={`absolute inset-0 bg-gradient-to-t from-black/30 to-transparent transition-opacity duration-300 opacity-0 group-hover:opacity-100'
                         }`} />
                       {/* Image navigation */}
-                      {images.length > 1 && !isDragging && (
+                      {images.length > 1 && (
                         <>
                           <button
                             onClick={() => setCurrentImageIndex(prev => prev > 0 ? prev - 1 : images.length - 1)}

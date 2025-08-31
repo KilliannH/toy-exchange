@@ -181,7 +181,6 @@ model ToyImage {
   toy               Toy    @relation(fields: [toyId], references: [id], onDelete: Cascade)
   url               String // nom du fichier dans GCS (ex: "abc123.png")
   order             Int    @default(0)
-  offsetYPercentage Float?
 
   // ⚠️ n'est jamais stocké en DB, juste calculé côté API
   signedUrl String? @ignore
