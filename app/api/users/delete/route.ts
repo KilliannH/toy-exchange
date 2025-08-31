@@ -105,7 +105,6 @@ export async function DELETE(request: NextRequest) {
         select: { images: true }
       });
 
-      // TODO: Supprimer les fichiers images physiques du stockage
     // Exemple avec AWS S3, Cloudinary, ou stockage local
     
     for (const toy of userToys) {

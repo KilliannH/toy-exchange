@@ -675,7 +675,6 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
                                     </>
                                 ) : (
                                     <>
-                                        <Trash2 className="w-4 h-4" />
                                         Supprimer définitivement
                                     </>
                                 )}

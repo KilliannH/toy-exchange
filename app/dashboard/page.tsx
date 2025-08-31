@@ -389,15 +389,14 @@ export default function DashboardPage() {
 
                     <div className="flex items-center gap-2 mb-4">
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium border ${
-                          status === "PENDING"
+                        className={`px-3 py-1 rounded-full text-xs font-medium border ${status === "PENDING"
                             ? "bg-yellow-500/20 text-yellow-300 border-yellow-500/30"
                             : status === "ACCEPTED"
-                            ? "bg-green-500/20 text-green-300 border-green-500/30"
-                            : status === "REJECTED"
-                            ? "bg-red-500/20 text-red-300 border-red-500/30"
-                            : "bg-gray-500/20 text-gray-300 border-gray-500/30"
-                        }`}
+                              ? "bg-green-500/20 text-green-300 border-green-500/30"
+                              : status === "REJECTED"
+                                ? "bg-red-500/20 text-red-300 border-red-500/30"
+                                : "bg-gray-500/20 text-gray-300 border-gray-500/30"
+                          }`}
                       >
                         {status}
                       </span>

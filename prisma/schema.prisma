@@ -8,17 +8,18 @@ generator client {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  password  String?
-  city      String?
-  lat       Float?
-  lng       Float?
-  radiusKm  Int?     @default(10)
-  points    Int?     @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String?
+  city          String?
+  lat           Float?
+  lng           Float?
+  radiusKm      Int?      @default(10)
+  points        Int?      @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  emailVerified DateTime?
 
   // Relations existantes
   toys     Toy[]
@@ -26,12 +27,13 @@ model User {
   sessions Session[]
 
   // Nouvelles relations
-  sentExchanges    Exchange[] @relation("ExchangeRequester")
-  sentMessages     Message[]  @relation("MessageSender")
-  receivedMessages Message[]  @relation("MessageReceiver")
-  givenReviews     Review[]   @relation("ReviewGiver")
-  receivedReviews  Review[]   @relation("ReviewReceiver")
-  favorites        Favorite[]
+  sentExchanges          Exchange[]               @relation("ExchangeRequester")
+  sentMessages           Message[]                @relation("MessageSender")
+  receivedMessages       Message[]                @relation("MessageReceiver")
+  givenReviews           Review[]                 @relation("ReviewGiver")
+  receivedReviews        Review[]                 @relation("ReviewReceiver")
+  favorites              Favorite[]
+  EmailVerificationToken EmailVerificationToken[]
 }
 
 model Toy {
@@ -56,31 +58,31 @@ model Toy {
   images ToyImage[]
 
   // Nouvelles relations
-  exchanges         Exchange[]
-  proposedExchanges Exchange[] @relation("ProposedToy") // 👈 opposé de Exchange.proposedToy
-  messages          Message[]
-  favorites         Favorite[]
-  messagesWithProposedToy Message[] @relation("MessageProposedToy")
+  exchanges               Exchange[]
+  proposedExchanges       Exchange[] @relation("ProposedToy") // 👈 opposé de Exchange.proposedToy
+  messages                Message[]
+  favorites               Favorite[]
+  messagesWithProposedToy Message[]  @relation("MessageProposedToy")
 }
 
 // Nouveau modèle pour les échanges
 model Exchange {
-  id            String         @id @default(cuid())
-  requesterId   String
-  toyId         String
-  status        ExchangeStatus @default(PENDING)
-  message       String?
-  proposedToyId String?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  completedAt   DateTime?
-  requesterConfirmed Boolean @default(false)
-  ownerConfirmed     Boolean @default(false)
+  id                 String         @id @default(cuid())
+  requesterId        String
+  toyId              String
+  status             ExchangeStatus @default(PENDING)
+  message            String?
+  proposedToyId      String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  completedAt        DateTime?
+  requesterConfirmed Boolean        @default(false)
+  ownerConfirmed     Boolean        @default(false)
 
-  requester   User    @relation("ExchangeRequester", fields: [requesterId], references: [id], onDelete: Cascade)
-  toy         Toy     @relation(fields: [toyId], references: [id], onDelete: Cascade)
-  proposedToy Toy?    @relation("ProposedToy", fields: [proposedToyId], references: [id])
-  reviews      Review[]
+  requester   User     @relation("ExchangeRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  toy         Toy      @relation(fields: [toyId], references: [id], onDelete: Cascade)
+  proposedToy Toy?     @relation("ProposedToy", fields: [proposedToyId], references: [id])
+  reviews     Review[]
 
   @@unique([requesterId, toyId])
 }
@@ -100,7 +102,7 @@ model Message {
   toy      Toy? @relation(fields: [toyId], references: [id], onDelete: SetNull)
 
   proposedToyId String?
-  proposedToy   Toy? @relation("MessageProposedToy", fields: [proposedToyId], references: [id])
+  proposedToy   Toy?    @relation("MessageProposedToy", fields: [proposedToyId], references: [id])
 }
 
 // Nouveau modèle pour les évaluations
@@ -173,15 +175,15 @@ enum ExchangeStatus {
 }
 
 model ToyImage {
-  id        String   @id @default(cuid())
-  toyId     String
-  toy       Toy      @relation(fields: [toyId], references: [id], onDelete: Cascade)
-  url       String   // nom du fichier dans GCS (ex: "abc123.png")
-  order     Int      @default(0)
+  id                String @id @default(cuid())
+  toyId             String
+  toy               Toy    @relation(fields: [toyId], references: [id], onDelete: Cascade)
+  url               String // nom du fichier dans GCS (ex: "abc123.png")
+  order             Int    @default(0)
   offsetYPercentage Float?
 
   // ⚠️ n'est jamais stocké en DB, juste calculé côté API
-  signedUrl String?  @ignore
+  signedUrl String? @ignore
 }
 
 // Modèles NextAuth existants
@@ -213,10 +215,25 @@ model Session {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  email     String
+  expires   DateTime
+  createdAt DateTime @default(now())
 
-  @@unique([identifier, token])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model RateLimitLog {
+  id         String   @id @default(cuid())
+  identifier String   // IP, email, userId, etc.
+  createdAt  DateTime @default(now())
+  
+  // Index pour optimiser les requêtes
+  @@index([identifier, createdAt])
+  @@index([createdAt]) // Pour le cleanup
 }

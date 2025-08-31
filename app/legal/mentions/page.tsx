@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown'
 export default function LegalMentionsPage() {
 
     const mentionsLegales = `
-**Nom du site / de l’application** : Toy Exchange
+**Nom du site / de l’application** : ToyExchange
 
 **Éditeur** : Killiann Hervagault  
 Adresse : 25 Rue de la planche au gue 44300 Nantes  
@@ -18,11 +18,11 @@ Adresse : 8 Rue de Londres 75009 Paris
 
 ## Propriété intellectuelle
 
-Tous les contenus (textes, images, logo, design) sont la propriété exclusive de Toy Exchange, sauf mentions contraires. Toute reproduction, même partielle, est interdite sans autorisation préalable.
+Tous les contenus (textes, images, logo, design) sont la propriété exclusive de ToyExchange, sauf mentions contraires. Toute reproduction, même partielle, est interdite sans autorisation préalable.
 
 ## Responsabilité
 
-Toy Exchange agit comme intermédiaire technique. Il ne saurait être tenu responsable des contenus publiés par les utilisateurs ni des litiges intervenant entre eux.
+ToyExchange agit comme intermédiaire technique. Il ne saurait être tenu responsable des contenus publiés par les utilisateurs ni des litiges intervenant entre eux.
 `;
 
     return (

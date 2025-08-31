@@ -9,7 +9,7 @@ import Script from "next/script";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Toy Exchange",
+  title: "ToyExchange",
   description: "Échange de jouets entre parents",
 };
 
