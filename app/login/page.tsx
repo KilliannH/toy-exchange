@@ -5,6 +5,7 @@ import { signIn } from "next-auth/react";
 import { Lock, Sparkles, Gamepad2, ToyBrick, Gem, Rocket, Sun, Star, Tent, CheckCircle, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -69,8 +70,12 @@ export default function LoginPage() {
         <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 shadow-2xl">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="text-6xl mb-4 text-cyan-400">
-              <Tent size={64} className="mx-auto" />
+            <div className="text-6xl mb-4 text-cyan-400 animate-bounce">
+              <Image src="/circus-tent.svg"
+                alt="ToyExchange logo"
+                width={64}
+                height={64}
+                className="mx-auto" />
             </div>
             <h1 className="text-4xl font-black bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-3">
               Bon retour !

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Leaf, Gem, Rocket, Pen, Handshake, Gift, Dice5, Palette, Puzzle, ToyBrick, Train, Dices } from "lucide-react";
+import { Leaf, Gem, Rocket, Pen, Handshake, Gift, Dice5, Palette, Puzzle, ToyBrick, Train, Dices, Sparkles } from "lucide-react";
 
 export default function HomePage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -70,8 +70,14 @@ export default function HomePage() {
             <div className="w-32 h-1 bg-gradient-to-r from-cyan-400 to-purple-400 mx-auto rounded-full animate-pulse" />
           </div>
 
-          <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-12 font-light leading-relaxed">
-            Révolutionnez l'échange de jouets ✨<br />
+          <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-12 font-light leading-relaxed text-center">
+            Révolutionnez l&apos;échange de jouets{" "}
+            <span
+              className="inline-flex align-middle"
+            >
+              <Sparkles size={22} aria-hidden="true" />
+            </span>
+            <br />
             <span className="bg-gradient-to-r from-green-400 to-cyan-400 bg-clip-text text-transparent font-semibold">
               Moins de gaspillage, plus de magie partagée
             </span>
@@ -214,7 +220,7 @@ export default function HomePage() {
                 </span>
               </Link>
               <p className="text-gray-400 max-w-md leading-relaxed">
-                La plateforme qui révolutionne l'échange de jouets entre parents. 
+                La plateforme qui révolutionne l'échange de jouets entre parents.
                 Moins de gaspillage, plus de partage, pour un avenir durable.
               </p>
             </div>

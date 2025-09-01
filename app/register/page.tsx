@@ -5,6 +5,7 @@ import { User, Mail, Lock, CheckCircle, ArrowRight, ArrowLeft, Loader2, Sparkles
 import toast from "react-hot-toast";
 import usePlacesAutocomplete, { getGeocode, getLatLng } from "use-places-autocomplete";
 import { Combobox } from "@headlessui/react";
+import Image from "next/image";
 
 export default function RegisterPage() {
     const [name, setName] = useState("");
@@ -137,7 +138,11 @@ export default function RegisterPage() {
                                 {/* Header */}
                                 <div className="text-center mb-8">
                                     <div className="text-6xl mb-4 text-emerald-400 animate-bounce">
-                                        <Tent size={64} className="mx-auto" />
+                                        <Image src="/circus-tent.svg"
+                                                        alt="ToyExchange logo"
+                                                        width={64}
+                                                        height={64}
+                                                        className="mx-auto" />
                                     </div>
                                     <h1 className="text-4xl font-black bg-gradient-to-r from-emerald-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent mb-3">
                                         Rejoignez l'aventure !

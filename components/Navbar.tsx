@@ -38,20 +38,16 @@ export default function NavBar() {
       : 'bg-transparent py-4'
       }`}>
       <div className="mx-auto max-w-7xl px-6 flex items-center justify-between">
-        <Link
-          href="/"
-          className="flex items-center gap-3 hover:scale-105 transition-transform duration-300"
-          aria-label="ToyExchange - Accueil"
-        >
-          <Image
-            src="/logo-cropped-inverted.png"
-            alt="ToyExchange"
-            width={420}
-            height={420}
-            priority
-            className="h-9 w-9"
-          />
-        </Link>
+        <Link href="/" className="flex items-center space-x-2">
+        <Image
+          src="/circus-tent.svg"
+          alt="ToyExchange logo"
+          width={32}
+          height={32}
+          className="w-8 h-8 -translate-y-1.5"
+        />
+        <span className="text-2xl font-black bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent hover:scale-105 transition-transform duration-300">ToyExchange</span>
+      </Link>
 
         <div className="hidden md:flex items-center gap-8">
 
