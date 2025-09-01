@@ -28,7 +28,8 @@ Les données sont conservées pendant 3 ans à compter de la dernière activité
 Conformément au RGPD, vous disposez d’un droit d’accès, de rectification, de suppression, d’opposition et de portabilité de vos données. Pour exercer vos droits, vous pouvez nous contacter à l’adresse suivante : privacy@toy-exchange.org.  
 
 **7. Cookies**  
-Des cookies peuvent être utilisés à des fins de mesure d’audience et de fonctionnement. Vous pouvez les accepter ou les refuser lors de votre première visite.`
+ToyExchange utilise des cookies nécessaires au fonctionnement du site.
+Avec votre accord, nous utilisons aussi des cookies de mesure d’audience (pour analyser l’utilisation du site) et des cookies de marketing (Meta Pixel) pour personnaliser nos publicités. Vous pouvez accepter, refuser ou personnaliser vos choix lors de votre première visite.`
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-24 px-6">

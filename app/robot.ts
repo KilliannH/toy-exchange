@@ -1,5 +1,5 @@
 export default function robots() {
-  const base = process.env.NEXT_PUBLIC_APP_URL || "https://example.com";
+  const base = process.env.NEXT_PUBLIC_APP_URL;
   return {
     rules: [
       { userAgent: "*", allow: ["/"], disallow: ["/dashboard", "/messages", "/api/"] },

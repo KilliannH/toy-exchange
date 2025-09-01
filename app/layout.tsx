@@ -6,6 +6,7 @@ import NavBar from "@/components/Navbar";
 import { Toaster } from "react-hot-toast"
 import Script from "next/script";
 import CookieNotice from "@/components/CookieNotice";
+import AnalyticsScripts from "@/components/AnalyticsScripts";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -56,6 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <NavBar />
           <main className="min-h-screen bg-gray-50">{children}</main>
           <CookieNotice />
+          <AnalyticsScripts />
           <Toaster
           position="top-right"
           toastOptions={{
