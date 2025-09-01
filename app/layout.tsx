@@ -24,13 +24,19 @@ export const metadata: Metadata = {
     url: "/",
     title: "ToyExchange — Échange & don de jouets",
     description: "Trouvez, échangez ou donnez des jouets facilement.",
-    images: [{ url: "/og-default.png", width: 1200, height: 630 }],
+    images: [
+    {
+      url: `${process.env.NEXT_PUBLIC_APP_URL}/og-default.png`,
+      width: 1200,
+      height: 630,
+    },
+  ],
   },
   twitter: {
     card: "summary_large_image",
     title: "ToyExchange — Échange & don de jouets",
     description: "Trouvez, échangez ou donnez des jouets facilement.",
-    images: ["/og-default.png"],
+    images: [`${process.env.NEXT_PUBLIC_APP_URL}/og-default.png`],
   },
 };
 
