@@ -1,32 +1,68 @@
 # ---- Builder ----
 FROM node:22-alpine AS builder
 WORKDIR /app
+
+# Copier les fichiers de dépendances
 COPY package*.json ./
-# si tu utilises pnpm: COPY pnpm-lock.yaml . && corepack enable && corepack prepare pnpm@latest --activate
+COPY prisma ./prisma/
+
+# Installer toutes les dépendances (dev incluses pour le build)
 RUN npm ci
+
+# Copier le code source
 COPY . .
-# Prisma (si utilisé)
+
+# Générer Prisma client
 RUN npx prisma generate
-# Build Next
+
+# Variables d'environnement pour le build (nécessaires pour NEXT_PUBLIC_*)
+ARG NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+ARG NEXT_PUBLIC_APP_URL
+ENV NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=$NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+
+# (optionnel mais utile pour fail-fast)
+RUN test -n "$NEXT_PUBLIC_GOOGLE_MAPS_API_KEY" || (echo 'Missing NEXT_PUBLIC_GOOGLE_MAPS_API_KEY' && exit 1)
+
+# Build Next.js
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 # ---- Runner ----
-FROM node:22-alpine
+FROM node:22-alpine AS runner
 WORKDIR /app
-ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1
-COPY --from=builder /app/package*.json ./
-RUN npm ci --omit=dev
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-# Prisma client
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/prisma ./prisma
 
-# Next.js standalone (optionnel si tu utilises output: 'standalone')
-# COPY --from=builder /app/.next/standalone ./
-# COPY --from=builder /app/.next/static ./.next/static
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+
+# Installe le Cloud SQL Auth Proxy v2 (binaire linux amd64)
+# => chemin officiel des connecteurs v2
+ARG PROXY_VERSION=2.18.1
+RUN apk add --no-cache wget ca-certificates bash && \
+    wget -O /usr/local/bin/cloud-sql-proxy \
+      https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v${PROXY_VERSION}/cloud-sql-proxy.linux.amd64 && \
+    chmod +x /usr/local/bin/cloud-sql-proxy
+
+# Créer un utilisateur non-root
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+# Copier les fichiers nécessaires
+COPY --from=builder /app/package*.json ./ 
+COPY --from=builder /app/.next/standalone ./ 
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+
+# Copier Prisma
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+
+USER nextjs
 
 EXPOSE 8080
 ENV PORT=8080
-CMD ["npm","start"]
+ENV HOSTNAME="0.0.0.0"
+
+# Lancer Cloud SQL Proxy puis Prisma migrations puis Next.js
+CMD ["sh", "-c", "cloud-sql-proxy --address 0.0.0.0 --port 5432 toy-exchange-470320:europe-west1:toyexchange-db-instance & sleep 5 && npx prisma migrate deploy && node server.js"]

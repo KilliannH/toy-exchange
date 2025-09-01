@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
     // ❌ Ne bloque pas le build en cas d'erreurs TS
     ignoreBuildErrors: true,
   },
+  output: 'standalone',
 };
 
 export default nextConfig;

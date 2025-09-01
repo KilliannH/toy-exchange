@@ -40,7 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         {/* Script pour l'API Google Maps JavaScript */}
         <Script
-          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.GOOGLE_PLACES_APIKEY}&libraries=places`}
+          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
           strategy="beforeInteractive"
         />
         {/* Autres balises meta, link, etc. */}
