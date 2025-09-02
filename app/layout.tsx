@@ -7,6 +7,7 @@ import { Toaster } from "react-hot-toast"
 import Script from "next/script";
 import CookieNotice from "@/components/CookieNotice";
 import AnalyticsScripts from "@/components/AnalyticsScripts";
+import MarketingScripts from "@/components/MarketingScripts";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -44,42 +45,41 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
-      <head>
-        {/* Script pour l'API Google Maps JavaScript */}
+      <body className={inter.className}>
+        {/* Google Maps API */}
         <Script
           src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
           strategy="beforeInteractive"
         />
-        {/* Autres balises meta, link, etc. */}
-      </head>
-      <body className={inter.className}>
+
         <Providers>
           <NavBar />
           <main className="min-h-screen bg-gray-50">{children}</main>
           <CookieNotice />
           <AnalyticsScripts />
+          <MarketingScripts />
           <Toaster
-          position="top-right"
-          toastOptions={{
-            style: {
-              background: "#1f2937", // gris foncé
-              color: "#fff",
-              borderRadius: "0.75rem",
-            },
-            success: {
-              iconTheme: {
-                primary: "#10b981", // vert
-                secondary: "#fff",
+            position="top-right"
+            toastOptions={{
+              style: {
+                background: "#1f2937",
+                color: "#fff",
+                borderRadius: "0.75rem",
               },
-            },
-            error: {
-              iconTheme: {
-                primary: "#ef4444", // rouge
-                secondary: "#fff",
+              success: {
+                iconTheme: {
+                  primary: "#10b981",
+                  secondary: "#fff",
+                },
               },
-            },
-          }}
-        />
+              error: {
+                iconTheme: {
+                  primary: "#ef4444",
+                  secondary: "#fff",
+                },
+              },
+            }}
+          />
         </Providers>
       </body>
     </html>
