@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import usePlacesAutocomplete, { getGeocode, getLatLng } from "use-places-autocomplete";
 import { Combobox } from "@headlessui/react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function RegisterPage() {
     const [name, setName] = useState("");
@@ -17,6 +18,7 @@ export default function RegisterPage() {
     const [city, setCity] = useState("");
     const [lat, setLat] = useState<number | null>(null);
     const [lng, setLng] = useState<number | null>(null);
+    const [acceptTerms, setAcceptTerms] = useState(false);
 
     const {
         ready,
@@ -42,7 +44,6 @@ export default function RegisterPage() {
             setLng(lng);
         } catch (error) {
             console.error("Erreur lors de la récupération des coordonnées :", error);
-            toast.error("Ville non trouvée. Veuillez réessayer.");
         }
     };
 
@@ -139,10 +140,10 @@ export default function RegisterPage() {
                                 <div className="text-center mb-8">
                                     <div className="text-6xl mb-4 text-emerald-400 animate-bounce">
                                         <Image src="/circus-tent.svg"
-                                                        alt="ToyExchange logo"
-                                                        width={64}
-                                                        height={64}
-                                                        className="mx-auto" />
+                                            alt="ToyExchange logo"
+                                            width={64}
+                                            height={64}
+                                            className="mx-auto" />
                                     </div>
                                     <h1 className="text-4xl font-black bg-gradient-to-r from-emerald-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent mb-3">
                                         Rejoignez l'aventure !
@@ -158,8 +159,8 @@ export default function RegisterPage() {
                                         <div
                                             key={stepNum}
                                             className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${step >= stepNum
-                                                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                                                    : 'bg-white/5 text-gray-400 border border-white/10'
+                                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                                : 'bg-white/5 text-gray-400 border border-white/10'
                                                 }`}
                                         >
                                             <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${step >= stepNum ? 'bg-emerald-500' : 'bg-white/20'
@@ -276,8 +277,8 @@ export default function RegisterPage() {
                                                         <div
                                                             key={i}
                                                             className={`flex-1 h-2 rounded-full transition-all duration-300 ${password.length > i * 2
-                                                                    ? 'bg-gradient-to-r from-emerald-400 to-cyan-400'
-                                                                    : 'bg-white/10'
+                                                                ? 'bg-gradient-to-r from-emerald-400 to-cyan-400'
+                                                                : 'bg-white/10'
                                                                 }`}
                                                         />
                                                     ))}
@@ -285,6 +286,36 @@ export default function RegisterPage() {
                                                 <p className="text-xs text-gray-400">
                                                     Force du mot de passe : {passwordStrength}
                                                 </p>
+                                            </div>
+
+                                            {/* Checkbox for Terms of Service */}
+                                            <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                                                <label className="flex items-start gap-3 cursor-pointer group">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={acceptTerms}
+                                                        onChange={(e) => setAcceptTerms(e.target.checked)}
+                                                        className="w-5 h-5 mt-0.5 bg-white/5 border-2 border-white/20 rounded text-emerald-500 focus:ring-2 focus:ring-emerald-400 focus:ring-offset-0 transition-all duration-300"
+                                                    />
+                                                    <span className="text-sm text-gray-300 leading-relaxed group-hover:text-white transition-colors">
+                                                        J'accepte les{' '}
+                                                        <Link
+                                                            href="/legal/terms"
+                                                            target="_blank"
+                                                            className="text-emerald-400 hover:text-emerald-300 underline transition-colors"
+                                                        >
+                                                            Conditions Générales d'Utilisation
+                                                        </Link>
+                                                        {' '}et la{' '}
+                                                        <Link
+                                                            href="/legal/privacy"
+                                                            target="_blank"
+                                                            className="text-emerald-400 hover:text-emerald-300 underline transition-colors"
+                                                        >
+                                                            Politique de Confidentialité
+                                                        </Link>
+                                                    </span>
+                                                </label>
                                             </div>
 
                                             <div className="flex gap-3">
@@ -297,7 +328,7 @@ export default function RegisterPage() {
 
                                                 <button
                                                     onClick={handleSubmit}
-                                                    disabled={loading || password.length < 8}
+                                                    disabled={loading || password.length < 8 || !acceptTerms}
                                                     className="group relative overflow-hidden flex-2 bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold px-6 py-4 rounded-2xl shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100"
                                                 >
                                                     <span className="relative z-10 flex items-center justify-center gap-2">
