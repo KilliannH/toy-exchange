@@ -34,14 +34,6 @@ export default function AnalyticsScripts() {
     }
   }, []);
 
-  // Debug - supprimer en production
-  useEffect(() => {
-    if (isClient) {
-      console.log("GA_ID:", GA_ID);
-      console.log("Consent given:", consentGiven);
-    }
-  }, [GA_ID, consentGiven, isClient]);
-
   // Ne pas afficher si pas côté client ou pas de GA_ID
   if (!isClient || !GA_ID) {
     return null;
@@ -52,7 +44,6 @@ export default function AnalyticsScripts() {
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
         strategy="afterInteractive"
-        onLoad={() => console.log("GA script loaded")}
       />
 
       <Script id="ga-init" strategy="afterInteractive">
@@ -76,8 +67,6 @@ export default function AnalyticsScripts() {
             send_page_view: false, // On enverra manuellement après consentement
             anonymize_ip: true
           });
-
-          console.log('GA initialized with ID: ${GA_ID}');
         `}
       </Script>
     </>
