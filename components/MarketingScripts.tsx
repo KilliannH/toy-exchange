@@ -1,28 +1,41 @@
 "use client";
 
 import Script from "next/script";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function MarketingScripts() {
+  const [isClient, setIsClient] = useState(false);
+  const [hasConsent, setHasConsent] = useState(false);
   const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
 
   useEffect(() => {
+    setIsClient(true);
+    
     const prefs = localStorage.getItem("cookie-preferences");
     if (prefs) {
-      const parsed = JSON.parse(prefs);
-      if (parsed.marketing && typeof window !== "undefined" && window.fbq) {
-        // Si consentement marketing => active Meta Pixel
-        window.fbq("consent", "grant");
-        window.fbq("track", "PageView");
+      try {
+        const parsed = JSON.parse(prefs);
+        if (parsed.marketing) {
+          setHasConsent(true);
+          // Attendre que fbq soit chargé
+          setTimeout(() => {
+            if (window.fbq) {
+              window.fbq("consent", "grant");
+              window.fbq("track", "PageView");
+            }
+          }, 1000);
+        }
+      } catch (e) {
+        console.error("Erreur parsing cookie preferences:", e);
       }
     }
   }, []);
 
-  if (!PIXEL_ID) return null;
+  // Ne pas afficher si pas côté client ou pas de PIXEL_ID
+  if (!isClient || !PIXEL_ID) return null;
 
   return (
     <>
-      {/* Charge la librairie Meta Pixel */}
       <Script id="meta-pixel-base" strategy="afterInteractive">
         {`
           !function(f,b,e,v,n,t,s)
@@ -35,9 +48,10 @@ export default function MarketingScripts() {
           'https://connect.facebook.net/en_US/fbevents.js');
 
           fbq('init', '${PIXEL_ID}');
-
-          // Par défaut, consentement refusé
           fbq('consent', 'revoke');
+          
+          // Rendre fbq disponible globalement
+          window.fbq = fbq;
         `}
       </Script>
 

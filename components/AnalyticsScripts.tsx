@@ -1,50 +1,83 @@
 "use client";
 
 import Script from "next/script";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function AnalyticsScripts() {
-  // ⚠️ remplace par ton vrai ID GA4
+  const [isClient, setIsClient] = useState(false);
+  const [consentGiven, setConsentGiven] = useState(false);
   const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 
   useEffect(() => {
+    setIsClient(true);
+    
+    // Vérifier le consentement après le montage du composant
     const prefs = localStorage.getItem("cookie-preferences");
     if (prefs) {
-      const parsed = JSON.parse(prefs);
-      if (parsed.analytics) {
-        // Si consentement analytics => on met à jour le consentement
-        window.gtag?.("consent", "update", {
-          ad_storage: "granted",
-          analytics_storage: "granted",
-        });
+      try {
+        const parsed = JSON.parse(prefs);
+        if (parsed.analytics) {
+          setConsentGiven(true);
+          // Attendre que gtag soit chargé avant de mettre à jour
+          setTimeout(() => {
+            if (window.gtag) {
+              window.gtag("consent", "update", {
+                ad_storage: "granted",
+                analytics_storage: "granted",
+              });
+            }
+          }, 1000);
+        }
+      } catch (e) {
+        console.error("Erreur parsing cookie preferences:", e);
       }
     }
   }, []);
 
-  if (!GA_ID) return null;
+  // Debug - supprimer en production
+  useEffect(() => {
+    if (isClient) {
+      console.log("GA_ID:", GA_ID);
+      console.log("Consent given:", consentGiven);
+    }
+  }, [GA_ID, consentGiven, isClient]);
+
+  // Ne pas afficher si pas côté client ou pas de GA_ID
+  if (!isClient || !GA_ID) {
+    return null;
+  }
 
   return (
     <>
-      {/* Charge la librairie gtag */}
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
         strategy="afterInteractive"
+        onLoad={() => console.log("GA script loaded")}
       />
 
-      {/* Initialisation avec Consent Mode (tout refusé par défaut) */}
       <Script id="ga-init" strategy="afterInteractive">
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
+          
+          // Déclarer gtag globalement
+          window.gtag = gtag;
+          
           gtag('js', new Date());
 
-          // Consent Mode par défaut (refusé)
+          // Consent Mode par défaut
           gtag('consent', 'default', {
             ad_storage: 'denied',
-            analytics_storage: 'denied'
+            analytics_storage: 'denied',
+            wait_for_update: 500
           });
 
-          gtag('config', '${GA_ID}');
+          gtag('config', '${GA_ID}', {
+            send_page_view: false, // On enverra manuellement après consentement
+            anonymize_ip: true
+          });
+
+          console.log('GA initialized with ID: ${GA_ID}');
         `}
       </Script>
     </>

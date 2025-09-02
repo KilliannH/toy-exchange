@@ -43,14 +43,17 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const googleMapsKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   return (
     <html lang="fr">
       <body className={inter.className}>
-        {/* Google Maps API */}
-        <Script
-          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
-          strategy="beforeInteractive"
-        />
+        {/* Google Maps API - seulement si la clé existe */}
+        {googleMapsKey && (
+          <Script
+            src={`https://maps.googleapis.com/maps/api/js?key=${googleMapsKey}&libraries=places`}
+            strategy="beforeInteractive"
+          />
+        )}
 
         <Providers>
           <NavBar />
