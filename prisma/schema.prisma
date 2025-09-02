@@ -17,6 +17,7 @@ model User {
   lng           Float?
   radiusKm      Int?      @default(10)
   points        Int?      @default(0)
+  role          Role      @default(USER)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   emailVerified DateTime?
@@ -36,6 +37,13 @@ model User {
   favorites              Favorite[]
   EmailVerificationToken EmailVerificationToken[]
   Report                 Report[]
+}
+
+enum Role {
+  USER
+  MODERATOR
+  ADMIN
+  SUPER_ADMIN
 }
 
 model Toy {
