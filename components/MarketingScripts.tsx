@@ -1,27 +1,29 @@
 "use client";
 
 import Script from "next/script";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export default function MarketingScripts() {
-  const [marketingOk, setMarketingOk] = useState(false);
+  const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
 
   useEffect(() => {
     const prefs = localStorage.getItem("cookie-preferences");
     if (prefs) {
       const parsed = JSON.parse(prefs);
-      if (parsed.marketing) {
-        setMarketingOk(true);
+      if (parsed.marketing && typeof window !== "undefined" && window.fbq) {
+        // Si consentement marketing => active Meta Pixel
+        window.fbq("consent", "grant");
+        window.fbq("track", "PageView");
       }
     }
   }, []);
 
-  if (!marketingOk) return null;
+  if (!PIXEL_ID) return null;
 
   return (
     <>
-      {/* Meta Pixel Code */}
-      <Script id="meta-pixel" strategy="afterInteractive">
+      {/* Charge la librairie Meta Pixel */}
+      <Script id="meta-pixel-base" strategy="afterInteractive">
         {`
           !function(f,b,e,v,n,t,s)
           {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -31,16 +33,20 @@ export default function MarketingScripts() {
           t.src=v;s=b.getElementsByTagName(e)[0];
           s.parentNode.insertBefore(t,s)}(window, document,'script',
           'https://connect.facebook.net/en_US/fbevents.js');
-          fbq('init', '1301165498212875');
-          fbq('track', 'PageView');
+
+          fbq('init', '${PIXEL_ID}');
+
+          // Par défaut, consentement refusé
+          fbq('consent', 'revoke');
         `}
       </Script>
+
       <noscript>
         <img
           height="1"
           width="1"
           style={{ display: "none" }}
-          src="https://www.facebook.com/tr?id=1301165498212875&ev=PageView&noscript=1"
+          src={`https://www.facebook.com/tr?id=${PIXEL_ID}&ev=PageView&noscript=1`}
         />
       </noscript>
     </>

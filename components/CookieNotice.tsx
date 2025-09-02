@@ -17,12 +17,26 @@ export default function CookieNotice() {
   }, []);
 
   const handleAcceptAll = () => {
-    localStorage.setItem('cookie-consent', 'accepted');
-    localStorage.setItem('cookie-preferences', JSON.stringify({
+    localStorage.setItem("cookie-consent", "accepted");
+    localStorage.setItem("cookie-preferences", JSON.stringify({
       necessary: true,
       analytics: true,
-      marketing: true
+      marketing: true,
     }));
+
+    // Met à jour Google Consent Mode
+    if (typeof window !== "undefined" && window.gtag) {
+      window.gtag("consent", "update", {
+        ad_storage: "granted",
+        analytics_storage: "granted",
+      });
+    }
+
+    if (typeof window !== "undefined" && window.fbq) {
+  window.fbq("consent", "grant");
+  window.fbq("track", "PageView");
+}
+
     setIsVisible(false);
   };
 
@@ -56,7 +70,7 @@ export default function CookieNotice() {
                 Nous utilisons des cookies
               </h3>
               <p className="text-gray-300 text-sm leading-relaxed">
-                Nous utilisons des cookies pour améliorer votre expérience, analyser le trafic et personnaliser le contenu. 
+                Nous utilisons des cookies pour améliorer votre expérience, analyser le trafic et personnaliser le contenu.
                 En continuant à naviguer, vous acceptez notre utilisation des cookies.{' '}
                 <Link href="/legal/privacy" className="text-cyan-400 hover:text-cyan-300 underline">
                   En savoir plus
@@ -76,7 +90,7 @@ export default function CookieNotice() {
                         Toujours activé
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="text-white font-medium text-sm">Cookies analytiques</div>
@@ -115,14 +129,14 @@ export default function CookieNotice() {
                 Personnaliser
               </button>
             )}
-            
+
             <button
               onClick={handleAcceptNecessary}
               className="bg-gray-700 hover:bg-gray-600 text-white font-medium px-4 py-2 rounded-xl transition-colors text-sm"
             >
               Nécessaires uniquement
             </button>
-            
+
             <button
               onClick={handleAcceptAll}
               className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-700 hover:to-purple-700 text-white font-semibold px-6 py-2 rounded-xl transition-all duration-300 shadow-xl text-sm"
