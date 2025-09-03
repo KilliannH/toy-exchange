@@ -1,21 +1,19 @@
 // app/points/cancel/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
     XCircle,
-    ArrowLeft,
     RefreshCw,
-    Coins,
     ToyBrick,
     Home,
     AlertCircle,
     CreditCard
 } from "lucide-react";
 
-export default function PointsCancelPage() {
+function CancelContent() {
     const [isLoading, setIsLoading] = useState(true);
     const searchParams = useSearchParams();
     const sessionId = searchParams.get('session_id');
@@ -190,5 +188,24 @@ export default function PointsCancelPage() {
                 }
             `}</style>
         </div>
+    );
+}
+
+function LoadingFallback() {
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-900 to-slate-900 flex items-center justify-center">
+            <div className="text-center">
+                <div className="animate-spin w-16 h-16 border-4 border-red-400 border-t-transparent rounded-full mx-auto mb-4"></div>
+                <p className="text-white text-lg">Chargement...</p>
+            </div>
+        </div>
+    );
+}
+
+export default function PointsCancelPage() {
+    return (
+        <Suspense fallback={<LoadingFallback />}>
+            <CancelContent />
+        </Suspense>
     );
 }

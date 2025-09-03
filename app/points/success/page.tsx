@@ -1,21 +1,19 @@
 // app/points/success/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
     CheckCircle,
     Coins,
     ArrowRight,
-    Sparkles,
-    Gift,
     ToyBrick,
     Home,
     CreditCard
 } from "lucide-react";
 
-export default function PointsSuccessPage() {
+function SuccessContent() {
     const [isLoading, setIsLoading] = useState(true);
     const [purchaseData, setPurchaseData] = useState<any>(null);
     const searchParams = useSearchParams();
@@ -163,5 +161,24 @@ export default function PointsSuccessPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+function LoadingFallback() {
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+            <div className="text-center">
+                <div className="animate-spin w-16 h-16 border-4 border-green-400 border-t-transparent rounded-full mx-auto mb-4"></div>
+                <p className="text-white text-lg">Chargement...</p>
+            </div>
+        </div>
+    );
+}
+
+export default function PointsSuccessPage() {
+    return (
+        <Suspense fallback={<LoadingFallback />}>
+            <SuccessContent />
+        </Suspense>
     );
 }
