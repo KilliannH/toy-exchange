@@ -5,15 +5,14 @@ import { authOptions } from "../../auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { use } from "react";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-08-27.basil', // Use the latest API version
-});
-
 // app/api/stripe/verify-session/route.ts
 export async function GET(req: NextRequest) {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: '2025-08-27.basil', // Use the latest API version
+  });
   try {
     const sessionId = req.nextUrl.searchParams.get('session_id');
-    
+
     if (!sessionId) {
       return NextResponse.json(
         { error: 'Session ID is required' },
@@ -22,7 +21,7 @@ export async function GET(req: NextRequest) {
     }
 
     const userSession = await getServerSession(authOptions);
-    const user = await prisma.user.findUnique({where: { id: userSession?.user.id} });
+    const user = await prisma.user.findUnique({ where: { id: userSession?.user.id } });
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
     return NextResponse.json({
