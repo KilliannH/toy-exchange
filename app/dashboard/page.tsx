@@ -1,4 +1,3 @@
-// components/DashboardPage.tsx
 "use client";
 
 import useSWR, { mutate } from "swr";
@@ -20,6 +19,10 @@ import {
   ChevronRight,
   Heart,
   ToyBrick,
+  X,
+  User,
+  Calendar,
+  ThumbsUp
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
@@ -52,12 +55,17 @@ export default function DashboardPage() {
     fetcher
   );
 
+  // Charger les reviews pour la popup
+  const { data: reviewsData } = useSWR("/api/reviews/mine", fetcher);
+
   // Normalisation en tableaux
   const toysArr = toArray(toysData);
   const exchangesArr = toArray(exchangesData);
   const favoritesArr = toArray(favoritesData);
+  const reviewsArr = toArray(reviewsData);
 
   const [editingToy, setEditingToy] = useState<any | null>(null);
+  const [showReviewsModal, setShowReviewsModal] = useState(false);
 
   async function handleDelete(toyId: string) {
     if (!confirm("Supprimer ce jouet ?")) return;
@@ -73,6 +81,25 @@ export default function DashboardPage() {
       );
     }
   }
+
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const formatTimeAgo = (date: string | Date) => {
+    const now = new Date();
+    const time = new Date(date);
+    const diffInHours = Math.floor((now.getTime() - time.getTime()) / (1000 * 60 * 60));
+
+    if (diffInHours < 1) return "Il y a quelques minutes";
+    if (diffInHours < 24) return `Il y a ${diffInHours}h`;
+    if (diffInHours < 48) return "Hier";
+    const diffInDays = Math.floor(diffInHours / 24);
+    return `Il y a ${diffInDays} jours`;
+  };
 
   if (toysError || exchangesError || favoritesError) {
     return (
@@ -107,315 +134,434 @@ export default function DashboardPage() {
   const avgRating = typeof stats?.avgRating === "number" ? stats.avgRating.toFixed(1) : "N/A";
   const points = stats?.points ?? session?.user?.points ?? 0;
 
+  // Configuration des cards avec actions
+  const statsCards = [
+    {
+      label: "Mes jouets",
+      value: toysCount,
+      icon: <Gamepad2 className="w-8 h-8" />,
+      color: "from-blue-500 to-cyan-500",
+      action: () => scrollToSection('mes-jouets')
+    },
+    {
+      label: "Échanges actifs",
+      value: exchangesCount,
+      icon: <RefreshCw className="w-8 h-8" />,
+      color: "from-green-500 to-emerald-500",
+      action: () => scrollToSection('mes-echanges')
+    },
+    {
+      label: "Messages",
+      value: unreadMessages,
+      icon: <MessageSquare className="w-8 h-8" />,
+      color: "from-purple-500 to-pink-500",
+      action: () => window.location.href = '/messages'
+    },
+    {
+      label: "Note moyenne",
+      value: avgRating,
+      icon: <Star className="w-8 h-8" />,
+      color: "from-yellow-500 to-orange-500",
+      action: () => setShowReviewsModal(true)
+    },
+    {
+      label: "Mes points",
+      value: points,
+      icon: <BarChart3 className="w-8 h-8" />,
+      color: "from-emerald-500 to-green-500",
+      action: () => window.location.href = '/points'
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative">
-      {/* Animated background */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-3xl animate-bounce" style={{ animationDuration: "4s" }} />
-      </div>
-
-      <div className="relative z-10 pt-24 pb-12 px-6 max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-white via-cyan-300 to-purple-300 bg-clip-text text-transparent mb-4">
-            Mon Dashboard
-          </h1>
-          <p className="text-xl text-gray-300 font-light">
-            Gérez vos jouets et suivez vos échanges
-          </p>
+    <>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative">
+        {/* Animated background */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-3xl animate-bounce" style={{ animationDuration: "4s" }} />
         </div>
 
-        {/* Stats cards */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-12">
-          {[
-            { label: "Mes jouets", value: toysCount, icon: <Gamepad2 className="w-8 h-8" />, color: "from-blue-500 to-cyan-500" },
-            { label: "Échanges actifs", value: exchangesCount, icon: <RefreshCw className="w-8 h-8" />, color: "from-green-500 to-emerald-500" },
-            { label: "Messages", value: unreadMessages, icon: <MessageSquare className="w-8 h-8" />, color: "from-purple-500 to-pink-500" },
-            { label: "Note moyenne", value: avgRating, icon: <Star className="w-8 h-8" />, color: "from-yellow-500 to-orange-500" },
-            { label: "Mes points", value: points, icon: <BarChart3 className="w-8 h-8" />, color: "from-emerald-500 to-green-500" },
-          ].map((stat, i) => (
-            <div
-              key={i}
-              className="group bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:scale-105 transition-all duration-300"
-            >
-              <div className="text-cyan-400 mb-2 group-hover:scale-110 transition-transform duration-300">
-                {stat.icon}
+        <div className="relative z-10 pt-24 pb-12 px-6 max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <h1 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-white via-cyan-300 to-purple-300 bg-clip-text text-transparent mb-4">
+              Mon Dashboard
+            </h1>
+            <p className="text-xl text-gray-300 font-light">
+              Gérez vos jouets et suivez vos échanges
+            </p>
+          </div>
+
+          {/* Stats cards - Now clickable */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-12">
+            {statsCards.map((stat, i) => (
+              <div
+                key={i}
+                onClick={stat.action}
+                className={`group bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:scale-105 transition-all duration-300 ${stat.action ? 'cursor-pointer' : ''
+                  }`}
+              >
+                <div className="text-cyan-400 mb-2 group-hover:scale-110 transition-transform duration-300">
+                  {stat.icon}
+                </div>
+                <div className={`text-2xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
+                  {stat.value}
+                </div>
+                <div className="text-gray-400 text-sm font-medium">
+                  {stat.label}
+                </div>
+                {stat.action && stat.label !== "Mes points" && (
+                  <div className="text-xs text-gray-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    Cliquez pour {stat.label === "Messages" ? "voir" : "aller à"} {stat.label.toLowerCase()}
+                  </div>
+                )}
+                {stat.label === "Mes points" && (
+                  <div className="text-xs text-gray-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    Cliquez pour acheter plus de points
+                  </div>
+                )}
               </div>
-              <div className={`text-2xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
-                {stat.value}
-              </div>
-              <div className="text-gray-400 text-sm font-medium">
-                {stat.label}
-              </div>
+            ))}
+          </div>
+
+          {/* Editing form */}
+          {editingToy && (
+            <div className="mb-8 bg-black/20 backdrop-blur-xl border border-purple-500/30 rounded-3xl p-8">
+              <EditToyForm toy={editingToy} onClose={() => setEditingToy(null)} />
             </div>
-          ))}
-        </div>
+          )}
 
-        {/* Editing form */}
-        {editingToy && (
-          <div className="mb-8 bg-black/20 backdrop-blur-xl border border-purple-500/30 rounded-3xl p-8">
-            <EditToyForm toy={editingToy} onClose={() => setEditingToy(null)} />
-          </div>
-        )}
-
-        {/* === SECTION: Mes jouets === */}
-        <div className="mt-8">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-white">Mes jouets ({toysArr.length})</h2>
-            <Link
-              href="/post"
-              className="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold px-6 py-3 rounded-xl hover:scale-105 hover:shadow-lg hover:shadow-green-500/25 transition-all duration-300 flex items-center gap-2"
-            >
-              <Plus className="w-5 h-5" />
-              Ajouter un jouet
-            </Link>
-          </div>
-
-          {toysArr.length === 0 ? (
-            <div className="text-center py-16 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl">
-              <div className="text-8xl mb-6 text-gray-500">
-                <Gamepad2 size={96} className="mx-auto" />
-              </div>
-              <h2 className="text-3xl font-bold text-white mb-4">Votre collection est vide</h2>
-              <p className="text-xl text-gray-400 mb-8 max-w-md mx-auto">
-                Commencez par ajouter vos premiers jouets et rejoignez la communauté d'échange !
-              </p>
+          {/* === SECTION: Mes jouets === */}
+          <div className="mt-8" id="mes-jouets">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-3xl font-bold text-white">Mes jouets ({toysArr.length})</h2>
               <Link
                 href="/post"
-                className="group relative overflow-hidden bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold px-8 py-4 rounded-2xl shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-2"
+                className="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold px-6 py-3 rounded-xl hover:scale-105 hover:shadow-lg hover:shadow-green-500/25 transition-all duration-300 flex items-center gap-2"
               >
-                <span className="relative z-10 flex items-center gap-2">
-                  <Plus className="w-5 h-5" />
-                  Poster mon premier jouet
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-emerald-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <Plus className="w-5 h-5" />
+                Ajouter un jouet
               </Link>
             </div>
-          ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {toysArr.map((toy: any, index: number) => (
-                <div
-                  key={toy.id}
-                  className="group bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 hover:bg-white/10 hover:border-white/20 hover:scale-105 transition-all duration-500 relative overflow-hidden"
-                  style={{ animationDelay: `${index * 100}ms` }}
+
+            {toysArr.length === 0 ? (
+              <div className="text-center py-16 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl">
+                <div className="text-8xl mb-6 text-gray-500">
+                  <Gamepad2 size={96} className="mx-auto" />
+                </div>
+                <h2 className="text-3xl font-bold text-white mb-4">Votre collection est vide</h2>
+                <p className="text-xl text-gray-400 mb-8 max-w-md mx-auto">
+                  Commencez par ajouter vos premiers jouets et rejoignez la communauté d'échange !
+                </p>
+                <Link
+                  href="/post"
+                  className="group relative overflow-hidden bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold px-8 py-4 rounded-2xl shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-2"
                 >
-                  {/* Card glow effect */}
-                  <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 rounded-3xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500" />
+                  <span className="relative z-10 flex items-center gap-2">
+                    <Plus className="w-5 h-5" />
+                    Poster mon premier jouet
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-emerald-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </Link>
+              </div>
+            ) : (
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {toysArr.map((toy: any, index: number) => (
+                  <div
+                    key={toy.id}
+                    className="group bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 hover:bg-white/10 hover:border-white/20 hover:scale-105 transition-all duration-500 relative overflow-hidden"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    {/* Card glow effect */}
+                    <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 rounded-3xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500" />
 
-                  <div className="relative z-10">
-                    {/* Toy header */}
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors duration-300">
-                          {toy.title}
-                        </h3>
-                        <p className="text-gray-400 text-sm leading-relaxed">
-                          {toy.description}
-                        </p>
+                    <div className="relative z-10">
+                      {/* Toy header */}
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors duration-300">
+                            {toy.title}
+                          </h3>
+                          <p className="text-gray-400 text-sm leading-relaxed">
+                            {toy.description}
+                          </p>
+                        </div>
+                        <div className="ml-4 text-cyan-400 group-hover:scale-110 transition-transform duration-300">
+                          <Gamepad2 className="w-8 h-8" />
+                        </div>
                       </div>
-                      <div className="ml-4 text-cyan-400 group-hover:scale-110 transition-transform duration-300">
-                        <Gamepad2 className="w-8 h-8" />
+
+                      {/* Toy details */}
+                      <div className="flex items-center gap-4 mb-6">
+                        {(toy.ageMin != null || toy.ageMax != null) && (
+                          <span className="bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full text-xs font-medium border border-purple-500/30">
+                            {toy.ageMin ?? "?"}-{toy.ageMax ?? "?"} ans
+                          </span>
+                        )}
+                        {toy.condition && (
+                          <span className="bg-green-500/20 text-green-300 px-3 py-1 rounded-full text-xs font-medium border border-green-500/30">
+                            {toy.condition}
+                          </span>
+                        )}
                       </div>
-                    </div>
 
-                    {/* Toy details */}
-                    <div className="flex items-center gap-4 mb-6">
-                      {(toy.ageMin != null || toy.ageMax != null) && (
-                        <span className="bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full text-xs font-medium border border-purple-500/30">
-                          {toy.ageMin ?? "?"}-{toy.ageMax ?? "?"} ans
-                        </span>
-                      )}
-                      {toy.condition && (
-                        <span className="bg-green-500/20 text-green-300 px-3 py-1 rounded-full text-xs font-medium border border-green-500/30">
-                          {toy.condition}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Action buttons */}
-                    <div className="flex items-center justify-between">
-                      <Link
-                        href={`/toys/${toy.id}`}
-                        className="text-cyan-400 font-medium hover:text-cyan-300 transition-colors duration-200 flex items-center gap-2"
-                      >
-                        <Eye className="w-4 h-4" />
-                        <span>Voir détails</span>
-                        <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-                      </Link>
-
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => setEditingToy(toy)}
-                          className="group/btn p-2 bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/20 hover:border-yellow-500/40 rounded-lg transition-all duration-200"
-                          title="Modifier"
+                      {/* Action buttons */}
+                      <div className="flex items-center justify-between">
+                        <Link
+                          href={`/toys/${toy.id}`}
+                          className="text-cyan-400 font-medium hover:text-cyan-300 transition-colors duration-200 flex items-center gap-2"
                         >
-                          <Edit className="w-4 h-4 text-yellow-400 group-hover/btn:scale-110 transition-transform duration-200" />
-                        </button>
+                          <Eye className="w-4 h-4" />
+                          <span>Voir détails</span>
+                          <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                        </Link>
 
-                        <button
-                          onClick={() => handleDelete(toy.id)}
-                          className="group/btn p-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40 rounded-lg transition-all duration-200"
-                          title="Supprimer"
-                        >
-                          <Trash2 className="w-4 h-4 text-red-400 group-hover/btn:scale-110 transition-transform duration-200" />
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => setEditingToy(toy)}
+                            className="group/btn p-2 bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/20 hover:border-yellow-500/40 rounded-lg transition-all duration-200"
+                            title="Modifier"
+                          >
+                            <Edit className="w-4 h-4 text-yellow-400 group-hover/btn:scale-110 transition-transform duration-200" />
+                          </button>
+
+                          <button
+                            onClick={() => handleDelete(toy.id)}
+                            className="group/btn p-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40 rounded-lg transition-all duration-200"
+                            title="Supprimer"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-400 group-hover/btn:scale-110 transition-transform duration-200" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Section Mes favoris */}
-        <div className="mt-16">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-white">Mes favoris ({favoritesArr.length})</h2>
+                ))}
+              </div>
+            )}
           </div>
 
-          {favoritesLoading ? (
-            <div className="text-center text-gray-400">Chargement de vos favoris...</div>
-          ) : favoritesError ? (
-            <div className="text-center text-red-400">Erreur lors du chargement des favoris</div>
-          ) : favoritesArr.length === 0 ? (
-            <div className="text-center py-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl">
-              <Heart size={96} className="text-gray-500 mx-auto mb-6" />
-              <h3 className="text-2xl font-bold text-white mb-2">Aucun favori pour le moment</h3>
-              <p className="text-gray-400 max-w-md mx-auto">
-                Parcourez les jouets et ajoutez ceux qui vous plaisent à vos favoris !
-              </p>
-              <Link
-                href="/toys"
-                className="mt-6 inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold px-6 py-3 rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl"
-              >
-                <ToyBrick size={20} />
-                Découvrir des jouets
-              </Link>
+          {/* Section Mes favoris */}
+          <div className="mt-16">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-3xl font-bold text-white">Mes favoris ({favoritesArr.length})</h2>
             </div>
-          ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {favoritesArr.map((fav: any) => {
-                const img0 = fav?.toy?.images?.[0];
-                const signedUrl = img0?.signedUrl;
-                const title = fav?.toy?.title ?? "Jouet";
-                const ownerName = fav?.toy?.user?.name || fav?.toy?.user?.email || "Membre";
-                const toyId = fav?.toy?.id;
 
-                return (
-                  <div
-                    key={fav.id ?? `${toyId}-${title}`}
-                    className="group bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition-all duration-300"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden bg-white/10">
-                        {signedUrl ? (
-                          <img
-                            src={signedUrl}
-                            alt={title}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-500">
-                            <ToyBrick className="w-6 h-6" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-xl font-bold text-white mb-2">
-                          {title}
-                        </h3>
-                        <p className="text-gray-400 text-sm mb-4">
-                          Proposé par {ownerName}
-                        </p>
-                        {toyId && (
-                          <Link
-                            href={`/toys/${toyId}`}
-                            className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors text-sm"
-                          >
-                            <Eye className="w-4 h-4" />
-                            Voir les détails
-                          </Link>
-                        )}
+            {favoritesLoading ? (
+              <div className="text-center text-gray-400">Chargement de vos favoris...</div>
+            ) : favoritesError ? (
+              <div className="text-center text-red-400">Erreur lors du chargement des favoris</div>
+            ) : favoritesArr.length === 0 ? (
+              <div className="text-center py-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl">
+                <Heart size={96} className="text-gray-500 mx-auto mb-6" />
+                <h3 className="text-2xl font-bold text-white mb-2">Aucun favori pour le moment</h3>
+                <p className="text-gray-400 max-w-md mx-auto">
+                  Parcourez les jouets et ajoutez ceux qui vous plaisent à vos favoris !
+                </p>
+                <Link
+                  href="/toys"
+                  className="mt-6 inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold px-6 py-3 rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl"
+                >
+                  <ToyBrick size={20} />
+                  Découvrir des jouets
+                </Link>
+              </div>
+            ) : (
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {favoritesArr.map((fav: any) => {
+                  const img0 = fav?.toy?.images?.[0];
+                  const signedUrl = img0?.signedUrl;
+                  const title = fav?.toy?.title ?? "Jouet";
+                  const ownerName = fav?.toy?.user?.name || fav?.toy?.user?.email || "Membre";
+                  const toyId = fav?.toy?.id;
+
+                  return (
+                    <div
+                      key={fav.id ?? `${toyId}-${title}`}
+                      className="group bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition-all duration-300"
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden bg-white/10">
+                          {signedUrl ? (
+                            <img
+                              src={signedUrl}
+                              alt={title}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-500">
+                              <ToyBrick className="w-6 h-6" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-xl font-bold text-white mb-2">
+                            {title}
+                          </h3>
+                          <p className="text-gray-400 text-sm mb-4">
+                            Proposé par {ownerName}
+                          </p>
+                          {toyId && (
+                            <Link
+                              href={`/toys/${toyId}`}
+                              className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors text-sm"
+                            >
+                              <Eye className="w-4 h-4" />
+                              Voir les détails
+                            </Link>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
-        {/* Section Mes échanges */}
-        <div className="mt-16">
-          <h2 className="text-3xl font-bold text-white mb-8">Mes échanges ({exchangesArr.length})</h2>
+          {/* Section Mes échanges */}
+          <div className="mt-16" id="mes-echanges">
+            <h2 className="text-3xl font-bold text-white mb-8">Mes échanges ({exchangesArr.length})</h2>
 
-          {exchangesLoading ? (
-            <div className="text-center text-gray-400">Chargement de vos échanges...</div>
-          ) : exchangesError ? (
-            <div className="text-center text-red-400">Erreur lors du chargement des échanges</div>
-          ) : exchangesArr.length === 0 ? (
-            <div className="text-center text-gray-400">Vous n’avez aucun échange en cours.</div>
-          ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {exchangesArr.map((ex: any) => {
-                const toyTitle = ex?.toy?.title ?? "Jouet";
-                const toyId = ex?.toy?.id;
-                const requesterName = ex?.requester?.name || ex?.requester?.email || "Membre";
-                const status: string = ex?.status ?? "PENDING";
-                const myId = session?.user?.id;
+            {exchangesLoading ? (
+              <div className="text-center text-gray-400">Chargement de vos échanges...</div>
+            ) : exchangesError ? (
+              <div className="text-center text-red-400">Erreur lors du chargement des échanges</div>
+            ) : exchangesArr.length === 0 ? (
+              <div className="text-center text-gray-400">Vous n'avez aucun échange en cours.</div>
+            ) : (
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {exchangesArr.map((ex: any) => {
+                  const toyTitle = ex?.toy?.title ?? "Jouet";
+                  const toyId = ex?.toy?.id;
+                  const requesterName = ex?.requester?.name || ex?.requester?.email || "Membre";
+                  const status: string = ex?.status ?? "PENDING";
+                  const myId = session?.user?.id;
 
-                let partnerId: string | undefined;
-                if (ex?.requesterId === myId) {
-                  partnerId = ex?.toy?.user?.id; // je suis le demandeur → partenaire = propriétaire du jouet
-                } else {
-                  partnerId = ex?.requesterId; // je suis le propriétaire → partenaire = demandeur
-                }
+                  let partnerId: string | undefined;
+                  if (ex?.requesterId === myId) {
+                    partnerId = ex?.toy?.user?.id; // je suis le demandeur → partenaire = propriétaire du jouet
+                  } else {
+                    partnerId = ex?.requesterId; // je suis le propriétaire → partenaire = demandeur
+                  }
 
-                return (
-                  <div
-                    key={ex.id ?? `${toyId}-ex`}
-                    className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition-all duration-300"
-                  >
-                    <h3 className="text-lg font-bold text-white mb-2">
-                      {toyTitle}
-                    </h3>
-                    <p className="text-gray-400 text-sm mb-4">
-                      Proposé par {requesterName}
-                    </p>
+                  return (
+                    <div
+                      key={ex.id ?? `${toyId}-ex`}
+                      className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition-all duration-300"
+                    >
+                      <h3 className="text-lg font-bold text-white mb-2">
+                        {toyTitle}
+                      </h3>
+                      <p className="text-gray-400 text-sm mb-4">
+                        Proposé par {requesterName}
+                      </p>
 
-                    <div className="flex items-center gap-2 mb-4">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium border ${status === "PENDING"
+                      <div className="flex items-center gap-2 mb-4">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-medium border ${status === "PENDING"
                             ? "bg-yellow-500/20 text-yellow-300 border-yellow-500/30"
                             : status === "ACCEPTED"
                               ? "bg-green-500/20 text-green-300 border-green-500/30"
                               : status === "REJECTED"
                                 ? "bg-red-500/20 text-red-300 border-red-500/30"
                                 : "bg-gray-500/20 text-gray-300 border-gray-500/30"
-                          }`}
-                      >
-                        {status}
-                      </span>
-                    </div>
+                            }`}
+                        >
+                          {status}
+                        </span>
+                      </div>
 
-                    {toyId && partnerId && (
-                      <Link
-                        href={`/messages/${toyId}?partnerId=${partnerId}`}
-                        className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors text-sm"
-                      >
-                        <MessageSquare className="w-4 h-4" />
-                        Ouvrir la conversation
-                      </Link>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
+                      {toyId && partnerId && (
+                        <Link
+                          href={`/messages/${toyId}?partnerId=${partnerId}`}
+                          className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors text-sm"
+                        >
+                          <MessageSquare className="w-4 h-4" />
+                          Ouvrir la conversation
+                        </Link>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Modal Reviews */}
+      {showReviewsModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-yellow-500/30 rounded-3xl p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto relative">
+            <button
+              onClick={() => setShowReviewsModal(false)}
+              className="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            <div className="text-center mb-6">
+              <div className="text-6xl text-yellow-400 mb-4">
+                <Star size={64} className="mx-auto" />
+              </div>
+              <h3 className="text-2xl font-bold text-yellow-400 mb-2">
+                Mes avis ({reviewsArr.length})
+              </h3>
+              <div className="text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                {avgRating} ⭐
+              </div>
+            </div>
+
+            {reviewsArr.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-400">Aucun avis reçu pour le moment</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {reviewsArr.slice(0, 10).map((review: any, index: number) => (
+                  <div key={index} className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full flex items-center justify-center text-white font-bold">
+                          <User className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-white">
+                            {review.reviewer?.name || "Utilisateur"}
+                          </div>
+                          <div className="text-xs text-gray-500 flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {formatTimeAgo(review.createdAt)}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            size={16}
+                            className={i < review.rating
+                              ? "text-yellow-400 fill-current"
+                              : "text-gray-600"
+                            }
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    {review.comment && (
+                      <p className="text-gray-300 text-sm">
+                        {review.comment}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </>
   );
 }

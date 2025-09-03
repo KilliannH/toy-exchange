@@ -225,25 +225,6 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* Liens rapides */}
-            <div>
-              <h4 className="text-white font-semibold mb-4">Liens rapides</h4>
-              <div className="space-y-2">
-                <Link href="/toys" className="block text-gray-400 hover:text-cyan-400 transition-colors">
-                  Parcourir les jouets
-                </Link>
-                <Link href="/post" className="block text-gray-400 hover:text-cyan-400 transition-colors">
-                  Ajouter un jouet
-                </Link>
-                <Link href="/dashboard" className="block text-gray-400 hover:text-cyan-400 transition-colors">
-                  Mon tableau de bord
-                </Link>
-                <Link href="/profile" className="block text-gray-400 hover:text-cyan-400 transition-colors">
-                  Mon profil
-                </Link>
-              </div>
-            </div>
-
             {/* Légal */}
             <div>
               <h4 className="text-white font-semibold mb-4">Légal</h4>
