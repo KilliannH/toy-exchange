@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -40,6 +41,7 @@ function toArray<T = any>(data: any): T[] {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const { data: session } = useSession();
 
   const { data: toysData, error: toysError, isLoading: toysLoading } = useSWR("/api/toys/mine", fetcher);
@@ -155,7 +157,7 @@ export default function DashboardPage() {
       value: unreadMessages,
       icon: <MessageSquare className="w-8 h-8" />,
       color: "from-purple-500 to-pink-500",
-      action: () => window.location.href = '/messages'
+      action: () => router.push('/messages')
     },
     {
       label: "Note moyenne",
@@ -169,7 +171,7 @@ export default function DashboardPage() {
       value: points,
       icon: <BarChart3 className="w-8 h-8" />,
       color: "from-emerald-500 to-green-500",
-      action: () => window.location.href = '/points'
+      action: () => router.push('/points')
     },
   ];
 

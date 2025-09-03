@@ -85,7 +85,7 @@ export default function RegisterPage() {
                 password.length < 8 ? '🟢 Bon' : '💪 Excellent';
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative flex items-center justify-center p-6">
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative flex items-center justify-center pt-20 p-6">
             {/* Dynamic background orbs */}
             <div className="absolute inset-0 opacity-25">
                 <div className="absolute top-1/3 left-1/5 w-80 h-80 bg-gradient-to-r from-emerald-400 to-cyan-500 rounded-full blur-3xl animate-pulse" />
