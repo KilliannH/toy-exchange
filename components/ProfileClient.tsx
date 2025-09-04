@@ -95,7 +95,7 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
                 setLoadingActivities(false);
             }
         }
-        
+
         fetchActivities();
     }, []);
 
@@ -118,7 +118,7 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
         const time = new Date(timeString);
         const now = new Date();
         const diffInHours = Math.floor((now.getTime() - time.getTime()) / (1000 * 60 * 60));
-        
+
         if (diffInHours < 1) return "Il y a quelques minutes";
         if (diffInHours < 24) return `Il y a ${diffInHours}h`;
         if (diffInHours < 48) return "Hier";
@@ -128,9 +128,9 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
 
     const handleDeleteAccount = async () => {
         if (deleteConfirmation !== "SUPPRIMER") return;
-        
+
         setIsDeleting(true);
-        
+
         try {
             const response = await fetch("/api/users/delete", {
                 method: "DELETE",
@@ -204,11 +204,23 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
                 <div className="relative z-10 pt-24 pb-12 px-6 max-w-4xl mx-auto">
                     {/* Profile header */}
                     <div className="text-center mb-12">
-                        <div className="relative inline-block mb-6">
-                            <div className="w-32 h-32 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full flex items-center justify-center text-white text-4xl font-black shadow-2xl">
-                                {user.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase()}
+                        <div className="relative group inline-block mb-6">
+                            <div className="w-32 h-32 rounded-full shadow-2xl overflow-hidden flex items-center justify-center bg-gradient-to-r from-cyan-400 to-purple-400">
+                                {user?.image ? (
+                                    <img
+                                        src={user.image}
+                                        alt={user.name || user.email || "Avatar"}
+                                        width={128}
+                                        height={128}
+                                        className="object-cover w-full h-full"
+                                    />
+                                ) : (
+                                    <span className="text-white text-4xl font-black">
+                                        {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase()}
+                                    </span>
+                                )}
                             </div>
-                            <div className="absolute -inset-2 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full blur-lg opacity-30 animate-pulse" />
+                            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400/40 to-purple-400/40 rounded-full blur-md opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
                         </div>
 
                         <h1 className="text-5xl font-black bg-gradient-to-r from-white via-cyan-300 to-purple-300 bg-clip-text text-transparent mb-4">
@@ -471,7 +483,7 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
                     <div className="mt-12 bg-gradient-to-r from-emerald-500/10 via-cyan-500/10 to-purple-500/10 backdrop-blur-xl border border-emerald-500/20 rounded-3xl p-8 text-center">
                         <div className="flex items-center justify-center gap-4 mb-4">
                             <div className="text-4xl text-emerald-400 animate-bounce">
-                              <Trophy size={48} className="mx-auto" />
+                                <Trophy size={48} className="mx-auto" />
                             </div>
                             <h3 className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
                                 Membre actif de la communauté !
@@ -543,18 +555,17 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
                                                 <p className="text-gray-400 text-sm truncate">
                                                     {activity.toy}
                                                 </p>
-                                                <div className={`mt-2 inline-block px-2 py-1 rounded-lg text-xs font-medium ${
-                                                    activity.type === 'post'
+                                                <div className={`mt-2 inline-block px-2 py-1 rounded-lg text-xs font-medium ${activity.type === 'post'
                                                         ? 'bg-blue-500/20 text-blue-300'
                                                         : activity.type === 'exchange'
-                                                        ? 'bg-green-500/20 text-green-300'
-                                                        : 'bg-purple-500/20 text-purple-300'
-                                                }`}>
+                                                            ? 'bg-green-500/20 text-green-300'
+                                                            : 'bg-purple-500/20 text-purple-300'
+                                                    }`}>
                                                     {activity.type === 'post'
                                                         ? 'Nouveau jouet'
                                                         : activity.type === 'exchange'
-                                                        ? 'Échange'
-                                                        : 'Message'
+                                                            ? 'Échange'
+                                                            : 'Message'
                                                     }
                                                 </div>
                                             </div>
@@ -608,7 +619,7 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
                             }}
                             className="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors"
                         >
-                            <X className="w-6 h-6" /> 
+                            <X className="w-6 h-6" />
                         </button>
 
                         <div className="text-center mb-6">
@@ -662,11 +673,10 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
                             <button
                                 onClick={handleDeleteAccount}
                                 disabled={deleteConfirmation !== "SUPPRIMER" || isDeleting}
-                                className={`flex-1 font-semibold py-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 ${
-                                    deleteConfirmation === "SUPPRIMER" && !isDeleting
+                                className={`flex-1 font-semibold py-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 ${deleteConfirmation === "SUPPRIMER" && !isDeleting
                                         ? "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-xl"
                                         : "bg-gray-600 text-gray-400 cursor-not-allowed"
-                                }`}
+                                    }`}
                             >
                                 {isDeleting ? (
                                     <>

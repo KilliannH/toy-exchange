@@ -17,6 +17,7 @@ export default function NavBar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const { data: unreadData } = useSWR(session ? '/api/messages/unread' : null, fetcher);
+  const { data: avatarData } = useSWR(session ? "/api/profile/avatar" : null, fetcher);
   const unreadCount = unreadData?.count || 0;
 
   const handleSignOut = async () => {
@@ -134,8 +135,22 @@ export default function NavBar() {
                   href="/profile"
                   className="flex items-center gap-3 bg-white/10 hover:bg-white/15 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20 transition-all duration-300 hover:scale-105 cursor-pointer group"
                 >
-                  <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white font-bold">
-                    <User size={16} />
+                  <div className="relative group w-8 h-8 rounded-full overflow-hidden flex items-center justify-center">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-purple-400/40 to-pink-400/40 rounded-full blur-md opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
+
+                    <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-r from-purple-400 to-pink-400 relative z-10">
+                      {avatarData?.image ? (
+                        <img
+                          src={avatarData.image}
+                          alt={session.user?.name || "Avatar"}
+                          width={32}
+                          height={32}
+                          className="object-cover w-full h-full"
+                        />
+                      ) : (
+                        <User size={16} className="text-white" />
+                      )}
+                    </div>
                   </div>
                   <span className="text-white font-medium text-sm group-hover:text-cyan-300 transition-colors duration-300">
                     {session.user?.name || session.user?.email?.split('@')[0]}

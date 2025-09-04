@@ -1,14 +1,18 @@
 "use client";
 
+import { useDropzone } from "react-dropzone";
 import { useState, useEffect } from "react";
 import { ArrowLeft, Edit, Check, User, MapPin, Search, Lightbulb, Target, Home, Ruler, ShieldCheck, Save, Loader2 } from "lucide-react";
 import usePlacesAutocomplete, { getGeocode, getLatLng } from "use-places-autocomplete";
 import { Combobox } from "@headlessui/react";
 import toast from "react-hot-toast";
+import ImageUploadCard from "@/components/ImageUploadCard";
 
 export default function EditProfilePage() {
     const [name, setName] = useState("");
     const [city, setCity] = useState("");
+    const [image, setImage] = useState(null);
+    const [file, setFile] = useState<File | null>(null);
     const [radiusKm, setRadiusKm] = useState(10);
     const [loading, setLoading] = useState(false);
     const [initialLoading, setInitialLoading] = useState(true);
@@ -37,12 +41,13 @@ export default function EditProfilePage() {
             .then((data) => {
                 setName(data.name || "");
                 setCity(data.city || "");
+                setImage(data.image || null);
                 setRadiusKm(data.radiusKm || 10);
                 setLat(data.lat || null);
                 setLng(data.lng || null);
                 setInitialLoading(false);
                 // Mettre à jour l'input de la Combobox avec la ville par défaut
-                setValue(data.city || ""); 
+                setValue(data.city || "");
             });
     }, [setValue]);
 
@@ -64,18 +69,47 @@ export default function EditProfilePage() {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setLoading(true);
-        
+
+        let finalImageUrl = image;
+
+        // Si un nouveau fichier a été choisi → upload vers GCS
+        if (file) {
+            const res = await fetch("/api/upload-url", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ fileName: file.name, fileType: file.type }),
+            });
+
+            if (!res.ok) {
+                toast.error("Erreur génération URL signée");
+                setLoading(false);
+                return;
+            }
+
+            const { url, publicUrl } = await res.json();
+
+            // Upload physique
+            await fetch(url, {
+                method: "PUT",
+                headers: { "Content-Type": file.type },
+                body: file,
+            });
+
+            finalImageUrl = publicUrl; // URL finale pour la DB
+        }
+
+        // PATCH du profil
         await fetch("/api/profile", {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, city, radiusKm, lat, lng }),
+            body: JSON.stringify({ name, city, radiusKm, lat, lng, image: finalImageUrl }),
         });
-        
+
         setSaved(true);
         setLoading(false);
-        
         setTimeout(() => setSaved(false), 3000);
     }
+
 
     if (initialLoading) {
         return (
@@ -93,7 +127,7 @@ export default function EditProfilePage() {
 
             <div className="relative z-10 pt-24 pb-12 px-6 max-w-3xl mx-auto">
                 {/* Back button */}
-                <button 
+                <button
                     onClick={() => window.history.back()}
                     className="mb-8 group flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105"
                 >
@@ -129,6 +163,11 @@ export default function EditProfilePage() {
                     {/* Form section */}
                     <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
                         <div className="space-y-6">
+                            {/* Image Upload */}
+                            <div className="relative group">
+                                <label className="block text-sm font-medium text-gray-300 mb-3">Photo de profil</label>
+                                <ImageUploadCard image={image} setImage={setImage} setFile={setFile} />
+                            </div>
                             {/* Name field */}
                             <div className="relative group">
                                 <label className="block text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
@@ -195,7 +234,7 @@ export default function EditProfilePage() {
                                             Zone d'échange
                                         </div>
                                     </div>
-                                    
+
                                     <input
                                         type="range"
                                         min="1"
@@ -204,7 +243,7 @@ export default function EditProfilePage() {
                                         onChange={(e) => setRadiusKm(Number(e.target.value))}
                                         className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer slider"
                                     />
-                                    
+
                                     <div className="flex justify-between text-xs text-gray-400 mt-2">
                                         <span>1 km</span>
                                         <span>Proximité</span>
@@ -214,7 +253,7 @@ export default function EditProfilePage() {
                             </div>
 
                             {/* Save button */}
-                            <button 
+                            <button
                                 onClick={handleSubmit}
                                 disabled={loading || !name || !city}
                                 className="group relative overflow-hidden w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold px-6 py-5 rounded-2xl shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100"
@@ -248,8 +287,20 @@ export default function EditProfilePage() {
                             <div className="space-y-4">
                                 <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                                            {name?.charAt(0)?.toUpperCase() || "?"}
+                                        <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-r from-cyan-400 to-purple-400">
+                                            {image ? (
+                                                <img
+                                                    src={image}
+                                                    alt={name || "Avatar"}
+                                                    width={48}
+                                                    height={48}
+                                                    className="object-cover w-full h-full"
+                                                />
+                                            ) : (
+                                                <span className="text-white font-bold text-xl">
+                                                    {name?.charAt(0)?.toUpperCase() || "?"}
+                                                </span>
+                                            )}
                                         </div>
                                         <div>
                                             <div className="text-white font-semibold">
@@ -280,7 +331,7 @@ export default function EditProfilePage() {
                                 <Lightbulb className="w-6 h-6" />
                                 Conseils
                             </h3>
-                            
+
                             <div className="space-y-4">
                                 {[
                                     {
@@ -322,7 +373,7 @@ export default function EditProfilePage() {
                                 <div>
                                     <h4 className="text-yellow-300 font-semibold mb-2">Confidentialité</h4>
                                     <p className="text-yellow-200/80 text-sm leading-relaxed">
-                                        Vos informations ne sont visibles que par les autres membres lors d'échanges confirmés. 
+                                        Vos informations ne sont visibles que par les autres membres lors d'échanges confirmés.
                                         Votre email reste toujours privé.
                                     </p>
                                 </div>

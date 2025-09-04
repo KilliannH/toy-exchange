@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import ProfileClient from "@/components/ProfileClient";
 import { Frown } from "lucide-react"; // Import a suitable icon
+import { getBucket } from "@/lib/storage";
 
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions);
@@ -30,6 +31,26 @@ export default async function ProfilePage() {
       </div>
     );
   }
+
+  // ⚡ Signed URL si image privée
+  let signedImageUrl: string | null = null;
+  if (user.image) {
+    const objectPath = user.image.replace(
+      `https://storage.googleapis.com/${process.env.GCP_BUCKET_NAME}/`,
+      ""
+    );
+    const bucket = getBucket();
+    const file = bucket.file(objectPath);
+    const [url] = await file.getSignedUrl({
+      version: "v4",
+      action: "read",
+      expires: Date.now() + 5 * 60 * 1000, // 5 min
+    });
+    signedImageUrl = url;
+  }
+
+  // Replace plain URL by signed one
+  const userWithSignedImage = { ...user, image: signedImageUrl };
 
   // Calculate statistics
   let stats = {
@@ -77,5 +98,5 @@ export default async function ProfilePage() {
     }
   }
 
-  return <ProfileClient user={user} stats={stats} />;
+  return <ProfileClient user={userWithSignedImage} stats={stats} />;
 }
