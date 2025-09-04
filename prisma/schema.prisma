@@ -15,6 +15,7 @@ model User {
   city          String?
   lat           Float?
   lng           Float?
+  image        String?
   radiusKm      Int?      @default(10)
   points        Int?      @default(0)
   role          Role      @default(USER)
