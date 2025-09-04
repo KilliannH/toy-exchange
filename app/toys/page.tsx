@@ -4,7 +4,7 @@ import Link from "next/link";
 import useSWR, { mutate } from "swr";
 import { useMemo, useState, useEffect, useRef } from "react";
 import useSWRInfinite from "swr/infinite";
-import { Search, RotateCcw, Gem, ToyBrick, X, ListFilter, Grid2X2, Gift, Bolt, Plus, Sparkles } from "lucide-react";
+import { Search, RotateCcw, Gem, ToyBrick, X, ListFilter, Grid2X2, Gift, Bolt, Plus, Sparkles, MapPin } from "lucide-react";
 
 type ToyImage = { signedUrl?: string; url?: string; };
 type Toy = {
@@ -32,12 +32,12 @@ export default function ToysPage() {
     const [filter, setFilter] = useState<"all" | "EXCHANGE" | "POINTS" | "DON">("all");
     const [searchTerm, setSearchTerm] = useState("");
     const limit = 20;
+    const [ignoreGeo, setIgnoreGeo] = useState(false);
 
     const getKey = (pageIndex: number, previousPageData: ToysResponse | null) => {
         if (previousPageData && !previousPageData.hasMore) return null;
-        return `/api/toys?page=${pageIndex + 1}&limit=${limit}`;
+        return `/api/toys?page=${pageIndex + 1}&limit=${limit}${ignoreGeo ? "&ignoreGeo=true" : ""}`;
     };
-
     const { data, error, isLoading, isValidating, setSize } = useSWRInfinite<ToysResponse>(getKey, fetcher, {
         revalidateFirstPage: false,
         keepPreviousData: true,
@@ -214,21 +214,35 @@ export default function ToysPage() {
 
                 {/* Results count */}
                 <div className="flex items-center justify-between mb-8">
-                    {filteredToys.length > 0 &&
+                    {filteredToys.length > 0 && (
                         <p className="text-gray-300">
-                            <span className="text-cyan-400 font-bold text-lg">{filteredToys.length}</span> résultat{filteredToys.length !== 1 ? "s" : ""} affiché{filteredToys.length !== 1 ? "s" : ""} sur <span className="text-purple-300">{total}</span>
+                            <span className="text-cyan-400 font-bold text-lg">{filteredToys.length}</span>{" "}
+                            résultat{filteredToys.length !== 1 ? "s" : ""} affiché{filteredToys.length !== 1 ? "s" : ""}
+                            {" "} sur <span className="text-purple-300">{total}</span>
                         </p>
-                    }
-                    {filteredToys.length > 0 &&
-                        <div className="flex gap-2">
-                            <button
-                                className="p-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all duration-300 hover:scale-105"
-                                title="Vue grille"
-                            >
-                                <Grid2X2 size={20} className="text-white" />
-                            </button>
+                    )}
+
+                    <div className="flex items-center gap-3">
+                        <div
+                            onClick={() => setIgnoreGeo((prev) => !prev)}
+                            className={`flex items-center px-3 py-1 rounded-full text-sm font-medium cursor-pointer transition-all duration-300 ${ignoreGeo
+                                ? "bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30"
+                                : "bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/30"
+                                }`}
+                        >
+                            {ignoreGeo ? (
+                                <>
+                                    <span>Affiche tous les jouets</span>
+                                    <X size={14} className="ml-2" />
+                                </>
+                            ) : (
+                                <>
+                                    <span>Filtré par votre ville</span>
+                                    <X size={14} className="ml-2" />
+                                </>
+                            )}
                         </div>
-                    }
+                    </div>
                 </div>
 
                 {/* Toys grid */}
@@ -301,11 +315,15 @@ export default function ToysPage() {
 
                                         {/* Content */}
                                         <div className="p-6">
-                                            <h2 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-300 transition-colors duration-300 line-clamp-2">
+                                            <h2 className="text-xl font-bold text-white mb-1 group-hover:text-cyan-300 transition-colors duration-300 line-clamp-2">
                                                 <Link href={`/toys/${toy.id}`} className="hover:underline">
                                                     {toy.title}
                                                 </Link>
                                             </h2>
+                                            <p className="flex items-center gap-1 text-sm text-gray-400 mb-3">
+                                                <MapPin size={14} className="text-cyan-400" />
+                                                {toy.user?.city || "Ville inconnue"}
+                                            </p>
 
                                             <p className="text-gray-400 text-sm mb-4 line-clamp-2 leading-relaxed">
                                                 {toy.description}

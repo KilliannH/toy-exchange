@@ -20,10 +20,10 @@ export async function GET() {
   let signedImageUrl: string | null = null;
   if (user.image) {
     // ⚠️ en DB tu dois stocker uniquement le chemin "avatars/xxx.png"
-    const objectPath = user.image.replace(
-      `https://storage.googleapis.com/${process.env.GCP_BUCKET_NAME}/`,
-      ""
-    );
+    const objectPath = user.image
+      .replace(`https://storage.googleapis.com/${process.env.GCP_BUCKET_NAME}/`, "")
+      .split("?")[0];
+      
     const bucket = getBucket();
     const file = bucket.file(objectPath);
 

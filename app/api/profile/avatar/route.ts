@@ -21,16 +21,15 @@ export async function GET(req: NextRequest) {
 
   const bucket = getBucket();
 
-  const objectPath = user.image.replace(
-    `https://storage.googleapis.com/${process.env.GCP_BUCKET_NAME}/`,
-    ""
-  );
+  const objectPath = user.image
+  .replace(`https://storage.googleapis.com/${process.env.GCP_BUCKET_NAME}/`, "")
+  .split("?")[0];
 
   const file = bucket.file(objectPath);
   const [url] = await file.getSignedUrl({
     version: "v4",
     action: "read",
-    expires: Date.now() + 5 * 60 * 1000, // 5 min
+  expires: Date.now() + 10 * 60 * 1000, // 10 min
   });
 
   return NextResponse.json({ image: url });

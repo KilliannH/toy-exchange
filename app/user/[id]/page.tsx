@@ -124,10 +124,9 @@ export async function getSignedUrl(image: string): Promise<string> {
   const bucket = getBucket();
 
   // Extraire le chemin de l’objet (ex: avatars/xxx.png)
-  const objectPath = image.replace(
-    `https://storage.googleapis.com/${bucket.name}/`,
-    ""
-  );
+  const objectPath = image
+  .replace(`https://storage.googleapis.com/${process.env.GCP_BUCKET_NAME}/`, "")
+  .split("?")[0];
 
   const file = bucket.file(objectPath);
 

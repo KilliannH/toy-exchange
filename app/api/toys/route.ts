@@ -11,9 +11,9 @@ function getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(lat1 * (Math.PI / 180)) *
-      Math.cos(lat2 * (Math.PI / 180)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+    Math.cos(lat2 * (Math.PI / 180)) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
@@ -23,11 +23,14 @@ export async function GET(req: Request) {
   const bucket = getBucket();
   const { searchParams } = new URL(req.url);
   const session = await getServerSession(authOptions);
+
   if (!session?.user) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
 
-  // Params de pagination
+  // params
+  const ignoreGeo = searchParams.get("ignoreGeo") === "true";
+
   let limit = parseInt(searchParams.get("limit") || "20", 10);
   if (!Number.isFinite(limit) || limit <= 0) limit = 20;
   if (limit > 50) limit = 50;
@@ -35,32 +38,29 @@ export async function GET(req: Request) {
   let page = parseInt(searchParams.get("page") || "1", 10);
   if (!Number.isFinite(page) || page <= 0) page = 1;
 
-  // Récup user + coords
+  // Récup user
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     select: { lat: true, lng: true, radiusKm: true },
   });
 
-  const userHasGeo =
-    user?.lat != null && user?.lng != null && user?.radiusKm != null;
+  const userHasGeo = user?.lat != null && user?.lng != null && user?.radiusKm != null;
 
-  // On récupère les jouets triés par fraîcheur (createdAt desc)
-  // (on pourrait réduire avec une bounding box si besoin perf, mais on reste simple)
   const toys = await prisma.toy.findMany({
     where: {
       status: "AVAILABLE",
-      // si tu veux inclure aussi ceux sans coords quand pas de filtre geo:
-      ...(userHasGeo
-        ? { lat: { not: null }, lng: { not: null } }
-        : {}),
+      ...(userHasGeo && !ignoreGeo ? { lat: { not: null }, lng: { not: null } } : {}),
     },
-    include: { images: true, user: true },
+    include: {
+      images: true,
+      user: { select: { city: true }} 
+    },
     orderBy: { createdAt: "desc" },
   });
 
-  // Filtre géo si l'utilisateur a des coords + radius
+  // filtre geo uniquement si pas ignoreGeo
   let filtered = toys;
-  if (userHasGeo) {
+  if (userHasGeo && !ignoreGeo) {
     const { lat, lng, radiusKm } = user!;
     filtered = toys.filter((toy) => {
       if (toy.lat == null || toy.lng == null) return false;
@@ -69,19 +69,19 @@ export async function GET(req: Request) {
     });
   }
 
-  // Pagination en mémoire (simple & efficace pour un volume raisonnable)
+  // pagination...
   const total = filtered.length;
   const start = (page - 1) * limit;
   const end = start + limit;
   const slice = filtered.slice(start, end);
   const hasMore = end < total;
 
-  // Génération des signed URLs uniquement pour la page courante
+  // signed urls
   const items = await Promise.all(
     slice.map(async (toy) => {
       const signedImages = await Promise.all(
         toy.images.map(async (img) => {
-          const file = bucket.file(img.url); // img.url = fileName
+          const file = bucket.file(img.url);
           const [signedUrl] = await file.getSignedUrl({
             version: "v4",
             action: "read",
@@ -94,13 +94,7 @@ export async function GET(req: Request) {
     })
   );
 
-  return NextResponse.json({
-    items,
-    page,
-    limit,
-    total,
-    hasMore,
-  });
+  return NextResponse.json({ items, page, limit, total, hasMore });
 }
 
 // POST /api/toys : créer un jouet
@@ -117,7 +111,7 @@ export async function POST(req: NextRequest) {
 
   const userHasGeo =
     user?.lat != null && user?.lng != null && user?.radiusKm != null;
-  
+
   const lat = userHasGeo ? user.lat : null;
   const lng = userHasGeo ? user.lng : null;
 

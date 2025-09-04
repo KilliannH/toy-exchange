@@ -15,9 +15,28 @@ export default function NavBar() {
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   const { data: unreadData } = useSWR(session ? '/api/messages/unread' : null, fetcher);
-  const { data: avatarData } = useSWR(session ? "/api/profile/avatar" : null, fetcher);
+  
+  useEffect(() => {
+  if (!session) return;
+
+  const fetchAvatar = async () => {
+    const res = await fetch("/api/profile/avatar");
+    if (res.ok) {
+      const data = await res.json();
+      setAvatarUrl(data.image);
+    }
+  };
+
+  fetchAvatar();
+
+  // Option : refresh toutes les 10 min automatiquement
+  const interval = setInterval(fetchAvatar, 10 * 60 * 1000);
+  return () => clearInterval(interval);
+}, [session]);
+
   const unreadCount = unreadData?.count || 0;
 
   const handleSignOut = async () => {
@@ -139,9 +158,9 @@ export default function NavBar() {
                     <div className="absolute -inset-1 bg-gradient-to-r from-purple-400/40 to-pink-400/40 rounded-full blur-md opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
 
                     <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-r from-purple-400 to-pink-400 relative z-10">
-                      {avatarData?.image ? (
+                      {avatarUrl ? (
                         <img
-                          src={avatarData.image}
+                          src={avatarUrl}
                           alt={session.user?.name || "Avatar"}
                           width={32}
                           height={32}

@@ -35,10 +35,9 @@ export default async function ProfilePage() {
   // ⚡ Signed URL si image privée
   let signedImageUrl: string | null = null;
   if (user.image) {
-    const objectPath = user.image.replace(
-      `https://storage.googleapis.com/${process.env.GCP_BUCKET_NAME}/`,
-      ""
-    );
+    const objectPath = user.image
+  .replace(`https://storage.googleapis.com/${process.env.GCP_BUCKET_NAME}/`, "")
+  .split("?")[0];
     const bucket = getBucket();
     const file = bucket.file(objectPath);
     const [url] = await file.getSignedUrl({
