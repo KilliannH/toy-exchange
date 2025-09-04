@@ -214,20 +214,24 @@ export default function ToysPage() {
 
                 {/* Results count */}
                 <div className="flex items-center justify-between mb-8">
-                    {filteredToys.length > 0 && (
+                    {/* Gauche : compteur */}
+                    {filteredToys.length > 0 ? (
                         <p className="text-gray-300">
                             <span className="text-cyan-400 font-bold text-lg">{filteredToys.length}</span>{" "}
                             résultat{filteredToys.length !== 1 ? "s" : ""} affiché{filteredToys.length !== 1 ? "s" : ""}
                             {" "} sur <span className="text-purple-300">{total}</span>
                         </p>
+                    ) : (
+                        <div /> // ← placeholder vide pour que le badge reste à droite
                     )}
 
+                    {/* Droite : badge */}
                     <div className="flex items-center gap-3">
                         <div
                             onClick={() => setIgnoreGeo((prev) => !prev)}
                             className={`flex items-center px-3 py-1 rounded-full text-sm font-medium cursor-pointer transition-all duration-300 ${ignoreGeo
-                                ? "bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30"
-                                : "bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/30"
+                                    ? "bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30"
+                                    : "bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/30"
                                 }`}
                         >
                             {ignoreGeo ? (
