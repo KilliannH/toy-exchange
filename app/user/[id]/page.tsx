@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import PublicProfileClient from "@/components/PublicProfileClient";
 import { withSignedUrls } from "@/lib/withSignedUrls";
+import { getBucket } from "@/lib/storage";
 
 interface Props {
   params: {
@@ -22,6 +23,7 @@ export default async function PublicUserProfilePage({ params }: Props) {
       email: false, // Ne pas exposer l'email
       city: true,
       createdAt: true,
+      image: true,
       // Relations pour les statistiques
       toys: {
         select: {
@@ -50,6 +52,7 @@ export default async function PublicUserProfilePage({ params }: Props) {
   }
 
   const toysWithSigned = await withSignedUrls(user.toys);
+  const signedImage = user.image ? await getSignedUrl(user.image) : null;
 
   // Calculer les statistiques
   const stats = {
@@ -108,9 +111,31 @@ export default async function PublicUserProfilePage({ params }: Props) {
 
   return (
     <PublicProfileClient 
-      user={{ ...user, toys: toysWithSigned }}
-      stats={stats} 
+      user={{ ...user, image: signedImage, toys: toysWithSigned }}
+      stats={stats}
       recentReviews={recentReviews}
     />
   );
+}
+
+export async function getSignedUrl(image: string): Promise<string> {
+  if (!image) return "";
+
+  const bucket = getBucket();
+
+  // Extraire le chemin de l’objet (ex: avatars/xxx.png)
+  const objectPath = image.replace(
+    `https://storage.googleapis.com/${bucket.name}/`,
+    ""
+  );
+
+  const file = bucket.file(objectPath);
+
+  const [url] = await file.getSignedUrl({
+    version: "v4",
+    action: "read",
+    expires: Date.now() + 5 * 60 * 1000, // 5 min
+  });
+
+  return url;
 }

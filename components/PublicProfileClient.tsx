@@ -106,7 +106,7 @@ export default function PublicProfileClient({ user, stats, recentReviews }: Publ
   const formatTimeAgo = (date: Date) => {
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
+
     if (diffInHours < 1) return "Il y a quelques minutes";
     if (diffInHours < 24) return `Il y a ${diffInHours}h`;
     if (diffInHours < 48) return "Hier";
@@ -129,17 +129,25 @@ export default function PublicProfileClient({ user, stats, recentReviews }: Publ
 
         {/* Profile header */}
         <div className="text-center mb-12">
-          <div className="relative inline-block mb-6">
-            <div className="w-32 h-32 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full flex items-center justify-center text-white text-4xl font-black shadow-2xl">
-              {user.name?.charAt(0)?.toUpperCase() || "?"}
+          <div className="relative group inline-block mb-6">
+            <div className="w-32 h-32 rounded-full overflow-hidden shadow-2xl bg-gradient-to-r from-cyan-400 to-purple-400 flex items-center justify-center text-white text-4xl font-black">
+              {user.image ? (
+                <img
+                  src={user.image}
+                  alt={user.name || "Avatar"}
+                  className="object-cover w-full h-full"
+                />
+              ) : (
+                user.name?.charAt(0)?.toUpperCase() || "?"
+              )}
             </div>
-            <div className="absolute -inset-2 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full blur-lg opacity-30 animate-pulse" />
+            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400/40 to-purple-400/40 rounded-full blur-md opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
           </div>
 
           <h1 className="text-4xl font-black bg-gradient-to-r from-white via-cyan-300 to-purple-300 bg-clip-text text-transparent mb-2">
             {user.name || "Utilisateur"}
           </h1>
-          
+
           {user.city && (
             <div className="flex items-center justify-center gap-2 text-gray-400 mb-4">
               <MapPin className="w-4 h-4" />
@@ -216,11 +224,10 @@ export default function PublicProfileClient({ user, stats, recentReviews }: Publ
                         {toy.title}
                       </h3>
                       <div className="flex items-center justify-between mt-2">
-                        <span className={`text-xs px-2 py-1 rounded-lg ${
-                          toy.mode === 'DON' 
-                            ? 'bg-green-500/20 text-green-300' 
+                        <span className={`text-xs px-2 py-1 rounded-lg ${toy.mode === 'DON'
+                            ? 'bg-green-500/20 text-green-300'
                             : 'bg-blue-500/20 text-blue-300'
-                        }`}>
+                          }`}>
                           {toy.mode === 'DON' ? 'Don' : 'Échange'}
                         </span>
                         <span className="text-xs text-gray-500">
@@ -268,8 +275,8 @@ export default function PublicProfileClient({ user, stats, recentReviews }: Publ
                             <Star
                               key={i}
                               size={16}
-                              className={i < review.rating 
-                                ? "text-yellow-400 fill-current" 
+                              className={i < review.rating
+                                ? "text-yellow-400 fill-current"
                                 : "text-gray-600"
                               }
                             />
@@ -301,11 +308,10 @@ export default function PublicProfileClient({ user, stats, recentReviews }: Publ
                 {badges.map((badge, i) => (
                   <div
                     key={i}
-                    className={`group p-3 rounded-2xl border text-center transition-all duration-300 hover:scale-105 relative cursor-pointer ${
-                      badge.earned
+                    className={`group p-3 rounded-2xl border text-center transition-all duration-300 hover:scale-105 relative cursor-pointer ${badge.earned
                         ? "bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-yellow-500/30 text-yellow-300"
                         : "bg-white/5 border-white/10 text-gray-500"
-                    }`}
+                      }`}
                     title={badge.description}
                   >
                     <div className="text-xl mb-1 flex justify-center group-hover:scale-110 transition-transform duration-300">
