@@ -36,38 +36,20 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: { strategy: "jwt" },
   callbacks: {
-  async signIn({ user }) {
-    const dbUser = await prisma.user.findUnique({
-      where: { email: user.email! },
-      select: { city: true, lat: true, lng: true },
-    });
-
-    // Retourne true = connexion OK
-    // Retourne URL = redirection forcée
-    if (!dbUser?.city || !dbUser?.lat || !dbUser?.lng) {
-      return "/onboarding/city"; // 🚀 direct onboarding
-    }
-
-    return true; // 🚀 continue flow normal (→ dashboard par défaut)
-  },
-  async session({ session, token }) {
+    async session({ session, token }) {
     if (session.user && token.sub) {
-      const userDb = await prisma.user.findUnique({
+      const user = await prisma.user.findUnique({
         where: { id: token.sub },
         select: { id: true, city: true, lat: true, lng: true },
       });
+
       session.user.id = token.sub;
-      session.user.city = userDb?.city || null;
-      session.user.lat = userDb?.lat || null;
-      session.user.lng = userDb?.lng || null;
+      session.user.city = user?.city || null; // 👈 ville dispo direct
+      session.user.lat = user?.lat || null;
+      session.user.lng = user?.lng || null;
     }
     return session;
   },
-  async redirect({ url, baseUrl }) {
-    // Si NextAuth reçoit une URL absolue → accepte uniquement si interne
-    if (url.startsWith(baseUrl)) return url;
-    return `${baseUrl}/dashboard`;
-  }
 },
   pages: {
     signIn: "/login", // 👈 redirige vers une page custom
