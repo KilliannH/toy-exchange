@@ -36,17 +36,21 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: { strategy: "jwt" },
   callbacks: {
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.sub!;
-      }
-      return session;
-    },
-    async redirect({ url, baseUrl }) {
-      if (url.startsWith(baseUrl)) return url;
-      return `${baseUrl}/dashboard`;
+  async session({ session, token }) {
+    if (session.user && token.sub) {
+      const user = await prisma.user.findUnique({
+        where: { id: token.sub },
+        select: { id: true, city: true, lat: true, lng: true },
+      });
+
+      session.user.id = token.sub;
+      session.user.city = user?.city || null; // 👈 ville dispo direct
+      session.user.lat = user?.lat || null;
+      session.user.lng = user?.lng || null;
     }
+    return session;
   },
+},
   pages: {
     signIn: "/login", // 👈 redirige vers une page custom
   },

@@ -27,7 +27,6 @@ import {
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import CityCheckWrapper from "@/components/CityCheckWrapper";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -178,7 +177,6 @@ export default function DashboardPage() {
 
   return (
     <>
-    <CityCheckWrapper>
       <div className="min-h-screen bg-slate-900 relative">
         {/* Animated background */}
 
@@ -562,7 +560,6 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
-      </CityCheckWrapper>
     </>
   );
 }
