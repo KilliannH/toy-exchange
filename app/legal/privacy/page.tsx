@@ -32,7 +32,7 @@ ToyExchange utilise des cookies nécessaires au fonctionnement du site.
 Avec votre accord, nous utilisons aussi des cookies de mesure d’audience (pour analyser l’utilisation du site) et des cookies de marketing (Meta Pixel) pour personnaliser nos publicités. Vous pouvez accepter, refuser ou personnaliser vos choix lors de votre première visite.`
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-24 px-6">
+        <div className="min-h-screen bg-slate-900 py-24 px-6">
             <div className="max-w-4xl mx-auto">
                 {/* Header */}
                 <div className="text-center mb-12">

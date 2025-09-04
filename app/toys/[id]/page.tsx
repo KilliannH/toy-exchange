@@ -133,7 +133,6 @@ export default function ToyDetailPage() {
 
   const handleShare = (platform: string) => {
     const encodedUrl = encodeURIComponent(shareUrl);
-    const encodedTitle = encodeURIComponent(shareTitle);
     
     switch (platform) {
       case 'facebook':
@@ -193,7 +192,7 @@ export default function ToyDetailPage() {
   // Now, early return conditions
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-900 to-slate-900 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
         <div className="bg-red-500/10 backdrop-blur-xl border border-red-500/20 rounded-3xl p-12 text-center max-w-md">
           <div className="text-8xl mb-6 text-red-400 animate-pulse">
             <Frown size={96} className="mx-auto" />
@@ -213,7 +212,7 @@ export default function ToyDetailPage() {
 
   if (isLoading || !toy) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
           <div className="relative mb-8">
             <div className="w-32 h-32 border-4 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
@@ -255,12 +254,7 @@ export default function ToyDetailPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative">
-        {/* Dynamic background */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-1/4 left-1/6 w-96 h-96 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-1/4 right-1/6 w-80 h-80 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-3xl animate-bounce" style={{ animationDuration: '3s' }} />
-        </div>
+      <div className="min-h-screen bg-slate-900 relative">
 
         <div className="relative z-10 pt-24 pb-12 px-6 max-w-6xl mx-auto">
           {/* Back button */}

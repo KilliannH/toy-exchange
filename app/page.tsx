@@ -20,21 +20,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 opacity-30">
-        <div
-          className="absolute w-96 h-96 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full blur-3xl animate-pulse"
-          style={{
-            left: mousePosition.x * 0.02 + 'px',
-            top: mousePosition.y * 0.02 + 'px',
-          }}
-        />
-        <div className="absolute top-1/4 right-1/4 w-72 h-72 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-3xl animate-bounce"
-          style={{ animationDuration: '3s' }} />
-        <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-gradient-to-r from-green-400 to-cyan-400 rounded-full blur-3xl animate-pulse"
-          style={{ animationDelay: '1s' }} />
-      </div>
+    <div className="min-h-screen bg-slate-900 relative overflow-hidden">
 
       {/* Floating elements */}
       <div className="absolute inset-0 pointer-events-none">
@@ -64,7 +50,7 @@ export default function HomePage() {
       <section className="relative z-10 text-center py-32 px-6">
         <div className={`transform transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <div className="mb-8">
-            <h1 className="text-6xl md:text-8xl font-black bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-4 leading-tight">
+            <h1 className="text-5xl md:text-6xl lg:text-8xl font-black bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-4 leading-tight">
               ToyExchange
             </h1>
             <div className="w-32 h-1 bg-gradient-to-r from-cyan-400 to-purple-400 mx-auto rounded-full animate-pulse" />

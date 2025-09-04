@@ -1,7 +1,6 @@
 // app/messages/page.tsx
 "use client";
 
-import { useState } from "react";
 import useSWR from "swr";
 import { useSession } from "next-auth/react";
 import { MessageSquare, Loader2, Frown, ToyBrick } from "lucide-react";
@@ -23,7 +22,7 @@ export default function MessagesPage() {
 
   if (!session) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-12 text-center max-w-md">
           <div className="text-8xl mb-6 text-red-400">
             <Frown size={96} className="mx-auto" />
@@ -45,7 +44,7 @@ export default function MessagesPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-900 to-slate-900 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
         <div className="bg-red-500/10 backdrop-blur-xl border border-red-500/20 rounded-3xl p-12 text-center max-w-md">
           <div className="text-8xl mb-6 text-red-400">
             <Frown size={96} className="mx-auto" />
@@ -67,7 +66,7 @@ export default function MessagesPage() {
 
   if (isLoading && !conversationsData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-16 h-16 text-purple-400 animate-spin mx-auto mb-4" />
           <p className="text-white/80 text-lg">
@@ -79,15 +78,7 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative">
-      {/* Animated background */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-1/4 left-1/6 w-96 h-96 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full blur-3xl animate-pulse" />
-        <div
-          className="absolute bottom-1/4 right-1/6 w-80 h-80 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-3xl animate-bounce"
-          style={{ animationDuration: "3s" }}
-        />
-      </div>
+    <div className="min-h-screen bg-slate-900 relative">
 
       <div className="relative z-10 pt-24 pb-12 px-6 max-w-4xl mx-auto">
         {/* Header */}

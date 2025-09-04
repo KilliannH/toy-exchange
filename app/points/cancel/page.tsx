@@ -29,7 +29,7 @@ function CancelContent() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-900 to-slate-900 flex items-center justify-center">
+            <div className="min-h-screen bg-slate-900 flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin w-16 h-16 border-4 border-red-400 border-t-transparent rounded-full mx-auto mb-4"></div>
                     <p className="text-white text-lg">Vérification en cours...</p>
@@ -39,7 +39,7 @@ function CancelContent() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br pt-40 from-slate-900 via-red-900 to-slate-900 relative overflow-hidden">
+        <div className="min-h-screen bg-slate-900 relative overflow-hidden">
             {/* Animated background */}
             <div className="absolute inset-0 opacity-20">
                 <div className="absolute top-1/4 left-1/6 w-96 h-96 bg-gradient-to-r from-red-400 to-pink-500 rounded-full blur-3xl animate-pulse" />

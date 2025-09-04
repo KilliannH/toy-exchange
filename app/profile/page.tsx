@@ -19,7 +19,7 @@ export default async function ProfilePage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-900 to-slate-900 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
         <div className="bg-red-500/10 backdrop-blur-xl border border-red-500/20 rounded-3xl p-12 text-center max-w-md">
           <div className="text-8xl mb-6 text-red-400 animate-pulse">
             <Frown size={96} className="mx-auto" />

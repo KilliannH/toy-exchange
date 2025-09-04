@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import useSWR from "swr";
-import { Home, Package, Plus, BarChart3, LogOut, Menu, User, MessageSquare, X } from "lucide-react";
+import { Package, Plus, BarChart3, LogOut, Menu, User, MessageSquare, X } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import Image from "next/image";
 

@@ -39,7 +39,7 @@ function SuccessContent() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+            <div className="min-h-screen bg-slate-900 flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin w-16 h-16 border-4 border-green-400 border-t-transparent rounded-full mx-auto mb-4"></div>
                     <p className="text-white text-lg">Vérification de votre paiement...</p>
@@ -49,12 +49,7 @@ function SuccessContent() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br pt-40 from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-            {/* Animated background */}
-            <div className="absolute inset-0 opacity-20">
-                <div className="absolute top-1/4 left-1/6 w-96 h-96 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full blur-3xl animate-pulse" />
-                <div className="absolute bottom-1/4 right-1/6 w-80 h-80 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full blur-3xl animate-bounce" style={{ animationDuration: '3s' }} />
-            </div>
+        <div className="min-h-screen bg-slate-900 relative overflow-hidden">
 
             {/* Confetti animation */}
             <div className="absolute inset-0 pointer-events-none">
