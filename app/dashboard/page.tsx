@@ -103,6 +103,15 @@ export default function DashboardPage() {
     return `Il y a ${diffInDays} jours`;
   };
 
+  const getCondition = (condition: string) => {
+    switch (condition) {
+      case "NEW": return "Neuf";
+      case "VERY_GOOD": return "Très bon";
+      case "GOOD": return "Bon état";
+      case "USED": return "Usé";
+    }
+  };
+
   if (toysError || exchangesError || favoritesError) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
@@ -298,8 +307,8 @@ export default function DashboardPage() {
                           </span>
                         )}
                         {toy.condition && (
-                          <span className="bg-green-500/20 text-green-300 px-3 py-1 rounded-full text-xs font-medium border border-green-500/30">
-                            {toy.condition}
+                          <span className="px-3 py-1 rounded-full text-xs font-medium border bg-orange-500/10 border-orange-500/20 font-medium text-orange-300">
+                            {getCondition(toy.condition)}
                           </span>
                         )}
                       </div>

@@ -121,16 +121,6 @@ export default function PostToyForm() {
     }
   };
 
-  const getConditionIcon = (condition: string) => {
-    switch (condition) {
-      case "NEW": return <Sparkles size={24} />;
-      case "VERY_GOOD": return <Star size={24} />;
-      case "GOOD": return <ThumbsUp size={24} />;
-      case "USED": return <Wrench size={24} />;
-      default: return null;
-    }
-  };
-
   return (
     <div className="min-h-screen bg-slate-900 relative">
 

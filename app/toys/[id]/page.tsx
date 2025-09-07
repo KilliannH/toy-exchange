@@ -239,16 +239,12 @@ export default function ToyDetailPage() {
     }
   };
 
-  const getConditionIcon = (condition: string) => {
+  const getCondition = (condition: string) => {
     switch (condition) {
-      case "Excellent":
-        return <Star size={24} />;
-      case "Bon":
-        return <ThumbsUp size={24} />;
-      case "Moyen":
-        return <Wrench size={24} />;
-      default:
-        return null;
+      case "NEW": return "Neuf";
+      case "VERY_GOOD": return "Très bon";
+      case "GOOD": return "Bon état";
+      case "USED": return "Usé";
     }
   };
 
@@ -428,21 +424,11 @@ export default function ToyDetailPage() {
                     <div className="text-purple-300 font-semibold">Âge conseillé</div>
                     <div className="text-white text-xl font-bold">{toy.ageMin}-{toy.ageMax} ans</div>
                   </div>
-                  <div className={`rounded-2xl p-4 border ${toy.condition === "Excellent"
-                    ? "bg-green-500/10 border-green-500/20"
-                    : toy.condition === "Bon"
-                      ? "bg-blue-500/10 border-blue-500/20"
-                      : "bg-orange-500/10 border-orange-500/20"
-                    }`}>
-                    <div className="text-2xl mb-2 text-white">
-                      {getConditionIcon(toy.condition)}
-                    </div>
-                    <div className={`font-semibold ${toy.condition === "Excellent" ? "text-green-300" :
-                      toy.condition === "Bon" ? "text-blue-300" : "text-orange-300"
-                      }`}>
+                  <div className={`rounded-2xl p-4 border bg-orange-500/10 border-orange-500/20`}>
+                    <div className={`font-semibold text-orange-300`}>
                       État
                     </div>
-                    <div className="text-white text-xl font-bold">{toy.condition}</div>
+                    <div className="text-white text-xl font-bold">{getCondition(toy.condition)}</div>
                   </div>
                 </div>
 
