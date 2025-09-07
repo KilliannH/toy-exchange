@@ -77,4 +77,4 @@ ENV PORT=8080
 ENV HOSTNAME="0.0.0.0"
 
 # Lancer Cloud SQL Proxy puis Prisma migrations puis Next.js
-CMD ["sh", "-c", "cloud-sql-proxy --address 0.0.0.0 --port 5432 toy-exchange-470320:europe-west1:toyexchange-db-instance & sleep 5 && npx prisma migrate deploy && node server.js"]
+CMD ["sh", "-c", "cloud-sql-proxy --address 0.0.0.0 --port 5432 toy-echange2:europe-west1:toyexchange-db-instance & sleep 5 && npx prisma migrate deploy && node server.js"]

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { User, Mail, Lock, CheckCircle, ArrowRight, ArrowLeft, Loader2, Sparkles, Trophy, Gift, Handshake, Gamepad2, Tent, Star } from "lucide-react";
 import { signIn } from "next-auth/react";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import usePlacesAutocomplete, { getGeocode, getLatLng } from "use-places-autocomplete";
 import { Combobox } from "@headlessui/react";
 import Image from "next/image";
@@ -16,6 +17,7 @@ export default function RegisterPage() {
     const [loading, setLoading] = useState(false);
     const [step, setStep] = useState(1);
 
+    const router = useRouter();
     const [city, setCity] = useState("");
     const [lat, setLat] = useState<number | null>(null);
     const [lng, setLng] = useState<number | null>(null);
@@ -59,22 +61,25 @@ export default function RegisterPage() {
         });
 
         if (res.ok) {
-            setStep(3);
+            setStep(3); // 👈 tu affiches ton step de confirmation
+            toast.success("Compte créé 🎉 redirection en cours...");
+
+            // reset des champs
+            setName("");
+            setEmail("");
+            setPassword("");
+            setCity("");
+            setLat(null);
+            setLng(null);
+
+            // redirection après 1.5 secondes
             setTimeout(() => {
-                toast.success("Compte créé 🎉 vous pouvez maintenant vous connecter");
-                setName("");
-                setEmail("");
-                setPassword("");
-                setCity("");
-                setLat(null);
-                setLng(null);
-                setStep(1);
-            }, 2000);
+                router.push("/dashboard");
+            }, 1500);
         } else {
             const data = await res.json();
             toast.error(data.error || "Erreur lors de l'inscription");
         }
-
         setLoading(false);
     }
 
