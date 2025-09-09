@@ -11,10 +11,12 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { useToyDetailTranslations } from "@/hooks/useToyDetailTranslations";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function ToyDetailPage() {
+  const t = useToyDetailTranslations();
   const params = useParams();
   const { data: toy, error, isLoading, mutate: mutateToy } = useSWR(
     params?.id ? `/api/toys/${params.id}` : null,
@@ -61,7 +63,7 @@ export default function ToyDetailPage() {
 
   const handleLike = async () => {
     if (!session) {
-      toast.error("Veuillez vous connecter pour ajouter un favori.");
+      toast.error(t.favorites.loginRequired);
       return;
     }
 
@@ -74,15 +76,15 @@ export default function ToyDetailPage() {
       const res = await fetch(`/api/favorites/${toy.id}`, { method });
 
       if (res.ok) {
-        toast.success(isLiked ? "Retiré des favoris." : "Ajouté aux favoris !");
+        toast.success(isLiked ? t.favorites.removedFromFavorites : t.favorites.addedToFavorites);
         // La revalidation a déjà eu lieu localement, pas besoin d'une autre mutation.
       } else {
-        toast.error("Erreur lors de la mise à jour des favoris.");
+        toast.error(t.favorites.updateError);
         // En cas d'erreur, on restaure l'état précédent
         mutateIsFavorite({ isFavorite: isLiked }, false);
       }
     } catch (err) {
-      toast.error("Erreur réseau.");
+      toast.error(t.favorites.networkError);
       mutateIsFavorite({ isFavorite: isLiked }, false);
     }
   };
@@ -90,12 +92,12 @@ export default function ToyDetailPage() {
   // New function to send a message
   const handleSendMessage = async () => {
     if (!session) {
-      toast.error("Vous devez être connecté pour envoyer un message.");
+      toast.error(t.messaging.loginRequired);
       return;
     }
 
     if (!messageContent.trim()) {
-      toast.error("Le message ne peut pas être vide.");
+      toast.error(t.messaging.emptyMessage);
       return;
     }
 
@@ -112,15 +114,15 @@ export default function ToyDetailPage() {
       });
 
       if (res.ok) {
-        toast.success("Message envoyé avec succès!");
+        toast.success(t.messaging.messageSent);
         setMessageContent("");
         setShowContactForm(false);
       } else {
         const data = await res.json();
-        toast.error(`Erreur lors de l'envoi du message: ${data.error}`);
+        toast.error(t.getSendError(data.error));
       }
     } catch (err) {
-      toast.error("Une erreur inattendue est survenue.");
+      toast.error(t.messaging.unexpectedError);
       console.error(err);
     } finally {
       setIsSendingMessage(false);
@@ -129,7 +131,6 @@ export default function ToyDetailPage() {
 
   // Share functions
   const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
-  const shareTitle = `Découvrez ce jouet: ${toy?.title || 'Jouet sur ToyExchange'}`;
 
   const handleShare = (platform: string) => {
     const encodedUrl = encodeURIComponent(shareUrl);
@@ -140,7 +141,7 @@ export default function ToyDetailPage() {
         break;
       case 'copy':
         navigator.clipboard.writeText(shareUrl);
-        toast.success("Lien copié dans le presse-papier!");
+        toast.success(t.sharing.linkCopied);
         break;
       default:
         break;
@@ -150,12 +151,12 @@ export default function ToyDetailPage() {
   // Report function
   const handleReport = async () => {
     if (!reportReason) {
-      toast.error("Veuillez sélectionner une raison de signalement.");
+      toast.error(t.reporting.selectReason);
       return;
     }
 
     if (!reportMessage.trim()) {
-      toast.error("Veuillez décrire le problème.");
+      toast.error(t.reporting.describeProblemRequired);
       return;
     }
 
@@ -174,16 +175,16 @@ export default function ToyDetailPage() {
       });
 
       if (res.ok) {
-        toast.success("Signalement envoyé avec succès. Notre équipe va examiner votre demande.");
+        toast.success(t.reporting.reportSent);
         setShowReportModal(false);
         setReportReason("");
         setReportMessage("");
       } else {
         const data = await res.json();
-        toast.error(`Erreur: ${data.error}`);
+        toast.error(t.getReportingError(data.error));
       }
     } catch (err) {
-      toast.error("Une erreur est survenue lors de l'envoi du signalement.");
+      toast.error(t.reporting.reportError);
     } finally {
       setIsReporting(false);
     }
@@ -197,13 +198,13 @@ export default function ToyDetailPage() {
           <div className="text-8xl mb-6 text-red-400 animate-pulse">
             <Frown size={96} className="mx-auto" />
           </div>
-          <h2 className="text-3xl font-bold text-red-400 mb-4">Jouet introuvable</h2>
-          <p className="text-red-300 mb-6">Ce trésor semble avoir disparu...</p>
+          <h2 className="text-3xl font-bold text-red-400 mb-4">{t.toyNotFound}</h2>
+          <p className="text-red-300 mb-6">{t.treasureDisappeared}</p>
           <button
             onClick={() => window.history.back()}
             className="bg-red-500/20 hover:bg-red-500/30 text-red-300 px-6 py-3 rounded-xl transition-all duration-300"
           >
-            <ArrowLeft size={16} className="inline-block mr-2" /> Retour
+            <ArrowLeft size={16} className="inline-block mr-2" /> {t.back}
           </button>
         </div>
       </div>
@@ -220,7 +221,7 @@ export default function ToyDetailPage() {
               <Package size={48} />
             </div>
           </div>
-          <p className="text-white/80 text-xl font-light">Déballage du trésor...</p>
+          <p className="text-white/80 text-xl font-light">{t.unboxingTreasure}</p>
         </div>
       </div>
     );
@@ -239,15 +240,6 @@ export default function ToyDetailPage() {
     }
   };
 
-  const getCondition = (condition: string) => {
-    switch (condition) {
-      case "NEW": return "Neuf";
-      case "VERY_GOOD": return "Très bon";
-      case "GOOD": return "Bon état";
-      case "USED": return "Usé";
-    }
-  };
-
   return (
     <>
       <div className="min-h-screen bg-slate-900 relative">
@@ -259,7 +251,7 @@ export default function ToyDetailPage() {
             className="mb-8 group flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105"
           >
             <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform duration-200" />
-            Retour à la galerie
+            {t.backToGallery}
           </button>
 
           <div className="grid lg:grid-cols-2 gap-12 items-start">
@@ -368,17 +360,13 @@ export default function ToyDetailPage() {
                           }`}
                       >
                         {getModeIcon(toy.mode)}{" "}
-                        {toy.mode === "EXCHANGE"
-                          ? "Échange"
-                          : toy.mode === "POINTS"
-                            ? "Points"
-                            : "Don"}
+                        {t.getModeLabel(toy.mode)}
                       </span>
 
-                      {/* 👇 Badge supplémentaire si mode = POINTS */}
+                      {/* Badge supplémentaire si mode = POINTS */}
                       {toy.mode === "POINTS" && (
                         <span className="px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
-                          {toy.pointsCost ?? 0} pts
+                          {toy.pointsCost ?? 0} {t.pointsCost}
                         </span>
                       )}
 
@@ -391,11 +379,7 @@ export default function ToyDetailPage() {
                             : "bg-red-500/20 text-red-300 border border-red-500/30"
                           }`}
                       >
-                        {toy.status === "AVAILABLE"
-                          ? "Disponible"
-                          : toy.status === "RESERVED"
-                            ? "Réservé"
-                            : "Échangé"}
+                        {t.getStatusLabel(toy.status)}
                       </span>
                     </div>
                   </div>
@@ -421,14 +405,14 @@ export default function ToyDetailPage() {
                     <div className="text-2xl mb-2 text-purple-300">
                       <Gem size={32} />
                     </div>
-                    <div className="text-purple-300 font-semibold">Âge conseillé</div>
-                    <div className="text-white text-xl font-bold">{toy.ageMin}-{toy.ageMax} ans</div>
+                    <div className="text-purple-300 font-semibold">{t.recommendedAge}</div>
+                    <div className="text-white text-xl font-bold">{toy.ageMin}-{toy.ageMax} {t.years}</div>
                   </div>
                   <div className={`rounded-2xl p-4 border bg-orange-500/10 border-orange-500/20`}>
                     <div className={`font-semibold text-orange-300`}>
-                      État
+                      {t.condition}
                     </div>
-                    <div className="text-white text-xl font-bold">{getCondition(toy.condition)}</div>
+                    <div className="text-white text-xl font-bold">{t.getConditionLabel(toy.condition)}</div>
                   </div>
                 </div>
 
@@ -440,12 +424,12 @@ export default function ToyDetailPage() {
                           {toy.user?.name?.charAt(0) || toy.user?.email?.charAt(0) || "?"}
                         </div>
                         <div className="flex-1">
-                          <div className="text-cyan-300 font-semibold">Proposé par</div>
+                          <div className="text-cyan-300 font-semibold">{t.offeredBy}</div>
                           <div className="text-white font-bold group-hover:text-cyan-300 transition-colors">
-                            {toy.user?.name || toy.user?.email?.split('@')[0] || "Utilisateur anonyme"}
+                            {toy.user?.name || toy.user?.email?.split('@')[0] || t.anonymousUser}
                           </div>
                           <div className="text-xs text-gray-400 mt-1">
-                            Cliquez pour voir le profil
+                            {t.viewProfile}
                           </div>
                         </div>
                         <div className="text-2xl text-cyan-400 animate-pulse group-hover:scale-110 transition-transform duration-300">
@@ -466,7 +450,7 @@ export default function ToyDetailPage() {
                   >
                     <span className="relative z-10 flex items-center justify-center gap-3 text-xl">
                       <MessageSquare size={28} />
-                      {showContactForm ? "Masquer le contact" : "Contacter le propriétaire"}
+                      {showContactForm ? t.hideContact : t.contactOwner}
                     </span>
                     <div className="absolute inset-0 bg-gradient-to-r from-emerald-700 to-cyan-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </button>
@@ -479,7 +463,7 @@ export default function ToyDetailPage() {
                   >
                     <span className="relative z-10 flex items-center justify-center gap-3 text-xl">
                       <MessageSquare size={28} />
-                      S'inscrire pour contacter
+                      {t.registerToContact}
                     </span>
                   </Link>
                 )}
@@ -490,7 +474,7 @@ export default function ToyDetailPage() {
                     className="group bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-6 py-4 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
                   >
                     <Share2 size={20} className="group-hover:scale-110 transition-transform duration-200" />
-                    Partager
+                    {t.share}
                   </button>
 
                   <button 
@@ -498,27 +482,27 @@ export default function ToyDetailPage() {
                     className="group bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-6 py-4 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
                   >
                     <AlertTriangle size={20} className="group-hover:scale-110 transition-transform duration-200" />
-                    Signaler
+                    {t.report}
                   </button>
                 </div>
               </div>
 
               {session && !isAuthor && toy.mode === "EXCHANGE" && (
                 <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 space-y-4">
-                  <h3 className="text-lg font-semibold text-white">Proposer un échange</h3>
+                  <h3 className="text-lg font-semibold text-white">{t.exchange.proposeExchange}</h3>
 
                   {isLoadingMyToys ? (
-                    <p className="text-gray-400 text-sm">Chargement de vos jouets...</p>
+                    <p className="text-gray-400 text-sm">{t.exchange.loadingToys}</p>
                   ) : availableToys.length === 0 ? (
                     <p className="text-gray-400 text-sm">
-                      Vous n'avez aucun jouet disponible pour échanger.
+                      {t.exchange.noAvailableToys}
                     </p>
                   ) : (
                     <form
                       onSubmit={async (e) => {
                         e.preventDefault();
                         if (!selectedToyId) {
-                          toast.error("Veuillez choisir un jouet à proposer.");
+                          toast.error(t.exchange.chooseToy);
                           return;
                         }
 
@@ -539,7 +523,7 @@ export default function ToyDetailPage() {
 
                         setIsSendingMessage(false);
                         if (res.ok) {
-                          toast.success("Votre proposition d'échange a été envoyée !");
+                          toast.success(t.exchange.proposalSent);
                           form.reset();
                           setSelectedToyId(null);
                         } else {
@@ -573,7 +557,7 @@ export default function ToyDetailPage() {
                       <input
                         type="text"
                         name="exchangeMessage"
-                        placeholder="Message optionnel..."
+                        placeholder={t.exchange.optionalMessage}
                         className="w-full bg-white/5 border border-white/20 text-white px-4 py-2 rounded-xl"
                       />
 
@@ -582,7 +566,7 @@ export default function ToyDetailPage() {
                         disabled={isSendingMessage}
                         className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:scale-105 transition-all disabled:opacity-50"
                       >
-                        {isSendingMessage ? "Envoi..." : "Envoyer la proposition"}
+                        {isSendingMessage ? t.messaging.sending : t.exchange.sendProposal}
                       </button>
                     </form>
                   )}
@@ -596,14 +580,16 @@ export default function ToyDetailPage() {
                     <div className="text-4xl mb-3 text-emerald-400">
                       <MessageSquare size={48} className="mx-auto" />
                     </div>
-                    <h3 className="text-2xl font-bold text-white mb-2">Contactez {toy.user?.name || "le propriétaire"}</h3>
-                    <p className="text-gray-400">Envoyez un message pour proposer un échange</p>
+                    <h3 className="text-2xl font-bold text-white mb-2">
+                      {t.getContactTitle(toy.user?.name)}
+                    </h3>
+                    <p className="text-gray-400">{t.messaging.contactSubtitle}</p>
                   </div>
 
                   <div className="space-y-4">
                     <div className="relative group">
                       <textarea
-                        placeholder="Bonjour ! Je suis intéressé(e) par votre jouet..."
+                        placeholder={t.messaging.messagePlaceholder}
                         rows={4}
                         value={messageContent}
                         onChange={(e) => setMessageContent(e.target.value)}
@@ -617,7 +603,7 @@ export default function ToyDetailPage() {
                         onClick={() => setShowContactForm(false)}
                         className="flex-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-6 py-3 rounded-2xl transition-all duration-300"
                       >
-                        Annuler
+                        {t.messaging.cancel}
                       </button>
                       <button
                         onClick={handleSendMessage}
@@ -630,7 +616,7 @@ export default function ToyDetailPage() {
                           ) : (
                             <Send size={20} />
                           )}
-                          {isSendingMessage ? "Envoi..." : "Envoyer le message"}
+                          {isSendingMessage ? t.messaging.sending : t.messaging.sendMessage}
                         </span>
                         <div className="absolute inset-0 bg-gradient-to-r from-emerald-700 to-cyan-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </button>
@@ -643,7 +629,7 @@ export default function ToyDetailPage() {
               <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6">
                 <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                   <ToyBrick size={24} />
-                  Jouets similaires
+                  {t.similarToys.title}
                 </h3>
                 <div className="grid grid-cols-3 gap-3">
                   {/* Placeholder similar toys */}
@@ -656,7 +642,7 @@ export default function ToyDetailPage() {
                   ))}
                 </div>
                 <button className="w-full mt-4 text-cyan-400 hover:text-cyan-300 font-medium transition-colors duration-200 text-sm">
-                  Voir tous les jouets similaires →
+                  {t.similarToys.viewAllSimilar}
                 </button>
               </div>
             </div>
@@ -680,10 +666,10 @@ export default function ToyDetailPage() {
                 <Share2 size={64} className="mx-auto" />
               </div>
               <h3 className="text-2xl font-bold text-cyan-400 mb-2">
-                Partager ce jouet
+                {t.sharing.shareTitle}
               </h3>
               <p className="text-gray-300 text-sm">
-                Faites découvrir ce trésor à vos amis
+                {t.sharing.shareSubtitle}
               </p>
             </div>
 
@@ -693,7 +679,7 @@ export default function ToyDetailPage() {
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-2xl transition-all duration-300 shadow-xl flex items-center justify-center gap-2"
               >
                 <Facebook className="w-5 h-5" />
-                Partager sur Facebook
+                {t.sharing.shareOnFacebook}
               </button>
 
               <button
@@ -701,13 +687,13 @@ export default function ToyDetailPage() {
                 className="w-full bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-2xl transition-all duration-300 shadow-xl flex items-center justify-center gap-2"
               >
                 <Copy className="w-5 h-5" />
-                Copier le lien
+                {t.sharing.copyLink}
               </button>
 
               <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <LinkIcon className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm text-gray-400">Lien direct :</span>
+                  <span className="text-sm text-gray-400">{t.sharing.directLink}</span>
                 </div>
                 <div className="text-xs text-gray-300 font-mono bg-black/20 p-2 rounded-lg break-all">
                   {shareUrl}
@@ -739,10 +725,10 @@ export default function ToyDetailPage() {
                 <AlertTriangle size={48} className="mx-auto animate-pulse" />
               </div>
               <h3 className="text-xl font-bold text-red-400 mb-1">
-                Signaler un problème
+                {t.reporting.reportTitle}
               </h3>
               <p className="text-gray-300 text-xs">
-                Aidez-nous à maintenir une communauté sûre
+                {t.reporting.reportSubtitle}
               </p>
             </div>
 
@@ -750,15 +736,15 @@ export default function ToyDetailPage() {
             <div className="space-y-4 overflow-y-auto flex-1 pr-2">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Raison du signalement *
+                  {t.reporting.reportReason}
                 </label>
                 <div className="space-y-2">
                   {[
-                    { value: 'scam', label: 'Arnaque / Escroquerie' },
-                    { value: 'inappropriate', label: 'Contenu inapproprié' },
-                    { value: 'condition', label: 'Jouet en mauvais état' },
-                    { value: 'fake', label: 'Fausse annonce' },
-                    { value: 'other', label: 'Autre raison' }
+                    { value: 'scam', label: t.getReportReason('scam') },
+                    { value: 'inappropriate', label: t.getReportReason('inappropriate') },
+                    { value: 'condition', label: t.getReportReason('condition') },
+                    { value: 'fake', label: t.getReportReason('fake') },
+                    { value: 'other', label: t.getReportReason('other') }
                   ].map((reason) => (
                     <button
                       key={reason.value}
@@ -778,12 +764,12 @@ export default function ToyDetailPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Décrivez le problème *
+                  {t.reporting.describeProblem}
                 </label>
                 <textarea
                   value={reportMessage}
                   onChange={(e) => setReportMessage(e.target.value)}
-                  placeholder="Donnez plus de détails..."
+                  placeholder={t.reporting.problemPlaceholder}
                   rows={3}
                   className="w-full bg-slate-800 border border-gray-600 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 resize-none"
                 />
@@ -793,9 +779,9 @@ export default function ToyDetailPage() {
                 <div className="flex items-start gap-2">
                   <Mail className="w-4 h-4 text-red-300 mt-0.5 flex-shrink-0" />
                   <div className="text-xs text-red-200">
-                    <p className="font-medium mb-1">Signalement confidentiel</p>
+                    <p className="font-medium mb-1">{t.reporting.confidentialReport}</p>
                     <p className="text-red-200/80">
-                      Envoyé à <span className="font-mono text-red-300">support@toy-exchange.org</span>
+                      {t.reporting.sentTo} <span className="font-mono text-red-300">support@toy-exchange.org</span>
                     </p>
                   </div>
                 </div>
@@ -812,7 +798,7 @@ export default function ToyDetailPage() {
                 }}
                 className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2.5 rounded-xl transition-colors text-sm"
               >
-                Annuler
+                {t.reporting.cancel}
               </button>
               <button
                 onClick={handleReport}
@@ -826,12 +812,12 @@ export default function ToyDetailPage() {
                 {isReporting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Envoi...
+                    {t.messaging.sending}
                   </>
                 ) : (
                   <>
                     <Send className="w-4 h-4" />
-                    Envoyer
+                    {t.reporting.send}
                   </>
                 )}
               </button>

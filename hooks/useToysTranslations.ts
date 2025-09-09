@@ -2,7 +2,7 @@
 import { useTranslations } from 'next-intl';
 
 export const useToysTranslations = () => {
-  const t = useTranslations('Toys');
+  const t = useTranslations('toys');
   
   return {
     // Helper functions pour les cas complexes

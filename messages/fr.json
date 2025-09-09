@@ -1,60 +1,161 @@
 {
-  "Toys": {
-    "pageTitle": "Galerie des Trésors",
-    "pageSubtitle": "Découvrez {count} jouet{plural} prêt{plural} à être échangé{plural}",
-    "searchPlaceholder": "Rechercher un jouet...",
-    "discoveryLoading": "Découverte des trésors en cours...",
-
-    "filters": {
-      "all": "Tout",
-      "exchange": "Échange", 
-      "points": "Points",
-      "don": "Don"
+    "toys": {
+        "pageTitle": "Galerie des Trésors",
+        "pageSubtitle": "Découvrez {count} jouet{plural} prêt{plural} à être échangé{plural}",
+        "searchPlaceholder": "Rechercher un jouet...",
+        "discoveryLoading": "Découverte des trésors en cours...",
+        "filters": {
+            "all": "Tout",
+            "exchange": "Échange",
+            "points": "Points",
+            "don": "Don"
+        },
+        "modes": {
+            "EXCHANGE": "Échange",
+            "POINTS": "Points",
+            "DON": "Don"
+        },
+        "conditions": {
+            "NEW": "Neuf",
+            "VERY_GOOD": "Très bon",
+            "GOOD": "Bon état",
+            "USED": "Usé"
+        },
+        "results": {
+            "count": "{count} résultat{plural} affiché{plural}",
+            "outOf": "sur {total}",
+            "noResults": "Aucun résultat trouvé",
+            "noResultsDescription": "Essayez de modifier votre recherche ou vos filtres pour découvrir plus de jouets"
+        },
+        "geo": {
+            "filteredByCity": "Filtré par votre ville",
+            "showAllToys": "Affiche tous les jouets"
+        },
+        "card": {
+            "viewDetails": "Voir les détails",
+            "unknownCity": "Ville inconnue",
+            "ageRange": "{min}-{max} ans"
+        },
+        "infiniteScroll": {
+            "endOfList": "Tu es arrivé au bout de la liste"
+        },
+        "errors": {
+            "loadingFailed": "Impossible de charger les jouets",
+            "tryAgain": "Réessayer",
+            "errorTitle": "Oups !"
+        },
+        "actions": {
+            "addToy": "Ajouter un jouet"
+        }
     },
-    
-    "modes": {
-      "EXCHANGE": "Échange",
-      "POINTS": "Points", 
-      "DON": "Don"
-    },
-    
-    "conditions": {
-      "NEW": "Neuf",
-      "VERY_GOOD": "Très bon",
-      "GOOD": "Bon état", 
-      "USED": "Usé"
-    },
-    
-    "results": {
-      "count": "{count} résultat{plural} affiché{plural}",
-      "outOf": "sur {total}",
-      "noResults": "Aucun résultat trouvé",
-      "noResultsDescription": "Essayez de modifier votre recherche ou vos filtres pour découvrir plus de jouets"
-    },
-    
-    "geo": {
-      "filteredByCity": "Filtré par votre ville",
-      "showAllToys": "Affiche tous les jouets"
-    },
-    
-    "card": {
-      "viewDetails": "Voir les détails",
-      "unknownCity": "Ville inconnue",
-      "ageRange": "{min}-{max} ans"
-    },
-    
-    "infiniteScroll": {
-      "endOfList": "Tu es arrivé au bout de la liste"
-    },
-    
-    "errors": {
-      "loadingFailed": "Impossible de charger les jouets",
-      "tryAgain": "Réessayer",
-      "errorTitle": "Oups !"
-    },
-    
-    "actions": {
-      "addToy": "Ajouter un jouet"
+    "toyDetail": {
+        "navigation": {
+            "backToGallery": "Retour à la galerie"
+        },
+        "loading": {
+            "unboxingTreasure": "Déballage du trésor..."
+        },
+        "error": {
+            "toyNotFound": "Jouet introuvable",
+            "treasureDisappeared": "Ce trésor semble avoir disparu...",
+            "back": "Retour"
+        },
+        "status": {
+            "AVAILABLE": "Disponible",
+            "RESERVED": "Réservé",
+            "EXCHANGED": "Échangé"
+        },
+        "modes": {
+            "EXCHANGE": "Échange",
+            "POINTS": "Points",
+            "DON": "Don"
+        },
+        "conditions": {
+            "NEW": "Neuf",
+            "VERY_GOOD": "Très bon",
+            "GOOD": "Bon état",
+            "USED": "Usé"
+        },
+        "details": {
+            "recommendedAge": "Âge conseillé",
+            "condition": "État",
+            "years": "ans",
+            "pointsCost": "pts",
+            "offeredBy": "Proposé par",
+            "anonymousUser": "Utilisateur anonyme",
+            "viewProfile": "Cliquez pour voir le profil"
+        },
+        "actions": {
+            "contactOwner": "Contacter le propriétaire",
+            "hideContact": "Masquer le contact",
+            "registerToContact": "S'inscrire pour contacter",
+            "share": "Partager",
+            "report": "Signaler"
+        },
+        "favorites": {
+            "loginRequired": "Veuillez vous connecter pour ajouter un favori.",
+            "addedToFavorites": "Ajouté aux favoris !",
+            "removedFromFavorites": "Retiré des favoris.",
+            "updateError": "Erreur lors de la mise à jour des favoris.",
+            "networkError": "Erreur réseau."
+        },
+        "messaging": {
+            "loginRequired": "Vous devez être connecté pour envoyer un message.",
+            "emptyMessage": "Le message ne peut pas être vide.",
+            "messageSent": "Message envoyé avec succès!",
+            "sendError": "Erreur lors de l'envoi du message: {error}",
+            "unexpectedError": "Une erreur inattendue est survenue.",
+            "contactTitle": "Contactez {name}",
+            "contactOwner": "le propriétaire",
+            "contactSubtitle": "Envoyez un message pour proposer un échange",
+            "messagePlaceholder": "Bonjour ! Je suis intéressé(e) par votre jouet...",
+            "cancel": "Annuler",
+            "sendMessage": "Envoyer le message",
+            "sending": "Envoi..."
+        },
+        "exchange": {
+            "proposeExchange": "Proposer un échange",
+            "loadingToys": "Chargement de vos jouets...",
+            "noAvailableToys": "Vous n'avez aucun jouet disponible pour échanger.",
+            "chooseToy": "Veuillez choisir un jouet à proposer.",
+            "proposalSent": "Votre proposition d'échange a été envoyée !",
+            "optionalMessage": "Message optionnel...",
+            "sendProposal": "Envoyer la proposition"
+        },
+        "sharing": {
+            "shareTitle": "Partager ce jouet",
+            "shareSubtitle": "Faites découvrir ce trésor à vos amis",
+            "shareOnFacebook": "Partager sur Facebook",
+            "copyLink": "Copier le lien",
+            "directLink": "Lien direct :",
+            "linkCopied": "Lien copié dans le presse-papier!"
+        },
+        "reporting": {
+            "reportTitle": "Signaler un problème",
+            "reportSubtitle": "Aidez-nous à maintenir une communauté sûre",
+            "reportReason": "Raison du signalement *",
+            "describeProblem": "Décrivez le problème *",
+            "problemPlaceholder": "Donnez plus de détails...",
+            "confidentialReport": "Signalement confidentiel",
+            "sentTo": "Envoyé à",
+            "sendError": "Erreur: {error}",
+            "selectReason": "Veuillez sélectionner une raison de signalement.",
+            "describeProblemRequired": "Veuillez décrire le problème.",
+            "reportSent": "Signalement envoyé avec succès. Notre équipe va examiner votre demande.",
+            "reportError": "Une erreur est survenue lors de l'envoi du signalement.",
+            "cancel": "Annuler",
+            "send": "Envoyer",
+            "reasons": {
+                "scam": "Arnaque / Escroquerie",
+                "inappropriate": "Contenu inapproprié",
+                "condition": "Jouet en mauvais état",
+                "fake": "Fausse annonce",
+                "other": "Autre raison"
+            }
+        },
+        "similarToys": {
+            "title": "Jouets similaires",
+            "viewAllSimilar": "Voir tous les jouets similaires →"
+        }
     }
-  }
 }

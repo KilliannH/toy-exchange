@@ -1,60 +1,161 @@
 {
-  "Toys": {
-    "pageTitle": "Treasure Gallery",
-    "pageSubtitle": "Discover {count} toy{plural} ready to be exchanged",
-    "searchPlaceholder": "Search for a toy...",
-    "discoveryLoading": "Discovering treasures in progress...",
-    
-    "filters": {
-      "all": "All",
-      "exchange": "Exchange", 
-      "points": "Points",
-      "don": "Gift"
+    "toys": {
+        "pageTitle": "Treasure Gallery",
+        "pageSubtitle": "Discover {count} toy{plural} ready to be exchanged",
+        "searchPlaceholder": "Search for a toy...",
+        "discoveryLoading": "Discovering treasures in progress...",
+        "filters": {
+            "all": "All",
+            "exchange": "Exchange",
+            "points": "Points",
+            "don": "Gift"
+        },
+        "modes": {
+            "EXCHANGE": "Exchange",
+            "POINTS": "Points",
+            "DON": "Gift"
+        },
+        "conditions": {
+            "NEW": "New",
+            "VERY_GOOD": "Very good",
+            "GOOD": "Good condition",
+            "USED": "Used"
+        },
+        "results": {
+            "count": "{count} result{plural} displayed",
+            "outOf": "out of {total}",
+            "noResults": "No results found",
+            "noResultsDescription": "Try modifying your search or filters to discover more toys"
+        },
+        "geo": {
+            "filteredByCity": "Filtered by your city",
+            "showAllToys": "Show all toys"
+        },
+        "card": {
+            "viewDetails": "View details",
+            "unknownCity": "Unknown city",
+            "ageRange": "{min}-{max} years"
+        },
+        "infiniteScroll": {
+            "endOfList": "You've reached the end of the list"
+        },
+        "errors": {
+            "loadingFailed": "Unable to load toys",
+            "tryAgain": "Try again",
+            "errorTitle": "Oops!"
+        },
+        "actions": {
+            "addToy": "Add a toy"
+        }
     },
-    
-    "modes": {
-      "EXCHANGE": "Exchange",
-      "POINTS": "Points", 
-      "DON": "Gift"
-    },
-    
-    "conditions": {
-      "NEW": "New",
-      "VERY_GOOD": "Very good",
-      "GOOD": "Good condition", 
-      "USED": "Used"
-    },
-    
-    "results": {
-      "count": "{count} result{plural} displayed",
-      "outOf": "out of {total}",
-      "noResults": "No results found",
-      "noResultsDescription": "Try modifying your search or filters to discover more toys"
-    },
-    
-    "geo": {
-      "filteredByCity": "Filtered by your city",
-      "showAllToys": "Show all toys"
-    },
-    
-    "card": {
-      "viewDetails": "View details",
-      "unknownCity": "Unknown city",
-      "ageRange": "{min}-{max} years"
-    },
-    
-    "infiniteScroll": {
-      "endOfList": "You've reached the end of the list"
-    },
-    
-    "errors": {
-      "loadingFailed": "Unable to load toys",
-      "tryAgain": "Try again",
-      "errorTitle": "Oops!"
-    },
-    
-    "actions": {
-      "addToy": "Add a toy"
+    "toyDetail": {
+        "navigation": {
+            "backToGallery": "Back to gallery"
+        },
+        "loading": {
+            "unboxingTreasure": "Unboxing treasure..."
+        },
+        "error": {
+            "toyNotFound": "Toy not found",
+            "treasureDisappeared": "This treasure seems to have disappeared...",
+            "back": "Back"
+        },
+        "status": {
+            "AVAILABLE": "Available",
+            "RESERVED": "Reserved",
+            "EXCHANGED": "Exchanged"
+        },
+        "modes": {
+            "EXCHANGE": "Exchange",
+            "POINTS": "Points",
+            "DON": "Gift"
+        },
+        "conditions": {
+            "NEW": "New",
+            "VERY_GOOD": "Very good",
+            "GOOD": "Good condition",
+            "USED": "Used"
+        },
+        "details": {
+            "recommendedAge": "Recommended age",
+            "condition": "Condition",
+            "years": "years",
+            "pointsCost": "pts",
+            "offeredBy": "Offered by",
+            "anonymousUser": "Anonymous user",
+            "viewProfile": "Click to view profile"
+        },
+        "actions": {
+            "contactOwner": "Contact owner",
+            "hideContact": "Hide contact",
+            "registerToContact": "Register to contact",
+            "share": "Share",
+            "report": "Report"
+        },
+        "favorites": {
+            "loginRequired": "Please log in to add to favorites.",
+            "addedToFavorites": "Added to favorites!",
+            "removedFromFavorites": "Removed from favorites.",
+            "updateError": "Error updating favorites.",
+            "networkError": "Network error."
+        },
+        "messaging": {
+            "loginRequired": "You must be logged in to send a message.",
+            "emptyMessage": "Message cannot be empty.",
+            "messageSent": "Message sent successfully!",
+            "sendError": "Error sending message: {error}",
+            "unexpectedError": "An unexpected error occurred.",
+            "contactTitle": "Contact {name}",
+            "contactOwner": "the owner",
+            "contactSubtitle": "Send a message to propose an exchange",
+            "messagePlaceholder": "Hello! I'm interested in your toy...",
+            "cancel": "Cancel",
+            "sendMessage": "Send message",
+            "sending": "Sending..."
+        },
+        "exchange": {
+            "proposeExchange": "Propose an exchange",
+            "loadingToys": "Loading your toys...",
+            "noAvailableToys": "You don't have any toys available for exchange.",
+            "chooseToy": "Please choose a toy to propose.",
+            "proposalSent": "Your exchange proposal has been sent!",
+            "optionalMessage": "Optional message...",
+            "sendProposal": "Send proposal"
+        },
+        "sharing": {
+            "shareTitle": "Share this toy",
+            "shareSubtitle": "Let your friends discover this treasure",
+            "shareOnFacebook": "Share on Facebook",
+            "copyLink": "Copy link",
+            "directLink": "Direct link:",
+            "linkCopied": "Link copied to clipboard!"
+        },
+        "reporting": {
+            "reportTitle": "Report a problem",
+            "reportSubtitle": "Help us maintain a safe community",
+            "reportReason": "Reason for report *",
+            "describeProblem": "Describe the problem *",
+            "problemPlaceholder": "Give more details...",
+            "confidentialReport": "Confidential report",
+            "sentTo": "Sent to",
+            "sendError": "Error: {error}",
+            "selectReason": "Please select a reason for reporting.",
+            "describeProblemRequired": "Please describe the problem.",
+            "reportSent": "Report sent successfully. Our team will review your request.",
+            "reportError": "An error occurred while sending the report.",
+            "cancel": "Cancel",
+            "send": "Send",
+            "reasons": {
+                "scam": "Scam / Fraud",
+                "inappropriate": "Inappropriate content",
+                "condition": "Toy in poor condition",
+                "fake": "Fake listing",
+                "other": "Other reason"
+            }
+        },
+        "similarToys": {
+            "title": "Similar toys",
+            "viewAllSimilar": "View all similar toys →"
+        }
     }
-  }
 }

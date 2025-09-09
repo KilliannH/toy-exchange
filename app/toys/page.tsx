@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import useSWR, { mutate } from "swr";
+import { mutate } from "swr";
 import { useToysTranslations } from '@/hooks/useToysTranslations';
 import { useMemo, useState, useEffect, useRef } from "react";
 import useSWRInfinite from "swr/infinite";
@@ -118,15 +118,6 @@ export default function ToysPage() {
                 return <Gift size={14} />;
             default:
                 return null;
-        }
-    };
-
-    const getCondition = (condition: string) => {
-        switch (condition) {
-            case "NEW": return "Neuf";
-            case "VERY_GOOD": return "Très bon";
-            case "GOOD": return "Bon état";
-            case "USED": return "Usé";
         }
     };
 
