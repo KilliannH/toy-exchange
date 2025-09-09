@@ -6,12 +6,14 @@ import { Lock, Sparkles, Gamepad2, ToyBrick, Gem, Rocket, Sun, Star, Tent, Check
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Image from "next/image";
+import { useLoginTranslations } from '@/hooks/useLoginTranslations';
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
+  const t = useLoginTranslations();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -24,10 +26,10 @@ export default function LoginPage() {
     });
     setIsLoading(false);
     if (res?.ok) {
-      // Utilise le routeur Next.js pour rester sur l’origine courante
+      // Utilise le routeur Next.js pour rester sur l'origine courante
       router.push("/dashboard");
     } else {
-      toast.error("Erreur lors de l'authentification");
+      toast.error(t.form.authError);
     }
   }
 
@@ -73,10 +75,10 @@ export default function LoginPage() {
                 className="mx-auto" />
             </div>
             <h1 className="text-4xl font-black bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-3">
-              Bon retour !
+              {t.pageTitle}
             </h1>
             <p className="text-gray-300 font-light">
-              Connectez-vous pour accéder à vos jouets
+              {t.pageSubtitle}
             </p>
           </div>
 
@@ -85,7 +87,7 @@ export default function LoginPage() {
             <div className="relative group">
               <input
                 type="email"
-                placeholder="Votre email"
+                placeholder={t.form.emailPlaceholder}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-white/5 border border-white/20 text-white placeholder-gray-400 px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-300 group-hover:border-white/30"
@@ -98,7 +100,7 @@ export default function LoginPage() {
             <div className="relative group">
               <input
                 type="password"
-                placeholder="Mot de passe"
+                placeholder={t.form.passwordPlaceholder}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-white/5 border border-white/20 text-white placeholder-gray-400 px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-300 group-hover:border-white/30"
@@ -118,11 +120,11 @@ export default function LoginPage() {
                 {isLoading ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Connexion...
+                    {t.form.signingIn}
                   </>
                 ) : (
                   <>
-                    <Rocket size={20} /> Se connecter
+                    <Rocket size={20} /> {t.form.signInButton}
                   </>
                 )}
               </span>
@@ -133,7 +135,7 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="flex items-center gap-4 my-8">
             <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-            <span className="text-gray-400 text-sm font-medium">ou</span>
+            <span className="text-gray-400 text-sm font-medium">{t.or}</span>
             <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
           </div>
 
@@ -151,21 +153,21 @@ export default function LoginPage() {
               </svg>
             </div>
             <span className="group-hover:text-cyan-300 transition-colors duration-300">
-              Continuer avec Google
+              {t.continueWithGoogle}
             </span>
           </button>
 
           {/* Footer links */}
           <div className="text-center mt-8 space-y-3">
             <p className="text-gray-400 text-sm">
-              Pas encore de compte ?{" "}
+              {t.footer.noAccount}{" "}
               <a href="/register" className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors duration-200">
-                Créer un compte
+                {t.footer.createAccount}
               </a>
             </p>
             <p className="text-gray-500 text-xs">
               <a href="/forgot-password" className="hover:text-gray-400 transition-colors duration-200">
-                Mot de passe oublié ?
+                {t.footer.forgotPassword}
               </a>
             </p>
           </div>

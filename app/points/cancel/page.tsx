@@ -12,11 +12,13 @@ import {
     AlertCircle,
     CreditCard
 } from "lucide-react";
+import { usePointsCancelTranslations } from "@/hooks/usePointsCancelTranslations";
 
 function CancelContent() {
     const [isLoading, setIsLoading] = useState(true);
     const searchParams = useSearchParams();
     const sessionId = searchParams.get('session_id');
+    const t = usePointsCancelTranslations();
 
     useEffect(() => {
         // Simuler un petit délai pour l'effet de chargement
@@ -32,7 +34,7 @@ function CancelContent() {
             <div className="min-h-screen bg-slate-900 flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin w-16 h-16 border-4 border-red-400 border-t-transparent rounded-full mx-auto mb-4"></div>
-                    <p className="text-white text-lg">Vérification en cours...</p>
+                    <p className="text-white text-lg">{t.loading.verification}</p>
                 </div>
             </div>
         );
@@ -76,11 +78,11 @@ function CancelContent() {
 
                     {/* Cancel message */}
                     <h1 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-red-400 via-pink-300 to-orange-300 bg-clip-text text-transparent mb-6 leading-tight">
-                        Paiement annulé
+                        {t.header.title}
                     </h1>
 
                     <p className="text-xl text-gray-300 mb-8 max-w-lg mx-auto leading-relaxed">
-                        Aucun souci ! Votre paiement a été annulé et aucun montant n'a été débité.
+                        {t.header.subtitle}
                     </p>
 
                     {/* Info box */}
@@ -89,28 +91,28 @@ function CancelContent() {
                             <AlertCircle className="w-12 h-12 text-orange-400 animate-bounce" />
                             <div>
                                 <div className="text-2xl font-bold text-white mb-2">
-                                    Transaction annulée
+                                    {t.info.transactionCancelled}
                                 </div>
                                 <div className="text-gray-400 text-sm">
-                                    Vous pouvez réessayer à tout moment
+                                    {t.info.retryAnytime}
                                 </div>
                             </div>
                         </div>
 
                         <div className="space-y-3 text-sm">
                             <div className="flex justify-between items-center">
-                                <span className="text-gray-400">Statut :</span>
-                                <span className="text-red-400 font-semibold">Annulé</span>
+                                <span className="text-gray-400">{t.info.status}</span>
+                                <span className="text-red-400 font-semibold">{t.info.cancelled}</span>
                             </div>
                             <div className="flex justify-between items-center">
-                                <span className="text-gray-400">Montant débité :</span>
-                                <span className="text-green-400 font-semibold">0€</span>
+                                <span className="text-gray-400">{t.info.amountCharged}</span>
+                                <span className="text-green-400 font-semibold">{t.info.zeroAmount}</span>
                             </div>
                             {sessionId && (
                                 <div className="flex justify-between items-center">
-                                    <span className="text-gray-400">Session ID :</span>
+                                    <span className="text-gray-400">{t.info.sessionIdLabel}</span>
                                     <span className="text-gray-300 font-mono text-xs">
-                                        {sessionId.slice(-8)}
+                                        {t.getSessionId(sessionId)}
                                     </span>
                                 </div>
                             )}
@@ -121,13 +123,13 @@ function CancelContent() {
                     <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 mb-8 max-w-lg mx-auto">
                         <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                             <AlertCircle className="w-5 h-5 text-yellow-400" />
-                            Pourquoi le paiement a été annulé ?
+                            {t.reasons.title}
                         </h3>
                         <ul className="text-sm text-gray-300 text-left space-y-2">
-                            <li>• Vous avez fermé la page de paiement</li>
-                            <li>• Vous avez cliqué sur "Annuler" pendant le processus</li>
-                            <li>• Le délai de paiement a expiré</li>
-                            <li>• Problème technique temporaire</li>
+                            <li>{t.reasons.closedPage}</li>
+                            <li>{t.reasons.clickedCancel}</li>
+                            <li>{t.reasons.timeoutExpired}</li>
+                            <li>{t.reasons.technicalProblem}</li>
                         </ul>
                     </div>
 
@@ -139,7 +141,7 @@ function CancelContent() {
                         >
                             <span className="relative z-10 flex items-center gap-2">
                                 <RefreshCw className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
-                                Réessayer l'achat
+                                {t.buttons.retryPurchase}
                             </span>
                             <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         </Link>
@@ -149,7 +151,7 @@ function CancelContent() {
                             className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold px-8 py-4 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
                         >
                             <ToyBrick className="w-5 h-5" />
-                            Voir les jouets gratuits
+                            {t.buttons.viewFreeToys}
                         </Link>
 
                         <Link
@@ -157,7 +159,7 @@ function CancelContent() {
                             className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-8 py-4 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
                         >
                             <Home className="w-5 h-5" />
-                            Retour au dashboard
+                            {t.buttons.backToDashboard}
                         </Link>
                     </div>
 
@@ -165,10 +167,10 @@ function CancelContent() {
                     <div className="mt-12 text-center">
                         <div className="flex items-center justify-center gap-2 text-green-400 text-sm mb-2">
                             <CreditCard className="w-4 h-4" />
-                            <span>Aucun montant n'a été débité de votre carte</span>
+                            <span>{t.reassurance.noCharge}</span>
                         </div>
                         <p className="text-gray-500 text-sm">
-                            Votre moyen de paiement est sécurisé par Stripe
+                            {t.reassurance.securedByStripe}
                         </p>
                     </div>
                 </div>
@@ -192,11 +194,13 @@ function CancelContent() {
 }
 
 function LoadingFallback() {
+    const t = usePointsCancelTranslations();
+    
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-900 to-slate-900 flex items-center justify-center">
             <div className="text-center">
                 <div className="animate-spin w-16 h-16 border-4 border-red-400 border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p className="text-white text-lg">Chargement...</p>
+                <p className="text-white text-lg">{t.loading.general}</p>
             </div>
         </div>
     );

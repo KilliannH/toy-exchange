@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { usePointsPageTranslations } from "@/hooks/usePointsPageTranslations";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -40,6 +41,7 @@ interface PointsPack {
 
 export default function PointsPageClient({ user }: { user: User }) {
   const [loading, setLoading] = useState<string | null>(null);
+  const t = usePointsPageTranslations();
 
   const pointsPacks: PointsPack[] = [
     {
@@ -47,7 +49,7 @@ export default function PointsPageClient({ user }: { user: User }) {
       points: 100,
       price: 5,
       priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_100_POINTS || "price_starter",
-      badge: "Starter",
+      badge: t.packs.starter,
       color: "from-blue-500 to-cyan-500",
       icon: <Zap className="w-8 h-8" />
     },
@@ -56,7 +58,7 @@ export default function PointsPageClient({ user }: { user: User }) {
       points: 250,
       price: 10,
       priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_250_POINTS || "price_popular",
-      badge: "Populaire",
+      badge: t.packs.popular,
       popular: true,
       color: "from-purple-500 to-pink-500",
       icon: <Star className="w-8 h-8" />
@@ -66,7 +68,7 @@ export default function PointsPageClient({ user }: { user: User }) {
       points: 600,
       price: 20,
       priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_600_POINTS || "price_premium",
-      badge: "Premium",
+      badge: t.packs.premium,
       color: "from-yellow-500 to-orange-500",
       icon: <Crown className="w-8 h-8" />
     }
@@ -98,7 +100,7 @@ export default function PointsPageClient({ user }: { user: User }) {
       // Rediriger vers Stripe Checkout
       const stripe = await stripePromise;
       if (!stripe) {
-        throw new Error('Stripe non initialisé');
+        throw new Error(t.errors.stripeNotInitialized);
       }
 
       const { error: stripeError } = await stripe.redirectToCheckout({
@@ -111,7 +113,7 @@ export default function PointsPageClient({ user }: { user: User }) {
 
     } catch (error: any) {
       console.error('Erreur lors de l\'achat:', error);
-      toast.error(error.message || 'Erreur lors de l\'achat');
+      toast.error(t.getPurchaseError(error.message) || t.errors.generalPurchaseError);
     } finally {
       setLoading(null);
     }
@@ -127,7 +129,7 @@ export default function PointsPageClient({ user }: { user: User }) {
           className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors mb-8 font-medium"
         >
           <ArrowLeft className="w-5 h-5" />
-          Retour au dashboard
+          {t.navigation.backToDashboard}
         </Link>
 
         {/* Header */}
@@ -136,10 +138,10 @@ export default function PointsPageClient({ user }: { user: User }) {
             <Coins className="w-16 h-16 text-yellow-400 mx-auto" />
           </div>
           <h1 className="text-5xl font-black bg-gradient-to-r from-white via-yellow-300 to-orange-300 bg-clip-text text-transparent mb-4">
-            Mes Points ToyExchange
+            {t.header.title}
           </h1>
           <p className="text-xl text-gray-300 mb-6">
-            Achetez des jouets premium avec vos points
+            {t.header.subtitle}
           </p>
           
           {/* Points actuels */}
@@ -148,13 +150,13 @@ export default function PointsPageClient({ user }: { user: User }) {
               <Coins className="w-12 h-12 text-yellow-400" />
               <div>
                 <div className="text-4xl font-black bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                  {user.points || 0}
+                  {t.getCurrentPoints(user.points || 0)}
                 </div>
-                <div className="text-gray-400 text-sm">Points disponibles</div>
+                <div className="text-gray-400 text-sm">{t.header.availablePoints}</div>
               </div>
             </div>
             <div className="text-gray-300 text-sm">
-              Salut {user.name || 'Membre'} ! Rechargez vos points pour accéder à plus de jouets.
+              {t.getWelcomeMessage(user.name)}
             </div>
           </div>
         </div>
@@ -162,7 +164,7 @@ export default function PointsPageClient({ user }: { user: User }) {
         {/* Packs de points */}
         <div className="mb-12">
           <h2 className="text-3xl font-bold text-white text-center mb-8">
-            Choisissez votre pack de points
+            {t.packs.choosePackTitle}
           </h2>
           
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -177,7 +179,7 @@ export default function PointsPageClient({ user }: { user: User }) {
                 {pack.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                     <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-2 rounded-full text-sm font-bold shadow-xl">
-                      ⭐ POPULAIRE
+                      {t.packs.popularBadge}
                     </div>
                   </div>
                 )}
@@ -194,26 +196,26 @@ export default function PointsPageClient({ user }: { user: User }) {
                   </h3>
                   
                   <div className={`text-4xl font-black mb-2 bg-gradient-to-r ${pack.color} bg-clip-text text-transparent`}>
-                    {pack.points} points
+                    {t.getPointsAmount(pack.points)}
                   </div>
                   
                   <div className="text-3xl font-bold text-white mb-6">
-                    {pack.price}€
+                    {t.getPrice(pack.price)}
                   </div>
 
                   {/* Avantages */}
                   <div className="text-sm text-gray-400 mb-6 space-y-2">
                     <div className="flex items-center justify-center gap-2">
                       <CheckCircle className="w-4 h-4 text-green-400" />
-                      <span>Points instantanés</span>
+                      <span>{t.benefits.instantPoints}</span>
                     </div>
                     <div className="flex items-center justify-center gap-2">
                       <Gift className="w-4 h-4 text-green-400" />
-                      <span>Accès jouets premium</span>
+                      <span>{t.benefits.premiumAccess}</span>
                     </div>
                     <div className="flex items-center justify-center gap-2">
                       <Sparkles className="w-4 h-4 text-green-400" />
-                      <span>Valeur {(pack.points / pack.price).toFixed(1)} pts/€</span>
+                      <span>{t.getValueRatio(pack.points / pack.price)}</span>
                     </div>
                   </div>
 
@@ -227,12 +229,12 @@ export default function PointsPageClient({ user }: { user: User }) {
                       {loading === pack.id ? (
                         <>
                           <Loader2 className="w-5 h-5 animate-spin" />
-                          Chargement...
+                          {t.purchase.loading}
                         </>
                       ) : (
                         <>
                           <CreditCard className="w-5 h-5" />
-                          Acheter maintenant
+                          {t.purchase.buyNow}
                         </>
                       )}
                     </span>
@@ -251,25 +253,25 @@ export default function PointsPageClient({ user }: { user: User }) {
               <Shield className="w-8 h-8" />
             </div>
             <h3 className="text-2xl font-bold text-white">
-              Paiement 100% sécurisé
+              {t.security.title}
             </h3>
           </div>
           
           <div className="grid md:grid-cols-3 gap-6 text-center">
             <div className="space-y-2">
               <CreditCard className="w-8 h-8 text-blue-400 mx-auto" />
-              <div className="text-white font-medium">Stripe</div>
-              <div className="text-sm text-gray-400">Paiements sécurisés par Stripe</div>
+              <div className="text-white font-medium">{t.security.stripeTitle}</div>
+              <div className="text-sm text-gray-400">{t.security.stripeDescription}</div>
             </div>
             <div className="space-y-2">
               <Zap className="w-8 h-8 text-green-400 mx-auto" />
-              <div className="text-white font-medium">Instantané</div>
-              <div className="text-sm text-gray-400">Points crédités immédiatement</div>
+              <div className="text-white font-medium">{t.security.instantTitle}</div>
+              <div className="text-sm text-gray-400">{t.security.instantDescription}</div>
             </div>
             <div className="space-y-2">
               <CheckCircle className="w-8 h-8 text-purple-400 mx-auto" />
-              <div className="text-white font-medium">Garantie</div>
-              <div className="text-sm text-gray-400">Remboursement si problème</div>
+              <div className="text-white font-medium">{t.security.guaranteeTitle}</div>
+              <div className="text-sm text-gray-400">{t.security.guaranteeDescription}</div>
             </div>
           </div>
         </div>

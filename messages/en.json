@@ -157,5 +157,502 @@
             "title": "Similar toys",
             "viewAllSimilar": "View all similar toys →"
         }
+    },
+    "dashboard": {
+        "pageTitle": "My Dashboard",
+        "pageSubtitle": "Manage your toys and track your exchanges",
+        "loading": {
+            "loadingTreasures": "Loading your treasures..."
+        },
+        "error": {
+            "errorTitle": "Oops, an error!",
+            "dataLoadError": "Unable to load your data"
+        },
+        "stats": {
+            "myToys": "My toys",
+            "activeExchanges": "Active exchanges",
+            "messages": "Messages",
+            "averageRating": "Average rating",
+            "myPoints": "My points",
+            "clickToView": "Click to view {section}",
+            "clickToGoTo": "Click to go to {section}",
+            "clickToBuyPoints": "Click to buy more points"
+        },
+        "myToys": {
+            "sectionTitle": "My toys ({count})",
+            "addToy": "Add a toy",
+            "emptyTitle": "Your collection is empty",
+            "emptyDescription": "Start by adding your first toys and join the exchange community!",
+            "addFirstToy": "Post my first toy",
+            "viewDetails": "View details",
+            "edit": "Edit",
+            "delete": "Delete",
+            "confirmDelete": "Delete this toy?",
+            "deleteSuccess": "Toy deleted!",
+            "deleteError": "Error during deletion",
+            "years": "years"
+        },
+        "favorites": {
+            "sectionTitle": "My favorites ({count})",
+            "loading": "Loading your favorites...",
+            "error": "Error loading favorites",
+            "emptyTitle": "No favorites yet",
+            "emptyDescription": "Browse toys and add the ones you like to your favorites!",
+            "discoverToys": "Discover toys",
+            "offeredBy": "Offered by {name}",
+            "viewDetails": "View details",
+            "toy": "Toy",
+            "member": "Member"
+        },
+        "exchanges": {
+            "sectionTitle": "My exchanges ({count})",
+            "loading": "Loading your exchanges...",
+            "error": "Error loading exchanges",
+            "empty": "You have no exchanges in progress.",
+            "proposedBy": "Proposed by {name}",
+            "openConversation": "Open conversation",
+            "status": {
+                "PENDING": "Pending",
+                "ACCEPTED": "Accepted",
+                "REJECTED": "Rejected",
+                "COMPLETED": "Completed"
+            }
+        },
+        "reviews": {
+            "modalTitle": "My reviews ({count})",
+            "empty": "No reviews received yet",
+            "user": "User"
+        },
+        "conditions": {
+            "NEW": "New",
+            "VERY_GOOD": "Very good",
+            "GOOD": "Good condition",
+            "USED": "Used"
+        },
+        "timeAgo": {
+            "fewMinutes": "A few minutes ago",
+            "hoursAgo": "{hours}h ago",
+            "yesterday": "Yesterday",
+            "daysAgo": "{days} days ago"
+        }
+    },
+    "login": {
+        "pageTitle": "Welcome back!",
+        "pageSubtitle": "Sign in to access your toys",
+        "form": {
+            "emailPlaceholder": "Your email",
+            "passwordPlaceholder": "Password",
+            "signInButton": "Sign in",
+            "signingIn": "Signing in...",
+            "authError": "Authentication error"
+        },
+        "divider": {
+            "or": "or"
+        },
+        "google": {
+            "continueWithGoogle": "Continue with Google"
+        },
+        "footer": {
+            "noAccount": "Don't have an account?",
+            "createAccount": "Create an account",
+            "forgotPassword": "Forgot password?"
+        }
+    },
+    "conversation": {
+        "loading": {
+            "loadingConversation": "Loading conversation..."
+        },
+        "error": {
+            "loadingError": "Loading error",
+            "cannotLoadConversation": "Unable to load conversation."
+        },
+        "header": {
+            "aboutToy": "About: {toyTitle}",
+            "unknownToy": "Unknown toy"
+        },
+        "exchange": {
+            "confirmExchange": "Confirm exchange",
+            "confirm": "Confirm",
+            "youConfirmed": "You confirmed",
+            "exchangeConfirmed": "Exchange confirmed",
+            "exchangeSuccess": "Exchange confirmed!",
+            "exchangeError": "Error: {error}",
+            "confirmExchangePrompt": "Are you sure you want to confirm this exchange?"
+        },
+        "donation": {
+            "confirmDonation": "Confirm donation",
+            "donationConfirmed": "Donation confirmed",
+            "donationSuccess": "Toy donation confirmed successfully!",
+            "donationError": "Error confirming donation: {error}",
+            "networkError": "Network error while confirming donation.",
+            "confirmPrompt": "Are you sure you want to confirm the donation of this toy? This action is irreversible."
+        },
+        "points": {
+            "confirmPurchase": "Confirm purchase ({points} pts)",
+            "purchaseConfirmed": "Purchase confirmed ({points} pts)",
+            "purchaseSuccess": "Purchase confirmed 🎉",
+            "purchaseError": "Error: {error}",
+            "confirmPrompt": "Confirm purchase for {points} points?"
+        },
+        "messages": {
+            "you": "You",
+            "writeMessage": "Write a message...",
+            "sendError": "Error sending message: {error}",
+            "networkError": "Network error.",
+            "donationCompleteMessage": "The donation is confirmed, you can no longer send messages.",
+            "exchangeCompleteMessage": "The exchange is confirmed, you can no longer send messages.",
+            "pointsCompleteMessage": "The donation (points) is confirmed, you can no longer send messages."
+        },
+        "reviews": {
+            "reviewTitle": "Review for {partnerName}",
+            "yourPartner": "your partner",
+            "ratingRequired": "Please give a rating from 1 to 5 stars.",
+            "commentPlaceholder": "Your comment...",
+            "submitReview": "Submit review",
+            "submitting": "Submitting...",
+            "reviewSuccess": "Thank you for your review!"
+        }
+    },
+    "messages": {
+        "pageTitle": "My conversations",
+        "loading": {
+            "loadingConversations": "Loading your conversations..."
+        },
+        "error": {
+            "accessDenied": "Access denied",
+            "loginRequired": "Please log in to view your messages.",
+            "signIn": "Sign in",
+            "oops": "Oops!",
+            "cannotLoadConversations": "Unable to load your conversations.",
+            "tryAgain": "Try again"
+        },
+        "empty": {
+            "noConversations": "No conversations",
+            "noMessagesYet": "You don't have any messages yet. Browse toys to find your first exchange!",
+            "browseToys": "Browse toys"
+        },
+        "conversation": {
+            "defaultTitle": "Conversation"
+        }
+    },
+    "cityOnboarding": {
+        "loading": {
+            "general": "Loading...",
+            "saving": "Saving..."
+        },
+        "header": {
+            "lastStep": "Last step!",
+            "hello": "Hi",
+            "defaultUser": "user",
+            "welcomeMessage": "Hi {userName}!",
+            "cityPrompt": "Enter your city to find toys near you"
+        },
+        "form": {
+            "cityLabel": "Which city are you in?",
+            "cityPlaceholder": "Search for your city...",
+            "noResults": "No results found",
+            "submitButton": "Complete registration",
+            "submitting": "Saving..."
+        },
+        "info": {
+            "whyCity": "Why your city?",
+            "whyCityDescription": "We use it to show you toys available near you and facilitate local exchanges."
+        },
+        "footer": {
+            "dataSecurityMessage": "Your location data is secure and is only used to improve your experience"
+        },
+        "messages": {
+            "locationSaved": "Location saved!",
+            "networkError": "An error occurred",
+            "geolocationError": "Error during geolocation"
+        },
+        "errors": {
+            "locationError": "Error retrieving coordinates: {error}",
+            "saveError": "{error}",
+            "generalError": "Error during registration"
+        }
+    },
+    "pointsCancel": {
+        "loading": {
+            "verification": "Verification in progress...",
+            "general": "Loading..."
+        },
+        "header": {
+            "title": "Payment cancelled",
+            "subtitle": "No worries! Your payment has been cancelled and no amount has been charged."
+        },
+        "info": {
+            "transactionCancelled": "Transaction cancelled",
+            "retryAnytime": "You can try again anytime",
+            "status": "Status:",
+            "cancelled": "Cancelled",
+            "amountCharged": "Amount charged:",
+            "zeroAmount": "€0",
+            "sessionIdLabel": "Session ID:",
+            "sessionId": "{sessionId}"
+        },
+        "reasons": {
+            "title": "Why was the payment cancelled?",
+            "closedPage": "• You closed the payment page",
+            "clickedCancel": "• You clicked \"Cancel\" during the process",
+            "timeoutExpired": "• Payment timeout expired",
+            "technicalProblem": "• Temporary technical issue"
+        },
+        "buttons": {
+            "retryPurchase": "Retry purchase",
+            "viewFreeToys": "View free toys",
+            "backToDashboard": "Back to dashboard"
+        },
+        "reassurance": {
+            "noCharge": "No amount has been charged to your card",
+            "securedByStripe": "Your payment method is secured by Stripe"
+        }
+    },
+    "pointsSuccess": {
+        "loading": {
+            "verification": "Verifying your payment...",
+            "general": "Loading..."
+        },
+        "header": {
+            "title": "Payment successful!",
+            "subtitle": "Congratulations! Your points have been successfully added to your account."
+        },
+        "details": {
+            "pointsAdded": "+{points}",
+            "pointsAddedLabel": "Points added",
+            "amountPaid": "€{amount}",
+            "amountPaidLabel": "Amount paid:",
+            "totalPoints": "{totalPoints} points",
+            "totalPointsLabel": "Total points:",
+            "transactionId": "{transactionId}",
+            "transactionIdLabel": "Transaction ID:",
+            "notAvailable": "N/A"
+        },
+        "buttons": {
+            "discoverToys": "Discover toys",
+            "backToDashboard": "Back to dashboard"
+        },
+        "footer": {
+            "receiptSent": "A receipt for your purchase has been sent by email",
+            "securedByStripe": "Payment secured by Stripe"
+        }
+    },
+    "pointsPage": {
+        "navigation": {
+            "backToDashboard": "Back to dashboard"
+        },
+        "header": {
+            "title": "My ToyExchange Points",
+            "subtitle": "Buy premium toys with your points",
+            "currentPoints": "{points}",
+            "availablePoints": "Available points",
+            "defaultMember": "Member",
+            "welcomeMessage": "Hi {userName}! Top up your points to access more toys."
+        },
+        "packs": {
+            "choosePackTitle": "Choose your points pack",
+            "starter": "Starter",
+            "popular": "Popular",
+            "premium": "Premium",
+            "popularBadge": "⭐ POPULAR",
+            "pointsAmount": "{points} points",
+            "price": "€{price}",
+            "valueRatio": "Value {ratio} pts/€"
+        },
+        "benefits": {
+            "instantPoints": "Instant points",
+            "premiumAccess": "Premium toys access",
+            "valuePerEuro": "Value {ratio} pts/€"
+        },
+        "purchase": {
+            "buyNow": "Buy now",
+            "loading": "Loading..."
+        },
+        "security": {
+            "title": "100% secure payment",
+            "stripeTitle": "Stripe",
+            "stripeDescription": "Payments secured by Stripe",
+            "instantTitle": "Instant",
+            "instantDescription": "Points credited immediately",
+            "guaranteeTitle": "Guarantee",
+            "guaranteeDescription": "Refund if problem occurs"
+        },
+        "errors": {
+            "stripeNotInitialized": "Stripe not initialized",
+            "generalPurchaseError": "Error during purchase",
+            "purchaseError": "{error}"
+        }
+    },
+    "postToy": {
+        "header": {
+            "title": "Share a treasure",
+            "subtitle": "Give a toy a new life"
+        },
+        "progress": {
+            "stepProgress": "Step {currentStep} of {totalSteps}",
+            "percentage": "{percentage}%",
+            "stepOf": "of"
+        },
+        "stepIndicators": {
+            "description": "Description",
+            "age": "Age",
+            "details": "Details",
+            "photos": "Photos"
+        },
+        "steps": {
+            "description": {
+                "title": "Tell us about this toy",
+                "subtitle": "Give it a catchy title and describe it",
+                "titleLabel": "Toy title",
+                "titlePlaceholder": "Ex: Lego Creator 3-in-1, Barbie Dreamhouse...",
+                "descriptionLabel": "Detailed description",
+                "descriptionPlaceholder": "Describe the condition, included pieces, why you're exchanging it..."
+            },
+            "age": {
+                "title": "Age range",
+                "subtitle": "Who is this toy suitable for?",
+                "minAgeLabel": "Minimum age",
+                "maxAgeLabel": "Maximum age",
+                "perfectFor": "Perfect for {ageMin}-{ageMax} years old"
+            },
+            "details": {
+                "title": "Toy details",
+                "subtitle": "Category, condition and exchange mode",
+                "categoryLabel": "Category",
+                "conditionLabel": "Toy condition",
+                "exchangeTypeLabel": "Exchange type",
+                "pointsValueLabel": "Points value",
+                "pointsPlaceholder": "Ex: 50",
+                "pointsHelp": "Number of points required to get this toy"
+            },
+            "images": {
+                "title": "Add photos",
+                "subtitle": "Quality images attract more exchanges",
+                "dragText": "Drag your photos here or click to select",
+                "fileInfo": "PNG, JPG up to 10MB • Maximum 5 images"
+            }
+        },
+        "categories": {
+            "construction": "Construction",
+            "dolls": "Dolls",
+            "vehicles": "Vehicles",
+            "boardGames": "Board games",
+            "books": "Books",
+            "other": "Other"
+        },
+        "conditions": {
+            "new": "New",
+            "veryGood": "Very good",
+            "good": "Good condition",
+            "used": "Used"
+        },
+        "exchangeModes": {
+            "donation": "Donation",
+            "exchange": "Exchange",
+            "points": "Points"
+        },
+        "navigation": {
+            "previous": "Previous",
+            "next": "Next",
+            "publish": "Publish toy",
+            "publishing": "Publishing..."
+        },
+        "success": {
+            "title": "Treasure published!",
+            "subtitle": "Your toy is now visible to the community",
+            "viewAllToys": "View all toys",
+            "myDashboard": "My dashboard"
+        },
+        "form": {
+            "characterCount": "{current}/{max} characters"
+        },
+        "messages": {
+            "toyAdded": "Toy added with images!",
+            "maxImages": "Maximum 5 images per toy",
+            "addError": "Error adding the toy."
+        },
+        "errors": {
+            "generalError": "An error occurred",
+            "uploadError": "{error}"
+        }
+    },
+    "editProfile": {
+        "loading": {
+            "profile": "Loading profile...",
+            "saving": "Saving..."
+        },
+        "navigation": {
+            "backToProfile": "Back to profile"
+        },
+        "header": {
+            "title": "Edit my profile",
+            "subtitle": "Customize your exchange experience"
+        },
+        "success": {
+            "profileUpdated": "Profile updated successfully!"
+        },
+        "form": {
+            "profilePhoto": "Profile photo",
+            "fullName": "Full name",
+            "namePlaceholder": "How would you like to be called?",
+            "city": "City",
+            "cityPlaceholder": "Search for a city...",
+            "noResults": "No results",
+            "searchRadius": "Search radius",
+            "radiusValue": "{radius} kilometers",
+            "kilometers": "kilometers",
+            "exchangeZone": "Exchange zone",
+            "proximity": "Proximity",
+            "saveButton": "Save changes"
+        },
+        "preview": {
+            "title": "Profile preview",
+            "nameNotDefined": "Name not defined",
+            "cityNotDefined": "City not defined",
+            "exchangeZoneTitle": "Exchange zone",
+            "zoneDescription": "{radius} km around you",
+            "aroundYou": "around you"
+        },
+        "tips": {
+            "title": "Tips",
+            "visibleName": "Visible name",
+            "visibleNameDesc": "Use your real first name to inspire trust",
+            "preciseCity": "Precise city",
+            "preciseCityDesc": "Facilitate meetings with exact location",
+            "optimalRadius": "Optimal radius",
+            "optimalRadiusDesc": "10-30km offers a good choice/proximity balance"
+        },
+        "privacy": {
+            "title": "Privacy",
+            "description": "Your information is only visible to other members during confirmed exchanges. Your email always remains private."
+        },
+        "messages": {
+            "cityNotFound": "City not found. Please try again.",
+            "uploadError": "Error generating signed URL"
+        },
+        "errors": {
+            "generalError": "An error occurred"
+        }
+    },
+    "profilePage": {
+        "error": {
+            "title": "Profile not found",
+            "subtitle": "Oops!",
+            "description": "An error occurred while loading"
+        },
+        "stats": {
+            "toysLabel": "Toys",
+            "exchangesLabel": "Exchanges",
+            "donationsLabel": "Donations",
+            "ratingLabel": "Average rating",
+            "memberSinceLabel": "Member since",
+            "toysCount": "{count}",
+            "exchangesCount": "{count}",
+            "donationsCount": "{count}",
+            "averageRating": "{rating}",
+            "memberSinceNew": "New",
+            "memberSinceMonths": "{months} months",
+            "newMember": "New"
+        }
     }
 }

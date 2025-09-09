@@ -157,5 +157,330 @@
             "title": "Jouets similaires",
             "viewAllSimilar": "Voir tous les jouets similaires →"
         }
-    }
+    },
+    "dashboard": {
+        "pageTitle": "Mon Dashboard",
+        "pageSubtitle": "Gérez vos jouets et suivez vos échanges",
+        "loading": {
+            "loadingTreasures": "Chargement de vos trésors..."
+        },
+        "error": {
+            "errorTitle": "Oups, une erreur !",
+            "dataLoadError": "Impossible de charger vos données"
+        },
+        "stats": {
+            "myToys": "Mes jouets",
+            "activeExchanges": "Échanges actifs",
+            "messages": "Messages",
+            "averageRating": "Note moyenne",
+            "myPoints": "Mes points",
+            "clickToView": "Cliquez pour voir {section}",
+            "clickToGoTo": "Cliquez pour aller à {section}",
+            "clickToBuyPoints": "Cliquez pour acheter plus de points"
+        },
+        "myToys": {
+            "sectionTitle": "Mes jouets ({count})",
+            "addToy": "Ajouter un jouet",
+            "emptyTitle": "Votre collection est vide",
+            "emptyDescription": "Commencez par ajouter vos premiers jouets et rejoignez la communauté d'échange !",
+            "addFirstToy": "Poster mon premier jouet",
+            "viewDetails": "Voir détails",
+            "edit": "Modifier",
+            "delete": "Supprimer",
+            "confirmDelete": "Supprimer ce jouet ?",
+            "deleteSuccess": "Jouet supprimé !",
+            "deleteError": "Erreur lors de la suppression",
+            "years": "ans"
+        },
+        "favorites": {
+            "sectionTitle": "Mes favoris ({count})",
+            "loading": "Chargement de vos favoris...",
+            "error": "Erreur lors du chargement des favoris",
+            "emptyTitle": "Aucun favori pour le moment",
+            "emptyDescription": "Parcourez les jouets et ajoutez ceux qui vous plaisent à vos favoris !",
+            "discoverToys": "Découvrir des jouets",
+            "offeredBy": "Proposé par {name}",
+            "viewDetails": "Voir les détails",
+            "toy": "Jouet",
+            "member": "Membre"
+        },
+        "exchanges": {
+            "sectionTitle": "Mes échanges ({count})",
+            "loading": "Chargement de vos échanges...",
+            "error": "Erreur lors du chargement des échanges",
+            "empty": "Vous n'avez aucun échange en cours.",
+            "proposedBy": "Proposé par {name}",
+            "openConversation": "Ouvrir la conversation",
+            "status": {
+                "PENDING": "En attente",
+                "ACCEPTED": "Accepté",
+                "REJECTED": "Refusé",
+                "COMPLETED": "Terminé"
+            }
+        },
+        "reviews": {
+            "modalTitle": "Mes avis ({count})",
+            "empty": "Aucun avis reçu pour le moment",
+            "user": "Utilisateur"
+        },
+        "conditions": {
+            "NEW": "Neuf",
+            "VERY_GOOD": "Très bon",
+            "GOOD": "Bon état",
+            "USED": "Usé"
+        },
+        "timeAgo": {
+            "fewMinutes": "Il y a quelques minutes",
+            "hoursAgo": "Il y a {hours}h",
+            "yesterday": "Hier",
+            "daysAgo": "Il y a {days} jours"
+        }
+    },
+    "login": {
+        "pageTitle": "Bon retour !",
+        "pageSubtitle": "Connectez-vous pour accéder à vos jouets",
+        "form": {
+            "emailPlaceholder": "Votre email",
+            "passwordPlaceholder": "Mot de passe",
+            "signInButton": "Se connecter",
+            "signingIn": "Connexion...",
+            "authError": "Erreur lors de l'authentification"
+        },
+        "divider": {
+            "or": "ou"
+        },
+        "google": {
+            "continueWithGoogle": "Continuer avec Google"
+        },
+        "footer": {
+            "noAccount": "Pas encore de compte ?",
+            "createAccount": "Créer un compte",
+            "forgotPassword": "Mot de passe oublié ?"
+        }
+    },
+    "conversation": {
+        "loading": {
+            "loadingConversation": "Chargement de la conversation..."
+        },
+        "error": {
+            "loadingError": "Erreur de chargement",
+            "cannotLoadConversation": "Impossible de charger la conversation."
+        },
+        "header": {
+            "aboutToy": "À propos de: {toyTitle}",
+            "unknownToy": "Jouet inconnu"
+        },
+        "exchange": {
+            "confirmExchange": "Confirmer l'échange",
+            "confirm": "Confirmer",
+            "youConfirmed": "Vous avez confirmé",
+            "exchangeConfirmed": "Échange confirmé",
+            "exchangeSuccess": "Échange confirmé !",
+            "exchangeError": "Erreur: {error}",
+            "confirmExchangePrompt": "Êtes-vous sûr de vouloir confirmer cet échange ?"
+        },
+        "donation": {
+            "confirmDonation": "Confirmer le don",
+            "donationConfirmed": "Don confirmé",
+            "donationSuccess": "Don du jouet confirmé avec succès !",
+            "donationError": "Erreur lors de la confirmation du don: {error}",
+            "networkError": "Erreur réseau lors de la confirmation du don.",
+            "confirmPrompt": "Êtes-vous sûr de vouloir confirmer le don de ce jouet ? Cette action est irréversible."
+        },
+        "points": {
+            "confirmPurchase": "Confirmer l'achat ({points} pts)",
+            "purchaseConfirmed": "Achat confirmé ({points} pts)",
+            "purchaseSuccess": "Achat confirmé 🎉",
+            "purchaseError": "Erreur: {error}",
+            "confirmPrompt": "Confirmer l'achat pour {points} points ?"
+        },
+        "messages": {
+            "you": "Vous",
+            "writeMessage": "Écrire un message...",
+            "sendError": "Erreur lors de l'envoi du message: {error}",
+            "networkError": "Erreur réseau.",
+            "donationCompleteMessage": "Le don est confirmé, vous ne pouvez plus envoyer de message.",
+            "exchangeCompleteMessage": "L'échange est confirmé, vous ne pouvez plus envoyer de message.",
+            "pointsCompleteMessage": "Le don (points) est confirmé, vous ne pouvez plus envoyer de message."
+        },
+        "reviews": {
+            "reviewTitle": "Avis sur {partnerName}",
+            "yourPartner": "votre partenaire",
+            "ratingRequired": "Veuillez donner une note de 1 à 5 étoiles.",
+            "commentPlaceholder": "Votre commentaire...",
+            "submitReview": "Envoyer l'avis",
+            "submitting": "Envoi...",
+            "reviewSuccess": "Merci pour votre avis !"
+        }
+    },
+    "messages": {
+        "pageTitle": "Mes conversations",
+        "loading": {
+            "loadingConversations": "Chargement de vos conversations..."
+        },
+        "error": {
+            "accessDenied": "Accès refusé",
+            "loginRequired": "Veuillez vous connecter pour voir vos messages.",
+            "signIn": "Se connecter",
+            "oops": "Oups !",
+            "cannotLoadConversations": "Impossible de charger vos conversations.",
+            "tryAgain": "Réessayer"
+        },
+        "empty": {
+            "noConversations": "Aucune conversation",
+            "noMessagesYet": "Vous n'avez pas encore de messages. Parcourez les jouets pour trouver votre premier échange !",
+            "browseToys": "Parcourir les jouets"
+        },
+        "conversation": {
+            "defaultTitle": "Conversation"
+        }
+    },
+    "cityOnboarding": {
+        "loading": {
+            "general": "Chargement...",
+            "saving": "Enregistrement..."
+        },
+        "header": {
+            "lastStep": "Dernière étape !",
+            "hello": "Salut",
+            "defaultUser": "utilisateur",
+            "welcomeMessage": "Salut {userName} !",
+            "cityPrompt": "Renseignez votre ville pour trouver des jouets près de chez vous"
+        },
+        "form": {
+            "cityLabel": "Dans quelle ville êtes-vous ?",
+            "cityPlaceholder": "Rechercher votre ville...",
+            "noResults": "Aucun résultat trouvé",
+            "submitButton": "Terminer l'inscription",
+            "submitting": "Enregistrement..."
+        },
+        "info": {
+            "whyCity": "Pourquoi votre ville ?",
+            "whyCityDescription": "Nous l'utilisons pour vous montrer les jouets disponibles près de chez vous et faciliter les échanges locaux."
+        },
+        "footer": {
+            "dataSecurityMessage": "Vos données de localisation sont sécurisées et ne sont utilisées que pour améliorer votre expérience"
+        },
+        "messages": {
+            "locationSaved": "Localisation enregistrée !",
+            "networkError": "Une erreur est survenue",
+            "geolocationError": "Erreur lors de la géolocalisation"
+        },
+        "errors": {
+            "locationError": "Erreur lors de la récupération des coordonnées : {error}",
+            "saveError": "{error}",
+            "generalError": "Erreur lors de l'enregistrement"
+        }
+    },
+    "pointsCancel": {
+        "loading": {
+            "verification": "Vérification en cours...",
+            "general": "Chargement..."
+        },
+        "header": {
+            "title": "Paiement annulé",
+            "subtitle": "Aucun souci ! Votre paiement a été annulé et aucun montant n'a été débité."
+        },
+        "info": {
+            "transactionCancelled": "Transaction annulée",
+            "retryAnytime": "Vous pouvez réessayer à tout moment",
+            "status": "Statut :",
+            "cancelled": "Annulé",
+            "amountCharged": "Montant débité :",
+            "zeroAmount": "0€",
+            "sessionIdLabel": "Session ID :",
+            "sessionId": "{sessionId}"
+        },
+        "reasons": {
+            "title": "Pourquoi le paiement a été annulé ?",
+            "closedPage": "• Vous avez fermé la page de paiement",
+            "clickedCancel": "• Vous avez cliqué sur \"Annuler\" pendant le processus",
+            "timeoutExpired": "• Le délai de paiement a expiré",
+            "technicalProblem": "• Problème technique temporaire"
+        },
+        "buttons": {
+            "retryPurchase": "Réessayer l'achat",
+            "viewFreeToys": "Voir les jouets gratuits",
+            "backToDashboard": "Retour au dashboard"
+        },
+        "reassurance": {
+            "noCharge": "Aucun montant n'a été débité de votre carte",
+            "securedByStripe": "Votre moyen de paiement est sécurisé par Stripe"
+        }
+    },
+    "pointSuccess": {
+        "loading": {
+            "verification": "Vérification de votre paiement...",
+            "general": "Chargement..."
+        },
+        "header": {
+            "title": "Paiement réussi !",
+            "subtitle": "Félicitations ! Vos points ont été ajoutés à votre compte avec succès."
+        },
+        "details": {
+            "pointsAdded": "+{points}",
+            "pointsAddedLabel": "Points ajoutés",
+            "amountPaid": "{amount}€",
+            "amountPaidLabel": "Montant payé :",
+            "totalPoints": "{totalPoints} points",
+            "totalPointsLabel": "Points totaux :",
+            "transactionId": "{transactionId}",
+            "transactionIdLabel": "Transaction ID :",
+            "notAvailable": "N/A"
+        },
+        "buttons": {
+            "discoverToys": "Découvrir les jouets",
+            "backToDashboard": "Retour au dashboard"
+        },
+        "footer": {
+            "receiptSent": "Un reçu de votre achat a été envoyé par email",
+            "securedByStripe": "Paiement sécurisé par Stripe"
+        }
+    },
+    "pointsPage": {
+  "navigation": {
+    "backToDashboard": "Retour au dashboard"
+  },
+  "header": {
+    "title": "Mes Points ToyExchange",
+    "subtitle": "Achetez des jouets premium avec vos points",
+    "currentPoints": "{points}",
+    "availablePoints": "Points disponibles",
+    "defaultMember": "Membre",
+    "welcomeMessage": "Salut {userName} ! Rechargez vos points pour accéder à plus de jouets."
+  },
+  "packs": {
+    "choosePackTitle": "Choisissez votre pack de points",
+    "starter": "Starter",
+    "popular": "Populaire",
+    "premium": "Premium",
+    "popularBadge": "⭐ POPULAIRE",
+    "pointsAmount": "{points} points",
+    "price": "{price}€",
+    "valueRatio": "Valeur {ratio} pts/€"
+  },
+  "benefits": {
+    "instantPoints": "Points instantanés",
+    "premiumAccess": "Accès jouets premium",
+    "valuePerEuro": "Valeur {ratio} pts/€"
+  },
+  "purchase": {
+    "buyNow": "Acheter maintenant",
+    "loading": "Chargement..."
+  },
+  "security": {
+    "title": "Paiement 100% sécurisé",
+    "stripeTitle": "Stripe",
+    "stripeDescription": "Paiements sécurisés par Stripe",
+    "instantTitle": "Instantané",
+    "instantDescription": "Points crédités immédiatement",
+    "guaranteeTitle": "Garantie",
+    "guaranteeDescription": "Remboursement si problème"
+  },
+  "errors": {
+    "stripeNotInitialized": "Stripe non initialisé",
+    "generalPurchaseError": "Erreur lors de l'achat",
+    "purchaseError": "{error}"
+  }
+}
 }

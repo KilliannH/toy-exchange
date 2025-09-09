@@ -7,6 +7,7 @@ import usePlacesAutocomplete, { getGeocode, getLatLng } from "use-places-autocom
 import { Combobox } from "@headlessui/react";
 import toast from "react-hot-toast";
 import ImageUploadCard from "@/components/ImageUploadCard";
+import { useEditProfileTranslations } from "@/hooks/useEditProfileTranslations";
 
 export default function EditProfilePage() {
     const [name, setName] = useState("");
@@ -19,6 +20,7 @@ export default function EditProfilePage() {
     const [saved, setSaved] = useState(false);
     const [lat, setLat] = useState<number | null>(null);
     const [lng, setLng] = useState<number | null>(null);
+    const t = useEditProfileTranslations();
 
     // Google Places Autocomplete hook
     const {
@@ -62,7 +64,7 @@ export default function EditProfilePage() {
             setLng(lng);
         } catch (error) {
             console.error("Erreur lors de la récupération des coordonnées :", error);
-            toast.error("Ville non trouvée. Veuillez réessayer.");
+            toast.error(t.messages.cityNotFound);
         }
     };
 
@@ -81,7 +83,7 @@ export default function EditProfilePage() {
             });
 
             if (!res.ok) {
-                toast.error("Erreur génération URL signée");
+                toast.error(t.messages.uploadError);
                 setLoading(false);
                 return;
             }
@@ -116,7 +118,7 @@ export default function EditProfilePage() {
             <div className="min-h-screen bg-slate-900 flex items-center justify-center">
                 <div className="text-center">
                     <Loader2 className="w-20 h-20 text-purple-400 animate-spin mb-4 mx-auto" />
-                    <p className="text-white/80 text-lg">Chargement du profil...</p>
+                    <p className="text-white/80 text-lg">{t.loading.profile}</p>
                 </div>
             </div>
         );
@@ -132,7 +134,7 @@ export default function EditProfilePage() {
                     className="mb-8 group flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105"
                 >
                     <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-200" />
-                    Retour au profil
+                    {t.navigation.backToProfile}
                 </button>
 
                 {/* Header */}
@@ -141,10 +143,10 @@ export default function EditProfilePage() {
                         <Edit size={64} className="mx-auto" />
                     </div>
                     <h1 className="text-5xl font-black bg-gradient-to-r from-white via-cyan-300 to-purple-300 bg-clip-text text-transparent mb-4">
-                        Modifier mon profil
+                        {t.header.title}
                     </h1>
                     <p className="text-xl text-gray-300 font-light">
-                        Personnalisez votre expérience d'échange
+                        {t.header.subtitle}
                     </p>
                 </div>
 
@@ -153,7 +155,7 @@ export default function EditProfilePage() {
                     <div className="mb-8 bg-emerald-500/10 backdrop-blur-xl border border-emerald-500/30 rounded-2xl p-6 text-center animate-slide-down">
                         <div className="flex items-center justify-center gap-3 text-emerald-300">
                             <Check className="w-6 h-6 animate-bounce" />
-                            <span className="font-semibold">Profil mis à jour avec succès !</span>
+                            <span className="font-semibold">{t.success.profileUpdated}</span>
                         </div>
                     </div>
                 )}
@@ -165,18 +167,18 @@ export default function EditProfilePage() {
                         <div className="space-y-6">
                             {/* Image Upload */}
                             <div className="relative group">
-                                <label className="block text-sm font-medium text-gray-300 mb-3">Photo de profil</label>
+                                <label className="block text-sm font-medium text-gray-300 mb-3">{t.form.profilePhoto}</label>
                                 <ImageUploadCard image={image} setImage={setImage} setFile={setFile} />
                             </div>
                             {/* Name field */}
                             <div className="relative group">
                                 <label className="block text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
                                     <User className="w-5 h-5 text-gray-400" />
-                                    Nom complet
+                                    {t.form.fullName}
                                 </label>
                                 <input
                                     type="text"
-                                    placeholder="Comment souhaitez-vous être appelé ?"
+                                    placeholder={t.form.namePlaceholder}
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     className="w-full bg-white/5 border border-white/20 text-white placeholder-gray-400 px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-300 group-hover:border-white/30"
@@ -187,7 +189,8 @@ export default function EditProfilePage() {
                             {/* City Combobox */}
                             <div className="relative group">
                                 <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                                    <Home className="w-5 h-5 text-gray-400" /> Ville
+                                    <Home className="w-5 h-5 text-gray-400" />
+                                    {t.form.city}
                                 </label>
                                 <Combobox value={city} onChange={handleSelect}>
                                     <Combobox.Input
@@ -200,7 +203,7 @@ export default function EditProfilePage() {
                                             setLat(null);
                                             setLng(null);
                                         }}
-                                        placeholder="Rechercher une ville..."
+                                        placeholder={t.form.cityPlaceholder}
                                         disabled={!ready}
                                     />
                                     <Combobox.Options className="absolute mt-2 z-10 w-full rounded-2xl bg-black/80 backdrop-blur-lg border border-white/20 text-white shadow-lg max-h-60 overflow-y-auto">
@@ -214,7 +217,7 @@ export default function EditProfilePage() {
                                             </Combobox.Option>
                                         ))}
                                         {status === "OK" && data.length === 0 && (
-                                            <p className="p-3 text-gray-400">Aucun résultat</p>
+                                            <p className="p-3 text-gray-400">{t.form.noResults}</p>
                                         )}
                                     </Combobox.Options>
                                 </Combobox>
@@ -225,13 +228,13 @@ export default function EditProfilePage() {
                             <div className="relative group">
                                 <label className="block text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
                                     <MapPin className="w-5 h-5 text-gray-400" />
-                                    Rayon de recherche
+                                    {t.form.searchRadius}
                                 </label>
                                 <div className="bg-white/5 border border-white/20 rounded-2xl p-6">
                                     <div className="flex items-center justify-between mb-4">
-                                        <span className="text-white font-semibold">{radiusKm} kilomètres</span>
+                                        <span className="text-white font-semibold">{t.getRadiusText(radiusKm)}</span>
                                         <div className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                                            Zone d'échange
+                                            {t.form.exchangeZone}
                                         </div>
                                     </div>
 
@@ -246,7 +249,7 @@ export default function EditProfilePage() {
 
                                     <div className="flex justify-between text-xs text-gray-400 mt-2">
                                         <span>1 km</span>
-                                        <span>Proximité</span>
+                                        <span>{t.form.proximity}</span>
                                         <span>100 km</span>
                                     </div>
                                 </div>
@@ -262,12 +265,12 @@ export default function EditProfilePage() {
                                     {loading ? (
                                         <>
                                             <Loader2 className="w-5 h-5 animate-spin" />
-                                            Sauvegarde...
+                                            {t.loading.saving}
                                         </>
                                     ) : (
                                         <>
                                             <Save size={20} />
-                                            Sauvegarder les modifications
+                                            {t.form.saveButton}
                                         </>
                                     )}
                                 </span>
@@ -281,7 +284,7 @@ export default function EditProfilePage() {
                         {/* Preview card */}
                         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
                             <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                                Aperçu du profil
+                                {t.preview.title}
                             </h2>
 
                             <div className="space-y-4">
@@ -298,16 +301,16 @@ export default function EditProfilePage() {
                                                 />
                                             ) : (
                                                 <span className="text-white font-bold text-xl">
-                                                    {name?.charAt(0)?.toUpperCase() || "?"}
+                                                    {t.getNameInitial(name)}
                                                 </span>
                                             )}
                                         </div>
                                         <div>
                                             <div className="text-white font-semibold">
-                                                {name || "Nom non défini"}
+                                                {name || t.preview.nameNotDefined}
                                             </div>
                                             <div className="text-gray-400 text-sm">
-                                                {city || "Ville non définie"}
+                                                {city || t.preview.cityNotDefined}
                                             </div>
                                         </div>
                                     </div>
@@ -317,8 +320,8 @@ export default function EditProfilePage() {
                                     <div className="flex items-center gap-3">
                                         <MapPin className="w-6 h-6 text-cyan-400" />
                                         <div>
-                                            <div className="text-cyan-300 font-semibold">Zone d'échange</div>
-                                            <div className="text-white font-bold text-lg">{radiusKm} km autour de vous</div>
+                                            <div className="text-cyan-300 font-semibold">{t.preview.exchangeZoneTitle}</div>
+                                            <div className="text-white font-bold text-lg">{t.getZoneDescription(radiusKm)}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -329,27 +332,27 @@ export default function EditProfilePage() {
                         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
                             <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                                 <Lightbulb className="w-6 h-6" />
-                                Conseils
+                                {t.tips.title}
                             </h3>
 
                             <div className="space-y-4">
                                 {[
                                     {
                                         icon: <Target className="w-5 h-5 text-blue-300" />,
-                                        title: "Nom visible",
-                                        desc: "Utilisez votre vrai prénom pour inspirer confiance",
+                                        title: t.tips.visibleName,
+                                        desc: t.tips.visibleNameDesc,
                                         color: "blue"
                                     },
                                     {
                                         icon: <Home className="w-5 h-5 text-green-300" />,
-                                        title: "Ville précise",
-                                        desc: "Facilitez les rencontres avec une localisation exacte",
+                                        title: t.tips.preciseCity,
+                                        desc: t.tips.preciseCityDesc,
                                         color: "green"
                                     },
                                     {
                                         icon: <Ruler className="w-5 h-5 text-purple-300" />,
-                                        title: "Rayon optimal",
-                                        desc: "10-30km offre un bon équilibre choix/proximité",
+                                        title: t.tips.optimalRadius,
+                                        desc: t.tips.optimalRadiusDesc,
                                         color: "purple"
                                     }
                                 ].map((tip, i) => (
@@ -371,10 +374,9 @@ export default function EditProfilePage() {
                                     <ShieldCheck className="w-6 h-6" />
                                 </div>
                                 <div>
-                                    <h4 className="text-yellow-300 font-semibold mb-2">Confidentialité</h4>
+                                    <h4 className="text-yellow-300 font-semibold mb-2">{t.privacy.title}</h4>
                                     <p className="text-yellow-200/80 text-sm leading-relaxed">
-                                        Vos informations ne sont visibles que par les autres membres lors d'échanges confirmés.
-                                        Votre email reste toujours privé.
+                                        {t.privacy.description}
                                     </p>
                                 </div>
                             </div>

@@ -4,11 +4,13 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import ProfileClient from "@/components/ProfileClient";
-import { Frown } from "lucide-react"; // Import a suitable icon
+import { Frown } from "lucide-react";
 import { getBucket } from "@/lib/storage";
+import { getTranslations } from 'next-intl/server';
 
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions);
+  const t = await getTranslations('profilePage');
 
   if (!session?.user) {
     redirect("/login");
@@ -25,8 +27,8 @@ export default async function ProfilePage() {
           <div className="text-8xl mb-6 text-red-400 animate-pulse">
             <Frown size={96} className="mx-auto" />
           </div>
-          <h2 className="text-3xl font-bold text-red-400 mb-4">Profil introuvable</h2>
-          <p className="text-red-300">Une erreur s'est produite lors du chargement</p>
+          <h2 className="text-3xl font-bold text-red-400 mb-4">{t('error.title')}</h2>
+          <p className="text-red-300">{t('error.description')}</p>
         </div>
       </div>
     );
@@ -36,8 +38,8 @@ export default async function ProfilePage() {
   let signedImageUrl: string | null = null;
   if (user.image) {
     const objectPath = user.image
-  .replace(`https://storage.googleapis.com/${process.env.GCP_BUCKET_NAME}/`, "")
-  .split("?")[0];
+      .replace(`https://storage.googleapis.com/${process.env.GCP_BUCKET_NAME}/`, "")
+      .split("?")[0];
     const bucket = getBucket();
     const file = bucket.file(objectPath);
     const [url] = await file.getSignedUrl({
@@ -57,7 +59,7 @@ export default async function ProfilePage() {
     exchangesCount: 0,
     donationsCount: 0,
     avgRating: 0,
-    memberSince: "Nouveau"
+    memberSince: t('stats.newMember')
   };
 
   if (user) {
@@ -66,14 +68,16 @@ export default async function ProfilePage() {
     });
 
     stats.donationsCount = await prisma.toy.count({
-      where: { 
+      where: {
         userId: user.id,
         mode: "DON"
       }
     });
 
     const monthsSinceJoin = Math.floor((Date.now() - user.createdAt.getTime()) / (1000 * 60 * 60 * 24 * 30));
-    stats.memberSince = monthsSinceJoin === 0 ? "Nouveau" : `${monthsSinceJoin} mois`;
+    stats.memberSince = monthsSinceJoin === 0 
+      ? t('stats.memberSinceNew') 
+      : t('stats.memberSinceMonths', { months: monthsSinceJoin });
 
     try {
       stats.exchangesCount = await prisma.exchange.count({

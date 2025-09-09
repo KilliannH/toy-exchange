@@ -8,10 +8,12 @@ import { Combobox } from "@headlessui/react";
 import { MapPin, ArrowRight, Loader2, CheckCircle, Tent } from "lucide-react";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import { useCityOnboardingTranslations } from "@/hooks/useCityOnboardingTranslations";
 
 export default function CityOnboardingPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
+    const t = useCityOnboardingTranslations();
     const [loading, setLoading] = useState(false);
     const [city, setCity] = useState("");
     const [lat, setLat] = useState<number | null>(null);
@@ -50,7 +52,7 @@ export default function CityOnboardingPage() {
             setLng(lng);
         } catch (error) {
             console.error("Erreur lors de la récupération des coordonnées :", error);
-            toast.error("Erreur lors de la géolocalisation");
+            toast.error(t.messages.geolocationError);
         }
     };
 
@@ -68,15 +70,15 @@ export default function CityOnboardingPage() {
             });
 
             if (response.ok) {
-                toast.success("Localisation enregistrée !");
+                toast.success(t.messages.locationSaved);
                 router.push("/dashboard");
             } else {
                 const data = await response.json();
-                toast.error(data.error || "Erreur lors de l'enregistrement");
+                toast.error(t.getSaveError(data.error || t.errors.generalError));
             }
         } catch (error) {
             console.error("Erreur:", error);
-            toast.error("Une erreur est survenue");
+            toast.error(t.messages.networkError);
         } finally {
             setLoading(false);
         }
@@ -87,7 +89,7 @@ export default function CityOnboardingPage() {
             <div className="min-h-screen bg-slate-900 flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full mx-auto mb-4"></div>
-                    <p className="text-white text-lg">Chargement...</p>
+                    <p className="text-white text-lg">{t.loading.general}</p>
                 </div>
             </div>
         );
@@ -129,13 +131,13 @@ export default function CityOnboardingPage() {
                             />
                         </div>
                         <h1 className="text-4xl font-black bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-3">
-                            Dernière étape !
+                            {t.header.lastStep}
                         </h1>
                         <p className="text-gray-300 font-light mb-2">
-                            Salut <span className="text-cyan-400 font-semibold">{session.user?.name}</span> !
+                            {t.getWelcomeMessage(session.user?.name)}
                         </p>
                         <p className="text-gray-400 text-sm">
-                            Renseignez votre ville pour trouver des jouets près de chez vous
+                            {t.header.cityPrompt}
                         </p>
                     </div>
 
@@ -144,7 +146,7 @@ export default function CityOnboardingPage() {
                         <div className="relative group">
                             <label className="block text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
                                 <Tent size={16} className="text-cyan-400" /> 
-                                Dans quelle ville êtes-vous ?
+                                {t.form.cityLabel}
                             </label>
                             <Combobox value={city} onChange={handleSelect}>
                                 <Combobox.Input
@@ -152,7 +154,7 @@ export default function CityOnboardingPage() {
                                     className="w-full bg-white/5 border border-white/20 text-white placeholder-gray-400 px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-300 group-hover:border-white/30"
                                     displayValue={(city: string) => city}
                                     onChange={(event) => setValue(event.target.value)}
-                                    placeholder="Rechercher votre ville..."
+                                    placeholder={t.form.cityPlaceholder}
                                     disabled={!ready}
                                     required
                                 />
@@ -168,7 +170,7 @@ export default function CityOnboardingPage() {
                                         </Combobox.Option>
                                     ))}
                                     {suggestionsStatus === "OK" && data.length === 0 && (
-                                        <p className="p-4 text-gray-400 text-center">Aucun résultat trouvé</p>
+                                        <p className="p-4 text-gray-400 text-center">{t.form.noResults}</p>
                                     )}
                                 </Combobox.Options>
                             </Combobox>
@@ -180,9 +182,9 @@ export default function CityOnboardingPage() {
                             <div className="flex items-start gap-3">
                                 <MapPin size={20} className="text-blue-400 mt-0.5 flex-shrink-0" />
                                 <div className="text-sm text-gray-300">
-                                    <p className="font-medium text-white mb-1">Pourquoi votre ville ?</p>
+                                    <p className="font-medium text-white mb-1">{t.info.whyCity}</p>
                                     <p className="text-gray-400">
-                                        Nous l'utilisons pour vous montrer les jouets disponibles près de chez vous et faciliter les échanges locaux.
+                                        {t.info.whyCityDescription}
                                     </p>
                                 </div>
                             </div>
@@ -198,12 +200,12 @@ export default function CityOnboardingPage() {
                                 {loading ? (
                                     <>
                                         <Loader2 className="w-5 h-5 animate-spin" />
-                                        Enregistrement...
+                                        {t.loading.saving}
                                     </>
                                 ) : (
                                     <>
                                         <CheckCircle size={20} />
-                                        Terminer l'inscription
+                                        {t.form.submitButton}
                                         <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
                                     </>
                                 )}
@@ -215,7 +217,7 @@ export default function CityOnboardingPage() {
                     {/* Footer */}
                     <div className="text-center mt-6">
                         <p className="text-gray-500 text-sm">
-                            Vos données de localisation sont sécurisées et ne sont utilisées que pour améliorer votre expérience
+                            {t.footer.dataSecurityMessage}
                         </p>
                     </div>
                 </div>

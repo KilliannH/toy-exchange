@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Sparkles, FileText, Baby, Settings, Camera, Check, X, ArrowLeft, ArrowRight, UploadCloud, Send, PartyPopper, Home, Gauge, Construction, Dices, Car, Book, Gem, Star, ThumbsUp, Wrench, Handshake, Gift, Bolt } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { usePostToyTranslations } from "@/hooks/usePostToyTranslations";
 
 export default function PostToyForm() {
   const [title, setTitle] = useState("");
@@ -19,7 +20,8 @@ export default function PostToyForm() {
   const [currentStep, setCurrentStep] = useState(1);
   const [dragActive, setDragActive] = useState(false);
   const [pointsCost, setPointsCost] = useState<number>(1);
-  const router = useRouter()
+  const router = useRouter();
+  const t = usePostToyTranslations();
 
   const totalSteps = 4;
   const progressWidth = `${(currentStep / totalSteps) * 100}%`;
@@ -69,14 +71,14 @@ export default function PostToyForm() {
       const newToy = await res.json();
       setCurrentStep(5); // Success step
       setTimeout(() => {
-        toast.success("Jouet ajouté avec images !");
+        toast.success(t.messages.toyAdded);
         setTitle("");
         setDescription("");
         setFiles([]);
         router.push(`/toys/${newToy.id}`);
       }, 2000);
     } else {
-      toast.error("Erreur lors de l'ajout du jouet.");
+      toast.error(t.messages.addError);
     }
 
     setLoading(false);
@@ -100,7 +102,7 @@ export default function PostToyForm() {
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const droppedFiles = Array.from(e.dataTransfer.files);
       if (droppedFiles.length > 5) {
-        toast.error("Maximum 5 images par jouet");
+        toast.error(t.messages.maxImages);
         return;
       }
       setFiles(droppedFiles);
@@ -133,18 +135,22 @@ export default function PostToyForm() {
                 <Sparkles size={64} className="mx-auto" />
               </div>
               <h1 className="text-5xl font-black bg-gradient-to-r from-emerald-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent mb-4">
-                Partagez un trésor
+                {t.header.title}
               </h1>
               <p className="text-xl text-gray-300 font-light">
-                Donnez une nouvelle vie à un jouet
+                {t.header.subtitle}
               </p>
             </div>
 
             {/* Progress bar */}
             <div className="mb-8">
               <div className="flex justify-between items-center mb-3">
-                <span className="text-sm font-medium text-gray-300">Étape {currentStep} sur {totalSteps}</span>
-                <span className="text-sm text-gray-400">{Math.round((currentStep / totalSteps) * 100)}%</span>
+                <span className="text-sm font-medium text-gray-300">
+                  {t.getStepProgress(currentStep, totalSteps)}
+                </span>
+                <span className="text-sm text-gray-400">
+                  {t.getProgressPercentage(Math.round((currentStep / totalSteps) * 100))}
+                </span>
               </div>
               <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                 <div
@@ -157,10 +163,10 @@ export default function PostToyForm() {
             {/* Step indicators */}
             <div className="flex justify-center gap-4 mb-12">
               {[
-                { num: 1, label: "Description", icon: <FileText size={20} /> },
-                { num: 2, label: "Âge", icon: <Baby size={20} /> },
-                { num: 3, label: "Détails", icon: <Settings size={20} /> },
-                { num: 4, label: "Photos", icon: <Camera size={20} /> }
+                { num: 1, label: t.stepIndicators.description, icon: <FileText size={20} /> },
+                { num: 2, label: t.stepIndicators.age, icon: <Baby size={20} /> },
+                { num: 3, label: t.stepIndicators.details, icon: <Settings size={20} /> },
+                { num: 4, label: t.stepIndicators.photos, icon: <Camera size={20} /> }
               ].map((step) => (
                 <div
                   key={step.num}
@@ -189,17 +195,17 @@ export default function PostToyForm() {
                     <div className="text-4xl mb-2 text-white">
                       <FileText size={48} className="mx-auto" />
                     </div>
-                    <h2 className="text-2xl font-bold text-white">Parlez-nous de ce jouet</h2>
-                    <p className="text-gray-400">Donnez-lui un titre accrocheur et décrivez-le</p>
+                    <h2 className="text-2xl font-bold text-white">{t.steps.description.title}</h2>
+                    <p className="text-gray-400">{t.steps.description.subtitle}</p>
                   </div>
 
                   <div className="relative group">
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Titre du jouet
+                      {t.steps.description.titleLabel}
                     </label>
                     <input
                       type="text"
-                      placeholder="Ex: Lego Creator 3-en-1, Barbie Dreamhouse..."
+                      placeholder={t.steps.description.titlePlaceholder}
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       className="w-full bg-white/5 border border-white/20 text-white placeholder-gray-400 px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all duration-300"
@@ -209,10 +215,10 @@ export default function PostToyForm() {
 
                   <div className="relative group">
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Description détaillée
+                      {t.steps.description.descriptionLabel}
                     </label>
                     <textarea
-                      placeholder="Décrivez l'état, les pièces incluses, pourquoi vous l'échangez..."
+                      placeholder={t.steps.description.descriptionPlaceholder}
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       rows={4}
@@ -220,7 +226,7 @@ export default function PostToyForm() {
                       required
                     />
                     <div className="text-xs text-gray-400 mt-1">
-                      {description.length}/300 caractères
+                      {t.getCharacterCount(description.length, 300)}
                     </div>
                   </div>
                 </div>
@@ -233,14 +239,14 @@ export default function PostToyForm() {
                     <div className="text-4xl mb-2 text-white">
                       <Baby size={48} className="mx-auto" />
                     </div>
-                    <h2 className="text-2xl font-bold text-white">Tranche d'âge</h2>
-                    <p className="text-gray-400">Pour qui ce jouet est-il adapté ?</p>
+                    <h2 className="text-2xl font-bold text-white">{t.steps.age.title}</h2>
+                    <p className="text-gray-400">{t.steps.age.subtitle}</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-6">
                     <div className="relative group">
                       <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Âge minimum
+                        {t.steps.age.minAgeLabel}
                       </label>
                       <input
                         type="number"
@@ -253,7 +259,7 @@ export default function PostToyForm() {
                     </div>
                     <div className="relative group">
                       <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Âge maximum
+                        {t.steps.age.maxAgeLabel}
                       </label>
                       <input
                         type="number"
@@ -272,7 +278,7 @@ export default function PostToyForm() {
                         <Baby size={32} className="mx-auto" />
                       </div>
                       <p className="text-emerald-300 font-medium">
-                        Parfait pour les {ageMin}-{ageMax} ans
+                        {t.getAgeRange(ageMin, ageMax)}
                       </p>
                     </div>
                   </div>
@@ -286,24 +292,24 @@ export default function PostToyForm() {
                     <div className="text-4xl mb-2 text-white">
                       <Settings size={48} className="mx-auto" />
                     </div>
-                    <h2 className="text-2xl font-bold text-white">Détails du jouet</h2>
-                    <p className="text-gray-400">Catégorie, état et mode d'échange</p>
+                    <h2 className="text-2xl font-bold text-white">{t.steps.details.title}</h2>
+                    <p className="text-gray-400">{t.steps.details.subtitle}</p>
                   </div>
 
                   <div className="grid gap-6">
                     {/* Category */}
                     <div className="relative group">
                       <label className="block text-sm font-medium text-gray-300 mb-3">
-                        Catégorie
+                        {t.steps.details.categoryLabel}
                       </label>
                       <div className="grid grid-cols-2 gap-3">
                         {[
-                          { value: "CONSTRUCTION", label: "Construction", icon: <Construction size={24} /> },
-                          { value: "DOLLS", label: "Poupées", icon: <Gem size={24} /> },
-                          { value: "VEHICLES", label: "Véhicules", icon: <Car size={24} /> },
-                          { value: "BOARD_GAMES", label: "Jeux société", icon: <Dices size={24} /> },
-                          { value: "BOOKS", label: "Livres", icon: <Book size={24} /> },
-                          { value: "OTHER", label: "Autres", icon: <Gem size={24} /> }
+                          { value: "CONSTRUCTION", label: t.categories.construction, icon: <Construction size={24} /> },
+                          { value: "DOLLS", label: t.categories.dolls, icon: <Gem size={24} /> },
+                          { value: "VEHICLES", label: t.categories.vehicles, icon: <Car size={24} /> },
+                          { value: "BOARD_GAMES", label: t.categories.boardGames, icon: <Dices size={24} /> },
+                          { value: "BOOKS", label: t.categories.books, icon: <Book size={24} /> },
+                          { value: "OTHER", label: t.categories.other, icon: <Gem size={24} /> }
                         ].map((cat) => (
                           <button
                             key={cat.value}
@@ -324,14 +330,14 @@ export default function PostToyForm() {
                     {/* Condition */}
                     <div className="relative group">
                       <label className="block text-sm font-medium text-gray-300 mb-3">
-                        État du jouet
+                        {t.steps.details.conditionLabel}
                       </label>
                       <div className="grid grid-cols-2 gap-3">
                         {[
-                          { value: "NEW", label: "Neuf", icon: <Sparkles size={24} />, color: "emerald" },
-                          { value: "VERY_GOOD", label: "Très bon", icon: <Star size={24} />, color: "green" },
-                          { value: "GOOD", label: "Bon état", icon: <ThumbsUp size={24} />, color: "blue" },
-                          { value: "USED", label: "Usé", icon: <Wrench size={24} />, color: "orange" }
+                          { value: "NEW", label: t.conditions.new, icon: <Sparkles size={24} />, color: "emerald" },
+                          { value: "VERY_GOOD", label: t.conditions.veryGood, icon: <Star size={24} />, color: "green" },
+                          { value: "GOOD", label: t.conditions.good, icon: <ThumbsUp size={24} />, color: "blue" },
+                          { value: "USED", label: t.conditions.used, icon: <Wrench size={24} />, color: "orange" }
                         ].map((cond) => (
                           <button
                             key={cond.value}
@@ -352,13 +358,13 @@ export default function PostToyForm() {
                     {/* Mode */}
                     <div className="relative group">
                       <label className="block text-sm font-medium text-gray-300 mb-3">
-                        Type d'échange
+                        {t.steps.details.exchangeTypeLabel}
                       </label>
                       <div className="grid grid-cols-3 gap-3">
                         {[
-                          { value: "DON", label: "Don", icon: <Gift size={24} />, color: "pink" },
-                          { value: "EXCHANGE", label: "Échange", icon: <Handshake size={24} />, color: "blue" },
-                          { value: "POINTS", label: "Points", icon: <Bolt size={24} />, color: "yellow" }
+                          { value: "DON", label: t.exchangeModes.donation, icon: <Gift size={24} />, color: "pink" },
+                          { value: "EXCHANGE", label: t.exchangeModes.exchange, icon: <Handshake size={24} />, color: "blue" },
+                          { value: "POINTS", label: t.exchangeModes.points, icon: <Bolt size={24} />, color: "yellow" }
                         ].map((m) => (
                           <button
                             key={m.value}
@@ -380,7 +386,7 @@ export default function PostToyForm() {
                     {mode === "POINTS" && (
                       <div className="relative group">
                         <label className="block text-sm font-medium text-gray-300 mb-3">
-                          Valeur en points
+                          {t.steps.details.pointsValueLabel}
                         </label>
                         <input
                           type="number"
@@ -388,11 +394,11 @@ export default function PostToyForm() {
                           max={500}
                           value={pointsCost}
                           onChange={(e) => setPointsCost(Number(e.target.value))}
-                          placeholder="Ex: 50"
+                          placeholder={t.steps.details.pointsPlaceholder}
                           className="w-full bg-white/5 border border-white/20 text-white placeholder-gray-400 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-300"
                         />
                         <p className="text-xs text-gray-400 mt-1">
-                          Nombre de points requis pour obtenir ce jouet
+                          {t.steps.details.pointsHelp}
                         </p>
                       </div>
                     )}
@@ -407,8 +413,8 @@ export default function PostToyForm() {
                     <div className="text-4xl mb-2 text-white">
                       <Camera size={48} className="mx-auto" />
                     </div>
-                    <h2 className="text-2xl font-bold text-white">Ajoutez des photos</h2>
-                    <p className="text-gray-400">Des images de qualité attirent plus d'échanges</p>
+                    <h2 className="text-2xl font-bold text-white">{t.steps.images.title}</h2>
+                    <p className="text-gray-400">{t.steps.images.subtitle}</p>
                   </div>
 
                   {/* Drag and drop area */}
@@ -429,7 +435,7 @@ export default function PostToyForm() {
                       onChange={(e) => {
                         const selected = Array.from(e.target.files || []);
                         if (selected.length > 5) {
-                          toast.error("Maximum 5 images par jouet");
+                          toast.error(t.messages.maxImages);
                           return;
                         }
                         setFiles(selected);
@@ -443,10 +449,10 @@ export default function PostToyForm() {
                       </div>
                       <div>
                         <p className="text-white font-semibold mb-2">
-                          Glissez vos photos ici ou cliquez pour sélectionner
+                          {t.steps.images.dragText}
                         </p>
                         <p className="text-gray-400 text-sm">
-                          PNG, JPG jusqu'à 10MB • Maximum 5 images
+                          {t.steps.images.fileInfo}
                         </p>
                       </div>
                     </div>
@@ -486,7 +492,7 @@ export default function PostToyForm() {
                     className="flex-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-6 py-4 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
                   >
                     <ArrowLeft size={16} />
-                    Précédent
+                    {t.navigation.previous}
                   </button>
                 )}
 
@@ -496,7 +502,7 @@ export default function PostToyForm() {
                     disabled={!canProceed()}
                     className="flex-2 bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold px-6 py-4 rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl disabled:opacity-50 disabled:hover:scale-100 flex items-center justify-center gap-2"
                   >
-                    Suivant
+                    {t.navigation.next}
                     <ArrowRight size={16} />
                   </button>
                 ) : (
@@ -509,11 +515,12 @@ export default function PostToyForm() {
                       {loading ? (
                         <>
                           <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          Publication...
+                          {t.navigation.publishing}
                         </>
                       ) : (
                         <>
-                          <Send size={20} /> Publier le jouet
+                          <Send size={20} /> 
+                          {t.navigation.publish}
                         </>
                       )}
                     </span>
@@ -530,23 +537,23 @@ export default function PostToyForm() {
               <PartyPopper size={96} className="mx-auto" />
             </div>
             <h2 className="text-4xl font-black bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent mb-4">
-              Trésor publié !
+              {t.success.title}
             </h2>
             <p className="text-xl text-gray-300 mb-8">
-              Votre jouet est maintenant visible par la communauté
+              {t.success.subtitle}
             </p>
             <div className="flex justify-center gap-4">
               <Link
                 href="/toys"
                 className="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold px-6 py-3 rounded-xl hover:scale-105 transition-all duration-300"
               >
-                Voir tous les jouets
+                {t.success.viewAllToys}
               </Link>
               <Link
                 href="/dashboard"
                 className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300"
               >
-                Mon dashboard
+                {t.success.myDashboard}
               </Link>
             </div>
           </div>

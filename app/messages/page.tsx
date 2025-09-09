@@ -5,11 +5,14 @@ import useSWR from "swr";
 import { useSession } from "next-auth/react";
 import { MessageSquare, Loader2, Frown, ToyBrick } from "lucide-react";
 import Link from "next/link";
+import { useMessagesTranslations } from '@/hooks/useMessagesTranslations';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function MessagesPage() {
   const { data: session } = useSession();
+  const t = useMessagesTranslations();
+  
   const { data: conversationsData, error, isLoading } = useSWR(
     session ? "/api/conversations" : null,
     fetcher
@@ -27,15 +30,15 @@ export default function MessagesPage() {
           <div className="text-8xl mb-6 text-red-400">
             <Frown size={96} className="mx-auto" />
           </div>
-          <h2 className="text-3xl font-bold text-white mb-4">Accès refusé</h2>
+          <h2 className="text-3xl font-bold text-white mb-4">{t.error.accessDenied}</h2>
           <p className="text-gray-300">
-            Veuillez vous connecter pour voir vos messages.
+            {t.error.loginRequired}
           </p>
           <Link
             href="/login"
             className="mt-6 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 px-6 py-3 rounded-xl transition-all duration-300"
           >
-            Se connecter
+            {t.error.signIn}
           </Link>
         </div>
       </div>
@@ -49,15 +52,15 @@ export default function MessagesPage() {
           <div className="text-8xl mb-6 text-red-400">
             <Frown size={96} className="mx-auto" />
           </div>
-          <h2 className="text-3xl font-bold text-red-400 mb-4">Oups !</h2>
+          <h2 className="text-3xl font-bold text-red-400 mb-4">{t.error.oops}</h2>
           <p className="text-red-300">
-            Impossible de charger vos conversations.
+            {t.error.cannotLoadConversations}
           </p>
           <button
             onClick={() => window.location.reload()}
             className="mt-6 bg-red-500/20 hover:bg-red-500/30 text-red-300 px-6 py-3 rounded-xl transition-all duration-300"
           >
-            Réessayer
+            {t.error.tryAgain}
           </button>
         </div>
       </div>
@@ -70,7 +73,7 @@ export default function MessagesPage() {
         <div className="text-center">
           <Loader2 className="w-16 h-16 text-purple-400 animate-spin mx-auto mb-4" />
           <p className="text-white/80 text-lg">
-            Chargement de vos conversations...
+            {t.loadingConversations}
           </p>
         </div>
       </div>
@@ -84,7 +87,7 @@ export default function MessagesPage() {
         {/* Header */}
         <div className="flex items-center justify-between gap-4 mb-8">
           <h1 className="text-4xl font-black bg-gradient-to-r from-white via-cyan-300 to-purple-300 bg-clip-text text-transparent">
-            Mes conversations
+            {t.pageTitle}
           </h1>
         </div>
 
@@ -95,17 +98,16 @@ export default function MessagesPage() {
               className="text-gray-500 mx-auto mb-6"
             />
             <h2 className="text-3xl font-bold text-white mb-4">
-              Aucune conversation
+              {t.empty.noConversations}
             </h2>
             <p className="text-gray-400 max-w-md mx-auto">
-              Vous n'avez pas encore de messages. Parcourez les jouets pour
-              trouver votre premier échange !
+              {t.empty.noMessagesYet}
             </p>
             <Link
               href="/toys"
               className="mt-6 inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold px-6 py-3 rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl"
             >
-              Parcourir les jouets
+              {t.empty.browseToys}
             </Link>
           </div>
         ) : (
@@ -123,7 +125,7 @@ export default function MessagesPage() {
                 const toyId = conv?.toy?.id;
                 const img0 = conv?.toy?.images?.[0];
                 const signedUrl = img0?.signedUrl;
-                const title = conv?.toy?.title ?? "Conversation";
+                const title = conv?.toy?.title ?? t.conversation.defaultTitle;
                 const createdAt = conv?.createdAt
                   ? new Date(conv.createdAt).toLocaleDateString()
                   : "";
