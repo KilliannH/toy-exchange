@@ -884,12 +884,12 @@
     },
     "publicProfileClient": {
         "navigation": {
-            "backToToys": "Retour aux jouets"
+            "backToToys": "← Retour aux jouets"
         },
         "header": {
             "defaultUser": "Utilisateur",
-            "memberSinceLabel": "Membre depuis",
-            "memberSince": "Membre depuis {duration}"
+            "memberSince": "Membre depuis {duration}",
+            "memberSinceLabel": "Membre depuis"
         },
         "stats": {
             "title": "Statistiques",
@@ -900,9 +900,9 @@
             "notAvailable": "N/A"
         },
         "toys": {
-            "title": "Jouets récents",
-            "noToys": "Aucun jouet posté pour le moment",
-            "noToysDesc": "Cet utilisateur n'a pas encore publié de jouets",
+            "title": "Jouets disponibles",
+            "noToys": "Aucun jouet disponible",
+            "noToysDesc": "Cet utilisateur n'a pas encore publié de jouets.",
             "modes": {
                 "donation": "Don",
                 "exchange": "Échange",
@@ -911,22 +911,22 @@
         },
         "reviews": {
             "title": "Avis récents",
-            "recentReviewsCount": "Avis récents ({count})",
-            "defaultUser": "Utilisateur"
+            "defaultUser": "Utilisateur anonyme",
+            "recentReviewsCount": "{count} avis récents"
         },
         "badges": {
             "title": "Badges",
-            "progress": "Badges ({earned}/{total})",
-            "firstExchange": "Premier échange",
+            "progress": "{earned}/{total}",
+            "firstExchange": "Premier Échange",
             "firstExchangeDesc": "A réalisé son premier échange",
             "generous": "Généreux",
-            "generousDesc": "A donné 3 jouets ou plus",
+            "generousDesc": "A fait plus de 5 dons",
             "collector": "Collectionneur",
-            "collectorDesc": "A posté 10 jouets ou plus",
+            "collectorDesc": "A plus de 10 jouets",
             "ambassador": "Ambassadeur",
-            "ambassadorDesc": "A réalisé 20 échanges ou plus",
+            "ambassadorDesc": "Membre très actif",
             "expert": "Expert",
-            "expertDesc": "Note moyenne de 4.5+ étoiles",
+            "expertDesc": "Note moyenne supérieure à 4.5",
             "veteran": "Vétéran",
             "veteranDesc": "Membre depuis plus d'un an"
         },
@@ -1235,26 +1235,26 @@
         }
     },
     "navigation": {
-    "logo": {
-      "alt": "ToyExchange logo"
-    },
-    "nav": {
-      "toys": "Jouets",
-      "post": "Poster",
-      "postToy": "Poster un jouet",
-      "messages": "Messages",
-      "dashboard": "Dashboard"
-    },
-    "user": {
-      "profile": "Profil",
-      "signOut": "Se déconnecter",
-      "signIn": "Se connecter",
-      "register": "S'inscrire",
-      "viewProfile": "Voir le profil"
-    },
-    "accessibility": {
-      "signOutTooltip": "Se déconnecter",
-      "avatarAlt": "Avatar"
+        "logo": {
+            "alt": "ToyExchange logo"
+        },
+        "nav": {
+            "toys": "Jouets",
+            "post": "Poster",
+            "postToy": "Poster un jouet",
+            "messages": "Messages",
+            "dashboard": "Dashboard"
+        },
+        "user": {
+            "profile": "Profil",
+            "signOut": "Se déconnecter",
+            "signIn": "Se connecter",
+            "register": "S'inscrire",
+            "viewProfile": "Voir le profil"
+        },
+        "accessibility": {
+            "signOutTooltip": "Se déconnecter",
+            "avatarAlt": "Avatar"
+        }
     }
-  }
 }
