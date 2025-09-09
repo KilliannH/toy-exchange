@@ -228,7 +228,6 @@ export default function ToysPage() {
                     {/* Gauche : compteur */}
                     {filteredToys.length > 0 ? (
                         <p className="text-gray-300">
-                            <span className="text-cyan-400 font-bold text-lg">{filteredToys.length}</span>{" "}
                             {t.getResultsCount(filteredToys.length, total)}
                         </p>
                     ) : (

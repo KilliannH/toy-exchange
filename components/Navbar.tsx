@@ -7,6 +7,7 @@ import useSWR from "swr";
 import { Package, Plus, BarChart3, LogOut, Menu, User, MessageSquare, X } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import Image from "next/image";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 const fetcher = (url) => fetch(url).then((res) => res.json());
 
@@ -105,6 +106,7 @@ export default function NavBar() {
           <div className="hidden md:flex items-center gap-8">
             {session?.user && (
               <>
+              <LanguageSwitcher />
                 <Link
                   href="/toys"
                   className="text-white/80 hover:text-white font-medium hover:scale-105 transition-all duration-200 relative group flex items-center gap-2"
