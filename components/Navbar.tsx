@@ -8,7 +8,7 @@ import { Package, Plus, BarChart3, LogOut, Menu, User, MessageSquare, X } from "
 import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import LanguageSwitcher from "./LanguageSwitcher";
-import { useNavbarTranslations } from '@/hooks/useNavbarTranslations';
+import { useNavbarTranslations } from '../hooks/useNavbarTranslations';
 
 const fetcher = (url) => fetch(url).then((res) => res.json());
 
@@ -152,6 +152,7 @@ export default function NavBar() {
 
           {/* Desktop User Menu */}
           <div className="hidden md:flex items-center gap-4">
+            <LanguageSwitcher />
             {session ? (
               <div className="flex items-center gap-4">
                 <Link
@@ -269,6 +270,10 @@ export default function NavBar() {
 
                 {/* Navigation Links */}
                 <div className="space-y-2 px-6 mb-6">
+                  {/* Language Switcher for mobile authenticated users */}
+                  <div className="mb-4">
+                    <LanguageSwitcher />
+                  </div>
 
                   <Link
                     href="/toys"
