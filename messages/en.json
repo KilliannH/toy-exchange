@@ -1,0 +1,60 @@
+{
+  "Toys": {
+    "pageTitle": "Treasure Gallery",
+    "pageSubtitle": "Discover {count} toy{plural} ready to be exchanged",
+    "searchPlaceholder": "Search for a toy...",
+    "discoveryLoading": "Discovering treasures in progress...",
+    
+    "filters": {
+      "all": "All",
+      "exchange": "Exchange", 
+      "points": "Points",
+      "don": "Gift"
+    },
+    
+    "modes": {
+      "EXCHANGE": "Exchange",
+      "POINTS": "Points", 
+      "DON": "Gift"
+    },
+    
+    "conditions": {
+      "NEW": "New",
+      "VERY_GOOD": "Very good",
+      "GOOD": "Good condition", 
+      "USED": "Used"
+    },
+    
+    "results": {
+      "count": "{count} result{plural} displayed",
+      "outOf": "out of {total}",
+      "noResults": "No results found",
+      "noResultsDescription": "Try modifying your search or filters to discover more toys"
+    },
+    
+    "geo": {
+      "filteredByCity": "Filtered by your city",
+      "showAllToys": "Show all toys"
+    },
+    
+    "card": {
+      "viewDetails": "View details",
+      "unknownCity": "Unknown city",
+      "ageRange": "{min}-{max} years"
+    },
+    
+    "infiniteScroll": {
+      "endOfList": "You've reached the end of the list"
+    },
+    
+    "errors": {
+      "loadingFailed": "Unable to load toys",
+      "tryAgain": "Try again",
+      "errorTitle": "Oops!"
+    },
+    
+    "actions": {
+      "addToy": "Add a toy"
+    }
+  }
+}

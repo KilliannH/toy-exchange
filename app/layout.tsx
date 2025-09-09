@@ -8,6 +8,7 @@ import Script from "next/script";
 import CookieNotice from "@/components/CookieNotice";
 import AnalyticsScripts from "@/components/AnalyticsScripts";
 import MarketingScripts from "@/components/MarketingScripts";
+import {NextIntlClientProvider} from 'next-intl';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -57,7 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <Providers>
           <NavBar />
-          <main className="min-h-screen bg-gray-50">{children}</main>
+          <main className="min-h-screen bg-gray-50"><NextIntlClientProvider>{children}</NextIntlClientProvider></main>
           <CookieNotice />
           <AnalyticsScripts />
           <MarketingScripts />

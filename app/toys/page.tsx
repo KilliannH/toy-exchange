@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import useSWR, { mutate } from "swr";
+import { useToysTranslations } from '@/hooks/useToysTranslations';
 import { useMemo, useState, useEffect, useRef } from "react";
 import useSWRInfinite from "swr/infinite";
 import { Search, RotateCcw, Gem, ToyBrick, X, ListFilter, Grid2X2, Gift, Bolt, Plus, Sparkles, MapPin } from "lucide-react";
@@ -29,6 +30,7 @@ type ToysResponse = {
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function ToysPage() {
+    const t = useToysTranslations();
     const [filter, setFilter] = useState<"all" | "EXCHANGE" | "POINTS" | "DON">("all");
     const [searchTerm, setSearchTerm] = useState("");
     const limit = 20;
@@ -120,13 +122,13 @@ export default function ToysPage() {
     };
 
     const getCondition = (condition: string) => {
-    switch (condition) {
-      case "NEW": return "Neuf";
-      case "VERY_GOOD": return "Très bon";
-      case "GOOD": return "Bon état";
-      case "USED": return "Usé";
-    }
-  };
+        switch (condition) {
+            case "NEW": return "Neuf";
+            case "VERY_GOOD": return "Très bon";
+            case "GOOD": return "Bon état";
+            case "USED": return "Usé";
+        }
+    };
 
     if (error) {
         return (
@@ -135,13 +137,13 @@ export default function ToysPage() {
                     <div className="text-8xl mb-6 text-red-400">
                         <X size={96} className="mx-auto" />
                     </div>
-                    <h2 className="text-3xl font-bold text-red-400 mb-4">Oups !</h2>
-                    <p className="text-red-300">Impossible de charger les jouets</p>
+                    <h2 className="text-3xl font-bold text-red-400 mb-4">{t.errorTitle}</h2>
+                    <p className="text-red-300">{t.loadingFailed}</p>
                     <button
                         onClick={() => mutate()}
                         className="mt-6 bg-red-500/20 hover:bg-red-500/30 text-red-300 px-6 py-3 rounded-xl transition-all duration-300"
                     >
-                        Réessayer
+                        {t.tryAgain}
                     </button>
                 </div>
             </div>
@@ -158,7 +160,7 @@ export default function ToysPage() {
                             <Gem size={36} />
                         </div>
                     </div>
-                    <p className="text-white/80 text-xl font-light">Découverte des trésors en cours...</p>
+                    <p className="text-white/80 text-xl font-light">{t.discoveryLoading}</p>
                 </div>
             </div>
         );
@@ -170,10 +172,10 @@ export default function ToysPage() {
                 {/* Hero header */}
                 <div className="text-center mb-12">
                     <h1 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-white via-cyan-300 to-purple-300 bg-clip-text text-transparent mb-4">
-                        Galerie des Trésors
+                        {t.pageTitle}
                     </h1>
                     <p className="text-xl text-gray-300 font-light max-w-2xl mx-auto">
-                        Découvrez {total} jouet{total !== 1 ? "s" : ""} prêt{total !== 1 ? "s" : ""} à être échangé{total !== 1 ? "s" : ""}
+                        {t.getPageSubtitle(total)}
                     </p>
                 </div>
 
@@ -187,7 +189,7 @@ export default function ToysPage() {
                             </div>
                             <input
                                 type="text"
-                                placeholder="Rechercher un jouet..."
+                                placeholder={t.searchPlaceholder}
                                 value={searchTerm}
                                 onChange={(e) => {
                                     setSearchTerm(e.target.value);
@@ -200,10 +202,10 @@ export default function ToysPage() {
                         {/* Filter buttons */}
                         <div className="flex gap-3">
                             {[
-                                { key: "all", label: "Tout", icon: <ListFilter size={18} /> },
-                                { key: "EXCHANGE", label: "Échange", icon: <RotateCcw size={18} /> },
-                                { key: "POINTS", label: "Points", icon: <Bolt size={18} /> },
-                                { key: "DON", label: "Don", icon: <Gift size={18} /> },
+                                { key: "all", label: t.getFilterLabel("all"), icon: <ListFilter size={18} /> },
+                                { key: "EXCHANGE", label: t.getFilterLabel("exchange"), icon: <RotateCcw size={18} /> },
+                                { key: "POINTS", label: t.getFilterLabel("points"), icon: <Bolt size={18} /> },
+                                { key: "DON", label: t.getFilterLabel("don"), icon: <Gift size={18} /> },
                             ].map((filterOption) => (
                                 <button
                                     key={filterOption.key}
@@ -227,11 +229,10 @@ export default function ToysPage() {
                     {filteredToys.length > 0 ? (
                         <p className="text-gray-300">
                             <span className="text-cyan-400 font-bold text-lg">{filteredToys.length}</span>{" "}
-                            résultat{filteredToys.length !== 1 ? "s" : ""} affiché{filteredToys.length !== 1 ? "s" : ""}
-                            {" "} sur <span className="text-purple-300">{total}</span>
+                            {t.getResultsCount(filteredToys.length, total)}
                         </p>
                     ) : (
-                        <div /> // ← placeholder vide pour que le badge reste à droite
+                        <div />
                     )}
 
                     {/* Droite : badge */}
@@ -239,18 +240,18 @@ export default function ToysPage() {
                         <div
                             onClick={() => setIgnoreGeo((prev) => !prev)}
                             className={`flex items-center px-3 py-1 rounded-full text-sm font-medium cursor-pointer transition-all duration-300 ${ignoreGeo
-                                    ? "bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30"
-                                    : "bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/30"
+                                ? "bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30"
+                                : "bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/30"
                                 }`}
                         >
                             {ignoreGeo ? (
                                 <>
-                                    <span>Affiche tous les jouets</span>
+                                    <span>{t.showAllToys}</span>
                                     <X size={14} className="ml-2" />
                                 </>
                             ) : (
                                 <>
-                                    <span>Filtré par votre ville</span>
+                                    <span>{t.filteredByCity}</span>
                                     <X size={14} className="ml-2" />
                                 </>
                             )}
@@ -264,9 +265,9 @@ export default function ToysPage() {
                         <div className="text-8xl mb-6 text-gray-500">
                             <ToyBrick size={96} className="mx-auto" />
                         </div>
-                        <h2 className="text-3xl font-bold text-white mb-4">Aucun résultat trouvé</h2>
+                        <h2 className="text-3xl font-bold text-white mb-4">{t.noResults}</h2>
                         <p className="text-gray-400 max-w-md mx-auto">
-                            Essayez de modifier votre recherche ou vos filtres pour découvrir plus de jouets
+                            {t.noResultsDescription}
                         </p>
                     </div>
                 ) : (
@@ -320,7 +321,7 @@ export default function ToysPage() {
                                                 >
                                                     {getModeIcon(toy.mode)}
                                                     <span className="text-white hidden sm:inline">
-                                                        {toy.mode === "EXCHANGE" ? "Échange" : toy.mode === "POINTS" ? "Points" : "Don"}
+                                                        {t.getModeLabel(toy.mode)}
                                                     </span>
                                                 </span>
                                             </div>
@@ -335,7 +336,7 @@ export default function ToysPage() {
                                             </h2>
                                             <p className="flex items-center gap-1 text-sm text-gray-400 mb-3">
                                                 <MapPin size={14} className="text-cyan-400" />
-                                                {toy.user?.city || "Ville inconnue"}
+                                                {toy.user?.city || t.unknownCity}
                                             </p>
 
                                             <p className="text-gray-400 text-sm mb-4 line-clamp-2 leading-relaxed">
@@ -346,12 +347,12 @@ export default function ToysPage() {
                                             <div className="flex items-center gap-2 mb-4">
                                                 {(toy.ageMin != null || toy.ageMax != null) && (
                                                     <span className="bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full text-xs font-medium border border-purple-500/30 flex items-center gap-1">
-                                                        <Gem size={12} /> {toy.ageMin ?? "?"}-{toy.ageMax ?? "?"} ans
+                                                        <Gem size={12} /> {t.getAgeRange(toy.ageMin, toy.ageMax)}
                                                     </span>
                                                 )}
                                                 {toy.condition && (
-                                                    <span className={"px-3 py-1 rounded-full text-xs font-medium border flex items-center gap-1 border bg-orange-500/10 border-orange-500/20 font-medium text-orange-300"}>
-                                                        {getCondition(toy.condition)}
+                                                    <span className="px-3 py-1 rounded-full text-xs font-medium border flex items-center gap-1 border bg-orange-500/10 border-orange-500/20 font-medium text-orange-300">
+                                                        {t.getConditionLabel(toy.condition)}
                                                     </span>
                                                 )}
                                             </div>
@@ -361,7 +362,7 @@ export default function ToysPage() {
                                                 href={`/toys/${toy.id}`}
                                                 className="group/btn w-full bg-gradient-to-r from-cyan-600 to-purple-600 text-white font-semibold px-6 py-3 rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-cyan-500/25 flex items-center justify-center gap-2"
                                             >
-                                                <span>Voir les détails</span>
+                                                <span>{t.viewDetails}</span>
                                                 <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                                 </svg>
@@ -380,7 +381,7 @@ export default function ToysPage() {
                             {isReachingEnd && (
                                 <p className="text-gray-400 text-sm flex items-center gap-2">
                                     <Sparkles className="w-4 h-4 text-purple-400" />
-                                    Tu es arrivé au bout de la liste
+                                    {t.endOfList}
                                     <Sparkles className="w-4 h-4 text-purple-400" />
                                 </p>
                             )}

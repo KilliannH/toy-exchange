@@ -1,0 +1,60 @@
+{
+  "Toys": {
+    "pageTitle": "Galerie des Trésors",
+    "pageSubtitle": "Découvrez {count} jouet{plural} prêt{plural} à être échangé{plural}",
+    "searchPlaceholder": "Rechercher un jouet...",
+    "discoveryLoading": "Découverte des trésors en cours...",
+
+    "filters": {
+      "all": "Tout",
+      "exchange": "Échange", 
+      "points": "Points",
+      "don": "Don"
+    },
+    
+    "modes": {
+      "EXCHANGE": "Échange",
+      "POINTS": "Points", 
+      "DON": "Don"
+    },
+    
+    "conditions": {
+      "NEW": "Neuf",
+      "VERY_GOOD": "Très bon",
+      "GOOD": "Bon état", 
+      "USED": "Usé"
+    },
+    
+    "results": {
+      "count": "{count} résultat{plural} affiché{plural}",
+      "outOf": "sur {total}",
+      "noResults": "Aucun résultat trouvé",
+      "noResultsDescription": "Essayez de modifier votre recherche ou vos filtres pour découvrir plus de jouets"
+    },
+    
+    "geo": {
+      "filteredByCity": "Filtré par votre ville",
+      "showAllToys": "Affiche tous les jouets"
+    },
+    
+    "card": {
+      "viewDetails": "Voir les détails",
+      "unknownCity": "Ville inconnue",
+      "ageRange": "{min}-{max} ans"
+    },
+    
+    "infiniteScroll": {
+      "endOfList": "Tu es arrivé au bout de la liste"
+    },
+    
+    "errors": {
+      "loadingFailed": "Impossible de charger les jouets",
+      "tryAgain": "Réessayer",
+      "errorTitle": "Oups !"
+    },
+    
+    "actions": {
+      "addToy": "Ajouter un jouet"
+    }
+  }
+}
