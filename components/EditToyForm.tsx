@@ -4,6 +4,7 @@ import { useState } from "react";
 import { mutate } from "swr";
 import { Pen, FileText, Baby, Camera, UploadCloud, X, Save, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useEditToyTranslations } from '../hooks/useEditToyTranslations';
 
 export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () => void }) {
     const [title, setTitle] = useState(toy.title);
@@ -15,6 +16,8 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
     const [loading, setLoading] = useState(false);
     const [visibleImages, setVisibleImages] = useState(toy.images);
     const [dragActive, setDragActive] = useState(false);
+    
+    const translations = useEditToyTranslations();
 
     async function uploadImages(files: File[]) {
         const fileNames: string[] = [];
@@ -59,7 +62,7 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
             mutate("/api/toys/mine");
             onClose();
         } else {
-            toast.error("Erreur lors de la mise à jour");
+            toast.error(translations.errors.updateError);
         }
 
         setLoading(false);
@@ -83,8 +86,9 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
             const droppedFiles = Array.from(e.dataTransfer.files);
             const already = toy.images.length - removeImages.length;
+            const remainingSlots = 5 - already;
             if (droppedFiles.length + already > 5) {
-                toast.error(`Vous ne pouvez pas dépasser 5 images par jouet (il reste ${5 - already} slot(s))`);
+                toast.error(translations.errors.tooManyImages.replace('{slots}', remainingSlots.toString()));
                 return;
             }
             setNewFiles(droppedFiles);
@@ -106,8 +110,8 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
                         <Pen size={32} />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-bold text-white">Modifier le jouet</h2>
-                        <p className="text-gray-400">Mettez à jour les informations</p>
+                        <h2 className="text-2xl font-bold text-white">{translations.header.title}</h2>
+                        <p className="text-gray-400">{translations.header.subtitle}</p>
                     </div>
                 </div>
                 <button
@@ -123,33 +127,33 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
                 <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
                     <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                         <FileText className="w-5 h-5" />
-                        Informations de base
+                        {translations.basicInfo.title}
                     </h3>
                     
                     <div className="space-y-4">
                         <div className="relative group">
                             <label className="block text-sm font-medium text-gray-300 mb-2">
-                                Titre
+                                {translations.basicInfo.titleField.label}
                             </label>
                             <input
                                 type="text"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
                                 className="w-full bg-white/5 border border-white/20 text-white placeholder-gray-400 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-300"
-                                placeholder="Nom du jouet"
+                                placeholder={translations.basicInfo.titleField.placeholder}
                             />
                         </div>
 
                         <div className="relative group">
                             <label className="block text-sm font-medium text-gray-300 mb-2">
-                                Description
+                                {translations.basicInfo.description.label}
                             </label>
                             <textarea
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                                 rows={3}
                                 className="w-full bg-white/5 border border-white/20 text-white placeholder-gray-400 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-300 resize-none"
-                                placeholder="Décrivez le jouet..."
+                                placeholder={translations.basicInfo.description.placeholder}
                             />
                         </div>
                     </div>
@@ -159,13 +163,13 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
                 <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
                     <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                         <Baby className="w-5 h-5" />
-                        Tranche d'âge
+                        {translations.ageRange.title}
                     </h3>
                     
                     <div className="grid grid-cols-2 gap-4">
                         <div className="relative group">
                             <label className="block text-sm font-medium text-gray-300 mb-2">
-                                Âge minimum
+                                {translations.ageRange.minAge.label}
                             </label>
                             <input
                                 type="number"
@@ -178,7 +182,7 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
                         </div>
                         <div className="relative group">
                             <label className="block text-sm font-medium text-gray-300 mb-2">
-                                Âge maximum
+                                {translations.ageRange.maxAge.label}
                             </label>
                             <input
                                 type="number"
@@ -193,7 +197,7 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
                     
                     <div className="mt-4 bg-cyan-500/10 border border-cyan-500/20 rounded-xl p-3 text-center">
                         <span className="text-cyan-300 font-medium">
-                            Convient aux {ageMin}-{ageMax} ans
+                            {translations.ageRange.suitableFor.replace('{min}', ageMin.toString()).replace('{max}', ageMax.toString())}
                         </span>
                     </div>
                 </div>
@@ -202,16 +206,16 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
                 <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
                     <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                         <Camera className="w-5 h-5" />
-                        Gestion des images
+                        {translations.images.title}
                         <span className="text-sm bg-cyan-500/20 text-cyan-300 px-2 py-1 rounded-full">
-                            {remainingSlots} slots libres
+                            {translations.images.slotsAvailable.replace('{count}', remainingSlots.toString())}
                         </span>
                     </h3>
 
                     {/* Existing images */}
                     {visibleImages.length > 0 && (
                         <div className="mb-6">
-                            <h4 className="text-sm font-medium text-gray-300 mb-3">Images actuelles</h4>
+                            <h4 className="text-sm font-medium text-gray-300 mb-3">{translations.images.currentImages}</h4>
                             <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
                                 {visibleImages.map((img: any) => (
                                     <div key={img.id} className="relative group">
@@ -241,7 +245,7 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
                     {/* New images upload */}
                     {remainingSlots > 0 && (
                         <div className="space-y-4">
-                            <h4 className="text-sm font-medium text-gray-300">Ajouter de nouvelles images</h4>
+                            <h4 className="text-sm font-medium text-gray-300">{translations.images.addNewImages}</h4>
                             
                             {/* Drag & drop zone */}
                             <div
@@ -262,8 +266,9 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
                                     onChange={(e) => {
                                         const selected = Array.from(e.target.files || []);
                                         const already = toy.images.length - removeImages.length;
+                                        const remainingSlots = 5 - already;
                                         if (selected.length + already > 5) {
-                                            toast.error(`Vous ne pouvez pas dépasser 5 images par jouet (il reste ${5 - already} slot(s))`);
+                                            toast.error(translations.errors.tooManyImages.replace('{slots}', remainingSlots.toString()));
                                             return;
                                         }
                                         setNewFiles(selected);
@@ -277,10 +282,10 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
                                     </div>
                                     <div>
                                         <p className="text-white font-medium">
-                                            Glissez vos photos ici
+                                            {translations.images.dragAndDrop.title}
                                         </p>
                                         <p className="text-gray-400 text-sm">
-                                            ou cliquez pour sélectionner ({remainingSlots} max)
+                                            {translations.images.dragAndDrop.subtitle.replace('{max}', remainingSlots.toString())}
                                         </p>
                                     </div>
                                 </div>
@@ -289,13 +294,13 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
                             {/* New files preview */}
                             {newFiles.length > 0 && (
                                 <div>
-                                    <h5 className="text-sm font-medium text-gray-300 mb-3">Nouvelles images à ajouter</h5>
+                                    <h5 className="text-sm font-medium text-gray-300 mb-3">{translations.images.newImagesToAdd}</h5>
                                     <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
                                         {newFiles.map((file, index) => (
                                             <div key={index} className="relative group">
                                                 <img
                                                     src={URL.createObjectURL(file)}
-                                                    alt={`Nouveau ${index + 1}`}
+                                                    alt={`${translations.images.newLabel} ${index + 1}`}
                                                     className="w-full h-20 object-cover rounded-xl border-2 border-emerald-500/30"
                                                 />
                                                 <button
@@ -306,7 +311,7 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
                                                     <X className="w-4 h-4" />
                                                 </button>
                                                 <div className="absolute bottom-0 left-0 right-0 bg-emerald-500/80 text-white text-xs px-1 py-0.5 rounded-b-xl">
-                                                    NOUVEAU
+                                                    {translations.images.newLabel}
                                                 </div>
                                             </div>
                                         ))}
@@ -319,10 +324,10 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
                     {remainingSlots === 0 && (
                         <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 text-center">
                             <div className="text-yellow-300">
-                                Limite d'images atteinte (5/5)
+                                {translations.images.limitReached.title}
                             </div>
                             <div className="text-yellow-200/70 text-sm">
-                                Supprimez des images existantes pour en ajouter de nouvelles
+                                {translations.images.limitReached.subtitle}
                             </div>
                         </div>
                     )}
@@ -335,7 +340,7 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
                         onClick={onClose}
                         className="flex-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-6 py-4 rounded-2xl transition-all duration-300 hover:scale-105"
                     >
-                        Annuler
+                        {translations.actions.cancel}
                     </button>
                     
                     <button
@@ -348,11 +353,11 @@ export default function EditToyForm({ toy, onClose }: { toy: any; onClose: () =>
                             {loading ? (
                                 <>
                                     <Loader2 className="w-5 h-5 animate-spin" />
-                                    Sauvegarde...
+                                    {translations.actions.saving}
                                 </>
                             ) : (
                                 <>
-                                    <Save size={20} /> Sauvegarder les modifications
+                                    <Save size={20} /> {translations.actions.save}
                                 </>
                             )}
                         </span>

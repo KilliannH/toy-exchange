@@ -1,6 +1,8 @@
 "use client";
 
 import { useTransition } from "react";
+import { useLocale } from 'next-intl';
+import { useRouter, usePathname } from 'next/navigation';
 import { Globe, Check, Loader2 } from "lucide-react";
 
 const languages = [
@@ -10,19 +12,21 @@ const languages = [
 
 export default function LanguageSwitcher() {
   const [pending, startTransition] = useTransition();
+  const currentLocale = useLocale();
 
   async function switchLocale(locale: string) {
-    // appelle un endpoint qui set le cookie
-    await fetch(`/api/set-locale?locale=${locale}`, { method: "POST" });
-    startTransition(() => {
-      window.location.reload(); // recharge pour prendre en compte la nouvelle locale
-    });
+    try {
+      // Appeler l'endpoint qui set le cookie
+      await fetch(`/api/set-locale?locale=${locale}`, { method: "POST" });
+      
+      startTransition(() => {
+        // Rechargement simple de la page pour prendre en compte la nouvelle locale
+        window.location.reload();
+      });
+    } catch (error) {
+      console.error('Error when loading locale:', error);
+    }
   }
-
-  // Récupérer la locale actuelle (vous pouvez l'adapter selon votre implémentation)
-  const currentLocale = typeof window !== 'undefined' 
-    ? document.documentElement.lang || 'fr' 
-    : 'fr';
 
   return (
     <div className="relative group">

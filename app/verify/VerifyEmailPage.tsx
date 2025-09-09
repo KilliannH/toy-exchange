@@ -11,24 +11,26 @@ import {
   RefreshCw,
   Home
 } from "lucide-react";
+import { useVerifyEmailTranslations } from "@/hooks/useVerifyEmailTranslations";
 
 export default function VerifyEmailPage() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'expired'>('loading');
   const [message, setMessage] = useState('');
   const searchParams = useSearchParams();
+  const t = useVerifyEmailTranslations();
   
   useEffect(() => {
     const token = searchParams.get('token');
     
     if (!token) {
       setStatus('error');
-      setMessage('Token de vérification manquant');
+      setMessage(t.messages.missingToken);
       return;
     }
 
     // Vérifier le token
     verifyEmail(token);
-  }, [searchParams]);
+  }, [searchParams, t.messages.missingToken]);
 
   const verifyEmail = async (token: string) => {
     try {
@@ -44,19 +46,19 @@ export default function VerifyEmailPage() {
 
       if (response.ok) {
         setStatus('success');
-        setMessage('Votre email a été vérifié avec succès !');
+        setMessage(t.messages.success);
       } else {
         if (data.error === 'Token expired') {
           setStatus('expired');
-          setMessage('Le lien de vérification a expiré');
+          setMessage(t.messages.expired);
         } else {
           setStatus('error');
-          setMessage(data.error || 'Erreur lors de la vérification');
+          setMessage(data.error || t.messages.verificationError);
         }
       }
     } catch (error) {
       setStatus('error');
-      setMessage('Une erreur est survenue lors de la vérification');
+      setMessage(t.messages.generalError);
     }
   };
 
@@ -68,14 +70,14 @@ export default function VerifyEmailPage() {
       });
 
       if (response.ok) {
-        setMessage('Un nouveau lien de vérification a été envoyé');
+        setMessage(t.messages.resendSuccess);
       } else {
         setStatus('error');
-        setMessage('Erreur lors de l\'envoi du lien');
+        setMessage(t.messages.resendError);
       }
     } catch (error) {
       setStatus('error');
-      setMessage('Une erreur est survenue');
+      setMessage(t.messages.generalError);
     }
   };
 
@@ -110,25 +112,25 @@ export default function VerifyEmailPage() {
           <h1 className="text-3xl font-bold mb-4">
             {status === 'loading' && (
               <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                Vérification en cours...
+                {t.titles.verifying}
               </span>
             )}
             
             {status === 'success' && (
               <span className="bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
-                Email vérifié !
+                {t.titles.verified}
               </span>
             )}
             
             {status === 'error' && (
               <span className="text-red-400">
-                Erreur de vérification
+                {t.titles.error}
               </span>
             )}
             
             {status === 'expired' && (
               <span className="text-orange-400">
-                Lien expiré
+                {t.titles.expired}
               </span>
             )}
           </h1>
@@ -147,10 +149,10 @@ export default function VerifyEmailPage() {
                   className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold py-3 px-6 rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl flex items-center justify-center gap-2"
                 >
                   <Mail className="w-5 h-5" />
-                  Se connecter
+                  {t.actions.signIn}
                 </Link>
                 <p className="text-sm text-gray-400">
-                  Vous pouvez maintenant vous connecter à votre compte
+                  {t.info.canSignIn}
                 </p>
               </>
             )}
@@ -161,7 +163,7 @@ export default function VerifyEmailPage() {
                 className="w-full bg-gradient-to-r from-orange-600 to-red-600 text-white font-semibold py-3 px-6 rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl flex items-center justify-center gap-2"
               >
                 <RefreshCw className="w-5 h-5" />
-                Renvoyer le lien
+                {t.actions.resendLink}
               </button>
             )}
 
@@ -171,7 +173,7 @@ export default function VerifyEmailPage() {
                 className="w-full bg-gradient-to-r from-red-600 to-pink-600 text-white font-semibold py-3 px-6 rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl flex items-center justify-center gap-2"
               >
                 <RefreshCw className="w-5 h-5" />
-                Réessayer l'inscription
+                {t.actions.retryRegistration}
               </Link>
             )}
 
@@ -181,14 +183,14 @@ export default function VerifyEmailPage() {
               className="w-full bg-white/10 backdrop-blur-md border border-white/20 text-white font-semibold py-3 px-6 rounded-2xl hover:bg-white/20 hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
             >
               <Home className="w-5 h-5" />
-              Retour à l'accueil
+              {t.actions.backToHome}
             </Link>
           </div>
 
           {/* Loading state additional info */}
           {status === 'loading' && (
             <p className="text-sm text-gray-500 mt-6">
-              Vérification de votre adresse email...
+              {t.info.verifyingEmail}
             </p>
           )}
         </div>

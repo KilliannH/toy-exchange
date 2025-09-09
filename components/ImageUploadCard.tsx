@@ -2,6 +2,7 @@
 
 import { useDropzone } from "react-dropzone";
 import { User } from "lucide-react";
+import { useImageUploadTranslations } from '../hooks/useImageUploadTranslations';
 
 export default function ImageUploadCard({
   image,
@@ -12,6 +13,8 @@ export default function ImageUploadCard({
   setImage: (url: string | null) => void;
   setFile: (file: File | null) => void;
 }) {
+  const translations = useImageUploadTranslations();
+
   const onDrop = (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (!file) return;
@@ -39,12 +42,19 @@ export default function ImageUploadCard({
 
       {image ? (
         <div className="relative w-32 h-32 mx-auto rounded-full overflow-hidden">
-          <img src={image} alt="Avatar" className="object-cover w-full h-full" />
+          <img 
+            src={image} 
+            alt={translations.uploadZone.altText} 
+            className="object-cover w-full h-full" 
+          />
         </div>
       ) : (
         <div className="text-gray-400">
           <User className="w-12 h-12 mx-auto mb-2 opacity-60" />
-          <p className="text-sm">Glissez-déposez une image<br />ou cliquez pour choisir</p>
+          <p className="text-sm">
+            {translations.uploadZone.dragAndDrop}<br />
+            {translations.uploadZone.clickToChoose}
+          </p>
         </div>
       )}
     </div>

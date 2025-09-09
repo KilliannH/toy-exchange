@@ -8,6 +8,7 @@ import { Package, Plus, BarChart3, LogOut, Menu, User, MessageSquare, X } from "
 import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import LanguageSwitcher from "./LanguageSwitcher";
+import { useNavbarTranslations } from '@/hooks/useNavbarTranslations';
 
 const fetcher = (url) => fetch(url).then((res) => res.json());
 
@@ -17,6 +18,7 @@ export default function NavBar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const translations = useNavbarTranslations();
 
   const { data: unreadData } = useSWR(session ? '/api/messages/unread' : null, fetcher);
   
@@ -94,7 +96,7 @@ export default function NavBar() {
           <Link href="/" className="flex items-center space-x-2" onClick={closeMobileMenu}>
             <Image
               src="/circus-tent.svg"
-              alt="ToyExchange logo"
+              alt={translations.logo.alt}
               width={32}
               height={32}
               className="w-8 h-8 -translate-y-1.5"
@@ -112,7 +114,7 @@ export default function NavBar() {
                   className="text-white/80 hover:text-white font-medium hover:scale-105 transition-all duration-200 relative group flex items-center gap-2"
                 >
                   <Package size={18} />
-                  Jouets
+                  {translations.nav.toys}
                   <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400 group-hover:w-full transition-all duration-300" />
                 </Link>
                 <Link
@@ -120,14 +122,14 @@ export default function NavBar() {
                   className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-2 rounded-full font-semibold hover:scale-105 hover:shadow-lg hover:shadow-green-500/25 transition-all duration-300 flex items-center gap-2"
                 >
                   <Plus size={18} />
-                  Poster
+                  {translations.nav.post}
                 </Link>
                 <Link
                   href="/messages"
                   className="text-white/80 hover:text-white font-medium hover:scale-105 transition-all duration-200 relative group flex items-center gap-2"
                 >
                   <MessageSquare size={18} />
-                  Messages
+                  {translations.nav.messages}
                   {unreadCount > 0 && (
                     <>
                       <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white animate-ping" />
@@ -141,7 +143,7 @@ export default function NavBar() {
                   className="text-white/80 hover:text-white font-medium hover:scale-105 transition-all duration-200 relative group flex items-center gap-2"
                 >
                   <BarChart3 size={18} />
-                  Dashboard
+                  {translations.nav.dashboard}
                   <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400 group-hover:w-full transition-all duration-300" />
                 </Link>
               </>
@@ -163,7 +165,7 @@ export default function NavBar() {
                       {avatarUrl ? (
                         <img
                           src={avatarUrl}
-                          alt={session.user?.name || "Avatar"}
+                          alt={session.user?.name || translations.accessibility.avatarAlt}
                           width={32}
                           height={32}
                           className="object-cover w-full h-full"
@@ -180,7 +182,7 @@ export default function NavBar() {
                 <button
                   onClick={handleSignOut}
                   className="group text-white/70 hover:text-red-400 transition-colors duration-200 p-2 hover:bg-white/10 rounded-lg"
-                  title="Se déconnecter"
+                  title={translations.accessibility.signOutTooltip}
                 >
                   <LogOut size={20} className="group-hover:scale-110 transition-transform duration-200" />
                 </button>
@@ -191,13 +193,13 @@ export default function NavBar() {
                   onClick={() => signIn()}
                   className="text-white/80 hover:text-white font-medium transition-colors duration-200 px-4 py-2 hover:bg-white/10 rounded-lg"
                 >
-                  Se connecter
+                  {translations.user.signIn}
                 </button>
                 <Link
                   href="/register"
                   className="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold px-6 py-2 rounded-full hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
                 >
-                  S'inscrire
+                  {translations.user.register}
                 </Link>
               </div>
             )}
@@ -227,7 +229,7 @@ export default function NavBar() {
             <div className="flex items-center space-x-2">
               <Image
                 src="/circus-tent.svg"
-                alt="ToyExchange logo"
+                alt={translations.logo.alt}
                 width={24}
                 height={24}
                 className="w-6 h-6"
@@ -260,7 +262,7 @@ export default function NavBar() {
                       <div className="text-white font-medium group-hover:text-cyan-300 transition-colors duration-300">
                         {session.user?.name || session.user?.email?.split('@')[0]}
                       </div>
-                      <div className="text-gray-400 text-sm">Voir le profil</div>
+                      <div className="text-gray-400 text-sm">{translations.user.viewProfile}</div>
                     </div>
                   </Link>
                 </div>
@@ -274,7 +276,7 @@ export default function NavBar() {
                     onClick={closeMobileMenu}
                   >
                     <Package size={20} className="text-purple-400" />
-                    <span className="font-medium">Jouets</span>
+                    <span className="font-medium">{translations.nav.toys}</span>
                   </Link>
 
                   <Link
@@ -283,7 +285,7 @@ export default function NavBar() {
                     onClick={closeMobileMenu}
                   >
                     <MessageSquare size={20} className="text-blue-400" />
-                    <span className="font-medium">Messages</span>
+                    <span className="font-medium">{translations.nav.messages}</span>
                     {unreadCount > 0 && (
                       <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
                         {unreadCount}
@@ -297,7 +299,7 @@ export default function NavBar() {
                     onClick={closeMobileMenu}
                   >
                     <BarChart3 size={20} className="text-green-400" />
-                    <span className="font-medium">Dashboard</span>
+                    <span className="font-medium">{translations.nav.dashboard}</span>
                   </Link>
                 </div>
 
@@ -309,7 +311,7 @@ export default function NavBar() {
                     onClick={closeMobileMenu}
                   >
                     <Plus size={20} />
-                    Poster un jouet
+                    {translations.nav.postToy}
                   </Link>
                 </div>
               </>
@@ -323,14 +325,14 @@ export default function NavBar() {
                   }}
                   className="w-full text-white/80 hover:text-white font-medium transition-colors duration-200 py-4 px-6 hover:bg-white/10 rounded-xl text-left"
                 >
-                  Se connecter
+                  {translations.user.signIn}
                 </button>
                 <Link
                   href="/register"
                   className="block w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold py-4 px-6 rounded-xl hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 text-center"
                   onClick={closeMobileMenu}
                 >
-                  S'inscrire
+                  {translations.user.register}
                 </Link>
               </div>
             )}
@@ -344,7 +346,7 @@ export default function NavBar() {
                 className="flex items-center gap-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl p-4 w-full transition-all duration-300 group"
               >
                 <LogOut size={20} />
-                <span className="font-medium">Se déconnecter</span>
+                <span className="font-medium">{translations.user.signOut}</span>
               </button>
             </div>
           )}

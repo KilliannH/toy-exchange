@@ -57,9 +57,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
 
         <Providers>
+          <NextIntlClientProvider>
           <NavBar />
-          <main className="min-h-screen bg-gray-50"><NextIntlClientProvider>{children}</NextIntlClientProvider></main>
+          <main className="min-h-screen bg-gray-50">{children}</main>
           <CookieNotice />
+          </NextIntlClientProvider>
           <AnalyticsScripts />
           <MarketingScripts />
           <Toaster

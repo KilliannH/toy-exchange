@@ -19,6 +19,7 @@ import {
   ToyBrick,
   Package
 } from "lucide-react";
+import { usePublicProfileClientTranslations } from "@/hooks/usePublicProfileClientTranslations";
 
 interface User {
   id: string;
@@ -60,44 +61,45 @@ interface PublicProfileClientProps {
 }
 
 export default function PublicProfileClient({ user, stats, recentReviews }: PublicProfileClientProps) {
-  const monthsSinceJoin = stats.memberSince !== "Nouveau" ? parseInt(stats.memberSince) : 0;
+  const t = usePublicProfileClientTranslations();
+  const monthsSinceJoin = stats.memberSince !== t.header.defaultUser ? parseInt(stats.memberSince) : 0;
 
   const badges = [
     {
-      name: "Premier échange",
+      name: t.badges.firstExchange,
       icon: <Award className="w-5 h-5" />,
       earned: stats.exchangesCount >= 1,
-      description: "A réalisé son premier échange"
+      description: t.badges.firstExchangeDesc
     },
     {
-      name: "Généreux",
+      name: t.badges.generous,
       icon: <Heart className="w-5 h-5" />,
       earned: stats.donationsCount >= 3,
-      description: "A donné 3 jouets ou plus"
+      description: t.badges.generousDesc
     },
     {
-      name: "Collectionneur",
+      name: t.badges.collector,
       icon: <Book className="w-5 h-5" />,
       earned: stats.toysCount >= 10,
-      description: "A posté 10 jouets ou plus"
+      description: t.badges.collectorDesc
     },
     {
-      name: "Ambassadeur",
+      name: t.badges.ambassador,
       icon: <Star className="w-5 h-5" />,
       earned: stats.exchangesCount >= 20,
-      description: "A réalisé 20 échanges ou plus"
+      description: t.badges.ambassadorDesc
     },
     {
-      name: "Expert",
+      name: t.badges.expert,
       icon: <Target className="w-5 h-5" />,
       earned: stats.avgRating >= 4.5,
-      description: "Note moyenne de 4.5+ étoiles"
+      description: t.badges.expertDesc
     },
     {
-      name: "Vétéran",
+      name: t.badges.veteran,
       icon: <Crown className="w-5 h-5" />,
       earned: monthsSinceJoin >= 12,
-      description: "Membre depuis plus d'un an"
+      description: t.badges.veteranDesc
     }
   ];
 
@@ -106,12 +108,7 @@ export default function PublicProfileClient({ user, stats, recentReviews }: Publ
   const formatTimeAgo = (date: Date) => {
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-
-    if (diffInHours < 1) return "Il y a quelques minutes";
-    if (diffInHours < 24) return `Il y a ${diffInHours}h`;
-    if (diffInHours < 48) return "Hier";
-    const diffInDays = Math.floor(diffInHours / 24);
-    return `Il y a ${diffInDays} jours`;
+    return t.getTimeAgo(diffInHours);
   };
 
   return (
@@ -124,7 +121,7 @@ export default function PublicProfileClient({ user, stats, recentReviews }: Publ
           className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors mb-8 font-medium"
         >
           <ArrowLeft className="w-5 h-5" />
-          Retour aux jouets
+          {t.navigation.backToToys}
         </Link>
 
         {/* Profile header */}
@@ -145,7 +142,7 @@ export default function PublicProfileClient({ user, stats, recentReviews }: Publ
           </div>
 
           <h1 className="text-4xl font-black bg-gradient-to-r from-white via-cyan-300 to-purple-300 bg-clip-text text-transparent mb-2">
-            {user.name || "Utilisateur"}
+            {t.getUserDisplayName(user.name)}
           </h1>
 
           {user.city && (
@@ -156,7 +153,7 @@ export default function PublicProfileClient({ user, stats, recentReviews }: Publ
           )}
 
           <p className="text-gray-300">
-            Membre depuis {stats.memberSince}
+            {t.getMemberSince(stats.memberSince)}
           </p>
         </div>
 
@@ -167,15 +164,15 @@ export default function PublicProfileClient({ user, stats, recentReviews }: Publ
             <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
               <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
                 <Trophy className="w-8 h-8" />
-                Statistiques
+                {t.stats.title}
               </h2>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {[
-                  { label: "Jouets", value: stats.toysCount.toString(), icon: <Gamepad2 className="w-6 h-6" />, color: "from-blue-500 to-cyan-500" },
-                  { label: "Échanges", value: stats.exchangesCount.toString(), icon: <RefreshCw className="w-6 h-6" />, color: "from-green-500 to-emerald-500" },
-                  { label: "Dons", value: stats.donationsCount.toString(), icon: <Heart className="w-6 h-6" />, color: "from-pink-500 to-red-500" },
-                  { label: "Note", value: stats.avgRating > 0 ? stats.avgRating.toFixed(1) : "N/A", icon: <Star className="w-6 h-6" />, color: "from-yellow-500 to-orange-500" }
+                  { label: t.stats.toys, value: stats.toysCount.toString(), icon: <Gamepad2 className="w-6 h-6" />, color: "from-blue-500 to-cyan-500" },
+                  { label: t.stats.exchanges, value: stats.exchangesCount.toString(), icon: <RefreshCw className="w-6 h-6" />, color: "from-green-500 to-emerald-500" },
+                  { label: t.stats.donations, value: stats.donationsCount.toString(), icon: <Heart className="w-6 h-6" />, color: "from-pink-500 to-red-500" },
+                  { label: t.stats.rating, value: stats.avgRating > 0 ? stats.avgRating.toFixed(1) : t.stats.notAvailable, icon: <Star className="w-6 h-6" />, color: "from-yellow-500 to-orange-500" }
                 ].map((stat, i) => (
                   <div key={i} className="text-center group">
                     <div className={`text-2xl mb-2 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent group-hover:scale-110 transition-transform duration-300`}>
@@ -194,7 +191,7 @@ export default function PublicProfileClient({ user, stats, recentReviews }: Publ
             <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
               <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
                 <Package className="w-8 h-8" />
-                Jouets récents
+                {t.toys.title}
               </h2>
 
               {user.toys.length > 0 ? (
@@ -228,7 +225,7 @@ export default function PublicProfileClient({ user, stats, recentReviews }: Publ
                             ? 'bg-green-500/20 text-green-300'
                             : 'bg-blue-500/20 text-blue-300'
                           }`}>
-                          {toy.mode === 'DON' ? 'Don' : 'Échange'}
+                          {t.getToyModeLabel(toy.mode)}
                         </span>
                         <span className="text-xs text-gray-500">
                           {formatTimeAgo(toy.createdAt)}
@@ -240,7 +237,7 @@ export default function PublicProfileClient({ user, stats, recentReviews }: Publ
               ) : (
                 <div className="text-center py-8">
                   <ToyBrick className="w-12 h-12 text-gray-500 mx-auto mb-3" />
-                  <p className="text-gray-400">Aucun jouet posté pour le moment</p>
+                  <p className="text-gray-400">{t.toys.noToys}</p>
                 </div>
               )}
             </div>
@@ -250,7 +247,7 @@ export default function PublicProfileClient({ user, stats, recentReviews }: Publ
               <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
                 <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
                   <Star className="w-8 h-8" />
-                  Avis récents ({recentReviews.length})
+                  {t.getRecentReviewsCount(recentReviews.length)}
                 </h2>
 
                 <div className="space-y-4">
@@ -263,7 +260,7 @@ export default function PublicProfileClient({ user, stats, recentReviews }: Publ
                           </div>
                           <div>
                             <div className="font-semibold text-white">
-                              {review.reviewer.name || "Utilisateur"}
+                              {t.getReviewerName(review.reviewer.name)}
                             </div>
                             <div className="text-xs text-gray-500">
                               {formatTimeAgo(review.createdAt)}
@@ -301,7 +298,7 @@ export default function PublicProfileClient({ user, stats, recentReviews }: Publ
             <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6">
               <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                 <Trophy className="w-6 h-6" />
-                Badges ({earnedBadges}/{badges.length})
+                {t.getBadgesProgress(earnedBadges, badges.length)}
               </h3>
 
               <div className="grid grid-cols-2 gap-3">

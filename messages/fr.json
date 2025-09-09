@@ -438,49 +438,823 @@
         }
     },
     "pointsPage": {
-  "navigation": {
-    "backToDashboard": "Retour au dashboard"
-  },
-  "header": {
-    "title": "Mes Points ToyExchange",
-    "subtitle": "Achetez des jouets premium avec vos points",
-    "currentPoints": "{points}",
-    "availablePoints": "Points disponibles",
-    "defaultMember": "Membre",
-    "welcomeMessage": "Salut {userName} ! Rechargez vos points pour accéder à plus de jouets."
-  },
-  "packs": {
-    "choosePackTitle": "Choisissez votre pack de points",
-    "starter": "Starter",
-    "popular": "Populaire",
-    "premium": "Premium",
-    "popularBadge": "⭐ POPULAIRE",
-    "pointsAmount": "{points} points",
-    "price": "{price}€",
-    "valueRatio": "Valeur {ratio} pts/€"
-  },
-  "benefits": {
-    "instantPoints": "Points instantanés",
-    "premiumAccess": "Accès jouets premium",
-    "valuePerEuro": "Valeur {ratio} pts/€"
-  },
-  "purchase": {
-    "buyNow": "Acheter maintenant",
-    "loading": "Chargement..."
-  },
-  "security": {
-    "title": "Paiement 100% sécurisé",
-    "stripeTitle": "Stripe",
-    "stripeDescription": "Paiements sécurisés par Stripe",
-    "instantTitle": "Instantané",
-    "instantDescription": "Points crédités immédiatement",
-    "guaranteeTitle": "Garantie",
-    "guaranteeDescription": "Remboursement si problème"
-  },
-  "errors": {
-    "stripeNotInitialized": "Stripe non initialisé",
-    "generalPurchaseError": "Erreur lors de l'achat",
-    "purchaseError": "{error}"
+        "navigation": {
+            "backToDashboard": "Retour au dashboard"
+        },
+        "header": {
+            "title": "Mes Points ToyExchange",
+            "subtitle": "Achetez des jouets premium avec vos points",
+            "currentPoints": "{points}",
+            "availablePoints": "Points disponibles",
+            "defaultMember": "Membre",
+            "welcomeMessage": "Salut {userName} ! Rechargez vos points pour accéder à plus de jouets."
+        },
+        "packs": {
+            "choosePackTitle": "Choisissez votre pack de points",
+            "starter": "Starter",
+            "popular": "Populaire",
+            "premium": "Premium",
+            "popularBadge": "⭐ POPULAIRE",
+            "pointsAmount": "{points} points",
+            "price": "{price}€",
+            "valueRatio": "Valeur {ratio} pts/€"
+        },
+        "benefits": {
+            "instantPoints": "Points instantanés",
+            "premiumAccess": "Accès jouets premium",
+            "valuePerEuro": "Valeur {ratio} pts/€"
+        },
+        "purchase": {
+            "buyNow": "Acheter maintenant",
+            "loading": "Chargement..."
+        },
+        "security": {
+            "title": "Paiement 100% sécurisé",
+            "stripeTitle": "Stripe",
+            "stripeDescription": "Paiements sécurisés par Stripe",
+            "instantTitle": "Instantané",
+            "instantDescription": "Points crédités immédiatement",
+            "guaranteeTitle": "Garantie",
+            "guaranteeDescription": "Remboursement si problème"
+        },
+        "errors": {
+            "stripeNotInitialized": "Stripe non initialisé",
+            "generalPurchaseError": "Erreur lors de l'achat",
+            "purchaseError": "{error}"
+        }
+    },
+    "postToy": {
+        "header": {
+            "title": "Partagez un trésor",
+            "subtitle": "Donnez une nouvelle vie à un jouet"
+        },
+        "progress": {
+            "stepProgress": "Étape {currentStep} sur {totalSteps}",
+            "percentage": "{percentage}%",
+            "stepOf": "sur"
+        },
+        "stepIndicators": {
+            "description": "Description",
+            "age": "Âge",
+            "details": "Détails",
+            "photos": "Photos"
+        },
+        "steps": {
+            "description": {
+                "title": "Parlez-nous de ce jouet",
+                "subtitle": "Donnez-lui un titre accrocheur et décrivez-le",
+                "titleLabel": "Titre du jouet",
+                "titlePlaceholder": "Ex: Lego Creator 3-en-1, Barbie Dreamhouse...",
+                "descriptionLabel": "Description détaillée",
+                "descriptionPlaceholder": "Décrivez l'état, les pièces incluses, pourquoi vous l'échangez..."
+            },
+            "age": {
+                "title": "Tranche d'âge",
+                "subtitle": "Pour qui ce jouet est-il adapté ?",
+                "minAgeLabel": "Âge minimum",
+                "maxAgeLabel": "Âge maximum",
+                "perfectFor": "Parfait pour les {ageMin}-{ageMax} ans"
+            },
+            "details": {
+                "title": "Détails du jouet",
+                "subtitle": "Catégorie, état et mode d'échange",
+                "categoryLabel": "Catégorie",
+                "conditionLabel": "État du jouet",
+                "exchangeTypeLabel": "Type d'échange",
+                "pointsValueLabel": "Valeur en points",
+                "pointsPlaceholder": "Ex: 50",
+                "pointsHelp": "Nombre de points requis pour obtenir ce jouet"
+            },
+            "images": {
+                "title": "Ajoutez des photos",
+                "subtitle": "Des images de qualité attirent plus d'échanges",
+                "dragText": "Glissez vos photos ici ou cliquez pour sélectionner",
+                "fileInfo": "PNG, JPG jusqu'à 10MB • Maximum 5 images"
+            }
+        },
+        "categories": {
+            "construction": "Construction",
+            "dolls": "Poupées",
+            "vehicles": "Véhicules",
+            "boardGames": "Jeux société",
+            "books": "Livres",
+            "other": "Autres"
+        },
+        "conditions": {
+            "new": "Neuf",
+            "veryGood": "Très bon",
+            "good": "Bon état",
+            "used": "Usé"
+        },
+        "exchangeModes": {
+            "donation": "Don",
+            "exchange": "Échange",
+            "points": "Points"
+        },
+        "navigation": {
+            "previous": "Précédent",
+            "next": "Suivant",
+            "publish": "Publier le jouet",
+            "publishing": "Publication..."
+        },
+        "success": {
+            "title": "Trésor publié !",
+            "subtitle": "Votre jouet est maintenant visible par la communauté",
+            "viewAllToys": "Voir tous les jouets",
+            "myDashboard": "Mon dashboard"
+        },
+        "form": {
+            "characterCount": "{current}/{max} caractères"
+        },
+        "messages": {
+            "toyAdded": "Jouet ajouté avec images !",
+            "maxImages": "Maximum 5 images par jouet",
+            "addError": "Erreur lors de l'ajout du jouet."
+        },
+        "errors": {
+            "generalError": "Une erreur est survenue",
+            "uploadError": "{error}"
+        }
+    },
+    "editProfile": {
+        "loading": {
+            "profile": "Chargement du profil...",
+            "saving": "Sauvegarde..."
+        },
+        "navigation": {
+            "backToProfile": "Retour au profil"
+        },
+        "header": {
+            "title": "Modifier mon profil",
+            "subtitle": "Personnalisez votre expérience d'échange"
+        },
+        "success": {
+            "profileUpdated": "Profil mis à jour avec succès !"
+        },
+        "form": {
+            "profilePhoto": "Photo de profil",
+            "fullName": "Nom complet",
+            "namePlaceholder": "Comment souhaitez-vous être appelé ?",
+            "city": "Ville",
+            "cityPlaceholder": "Rechercher une ville...",
+            "noResults": "Aucun résultat",
+            "searchRadius": "Rayon de recherche",
+            "radiusValue": "{radius} kilomètres",
+            "kilometers": "kilomètres",
+            "exchangeZone": "Zone d'échange",
+            "proximity": "Proximité",
+            "saveButton": "Sauvegarder les modifications"
+        },
+        "preview": {
+            "title": "Aperçu du profil",
+            "nameNotDefined": "Nom non défini",
+            "cityNotDefined": "Ville non définie",
+            "exchangeZoneTitle": "Zone d'échange",
+            "zoneDescription": "{radius} km autour de vous",
+            "aroundYou": "autour de vous"
+        },
+        "tips": {
+            "title": "Conseils",
+            "visibleName": "Nom visible",
+            "visibleNameDesc": "Utilisez votre vrai prénom pour inspirer confiance",
+            "preciseCity": "Ville précise",
+            "preciseCityDesc": "Facilitez les rencontres avec une localisation exacte",
+            "optimalRadius": "Rayon optimal",
+            "optimalRadiusDesc": "10-30km offre un bon équilibre choix/proximité"
+        },
+        "privacy": {
+            "title": "Confidentialité",
+            "description": "Vos informations ne sont visibles que par les autres membres lors d'échanges confirmés. Votre email reste toujours privé."
+        },
+        "messages": {
+            "cityNotFound": "Ville non trouvée. Veuillez réessayer.",
+            "uploadError": "Erreur génération URL signée"
+        },
+        "errors": {
+            "generalError": "Une erreur est survenue"
+        }
+    },
+    "profilePage": {
+        "error": {
+            "title": "Profil introuvable",
+            "subtitle": "Oups !",
+            "description": "Une erreur s'est produite lors du chargement"
+        },
+        "stats": {
+            "toysLabel": "Jouets",
+            "exchangesLabel": "Échanges",
+            "donationsLabel": "Dons",
+            "ratingLabel": "Note moyenne",
+            "memberSinceLabel": "Membre depuis",
+            "toysCount": "{count}",
+            "exchangesCount": "{count}",
+            "donationsCount": "{count}",
+            "averageRating": "{rating}",
+            "memberSinceNew": "Nouveau",
+            "memberSinceMonths": "{months} mois",
+            "newMember": "Nouveau"
+        }
+    },
+    "profileClient": {
+        "header": {
+            "title": "Mon Profil",
+            "subtitle": "Gérez vos informations personnelles"
+        },
+        "personalInfo": {
+            "title": "Informations personnelles",
+            "editButton": "Modifier",
+            "fullName": "Nom complet",
+            "email": "Adresse email",
+            "city": "Ville",
+            "notProvided": "Non renseigné"
+        },
+        "preferences": {
+            "title": "Préférences",
+            "searchRadius": "Rayon de recherche",
+            "custom": "Personnalisé",
+            "defaultValue": "Valeur par défaut"
+        },
+        "dangerZone": {
+            "title": "Zone de danger",
+            "deleteAccountTitle": "Supprimer mon compte",
+            "deleteDescription": "Cette action est irréversible. Toutes vos données seront définitivement supprimées :",
+            "irreversible": "irréversible",
+            "deleteButton": "Supprimer mon compte"
+        },
+        "stats": {
+            "title": "Statistiques",
+            "toysPosted": "Jouets postés",
+            "exchangesCompleted": "Échanges réalisés",
+            "averageRating": "Note moyenne",
+            "memberSince": "Membre depuis",
+            "notAvailable": "N/A"
+        },
+        "badges": {
+            "title": "Badges",
+            "progress": "{earned}/{total} badges débloqués",
+            "firstExchange": "Premier échange",
+            "firstExchangeDesc": "Réalisez votre premier échange",
+            "generous": "Généreux",
+            "generousDesc": "Donnez 3 jouets",
+            "collector": "Collectionneur",
+            "collectorDesc": "Postez 10 jouets",
+            "ambassador": "Ambassadeur",
+            "ambassadorDesc": "Réalisez 20 échanges",
+            "expert": "Expert",
+            "expertDesc": "Obtenez une note moyenne de 4.5+",
+            "veteran": "Vétéran",
+            "veteranDesc": "Membre depuis plus d'un an"
+        },
+        "quickActions": {
+            "title": "Actions rapides",
+            "browseToys": "Parcourir les jouets",
+            "addToy": "Ajouter un jouet",
+            "dashboard": "Mon dashboard"
+        },
+        "achievement": {
+            "title": "Membre actif de la communauté !",
+            "subtitle": "Merci de contribuer à un monde plus durable grâce au partage de jouets",
+            "levelLabel": "Niveau",
+            "levelExplorer": "Explorateur",
+            "levelAmbassador": "Ambassadeur",
+            "levelExpert": "Expert",
+            "exchangesProgress": "{current}/{target} échanges",
+            "remainingForNext": "{remaining} échanges pour \"{nextLevel}\""
+        },
+        "activity": {
+            "title": "Activité récente",
+            "loading": "Chargement des activités...",
+            "noActivity": "Aucune activité récente",
+            "startByAdding": "Commencez par ajouter votre premier jouet !",
+            "viewAll": "Voir toute l'activité",
+            "addToy": "Ajouter un jouet",
+            "timeAgo": {
+                "fewMinutes": "Il y a quelques minutes",
+                "hours": "Il y a {hours}h",
+                "yesterday": "Hier",
+                "days": "Il y a {days} jours"
+            },
+            "types": {
+                "newToy": "Nouveau jouet",
+                "exchange": "Échange",
+                "message": "Message"
+            }
+        },
+        "deleteModal": {
+            "title": "Supprimer définitivement ?",
+            "subtitle": "Cette action ne peut pas être annulée",
+            "aboutToDelete": "Vous êtes sur le point de supprimer :",
+            "items": {
+                "toys": "• {count} jouets postés",
+                "exchanges": "• {count} échanges réalisés",
+                "badges": "• {count} badges gagnés",
+                "personalData": "• Toutes vos données personnelles"
+            },
+            "confirmInstruction": "Pour confirmer, tapez",
+            "deleteWord": "SUPPRIMER",
+            "placeholder": "Tapez SUPPRIMER",
+            "cancel": "Annuler",
+            "deleteButton": "Supprimer définitivement",
+            "deleting": "Suppression...",
+            "deleteError": "Une erreur s'est produite lors de la suppression du compte"
+        }
+    },
+    "register": {
+        "header": {
+            "title": "Rejoignez l'aventure !",
+            "subtitle": "Créez votre compte et commencez à échanger"
+        },
+        "steps": {
+            "infos": "Infos",
+            "security": "Sécurité"
+        },
+        "auth": {
+            "continueWithGoogle": "Continuer avec Google",
+            "orWithEmail": "ou avec votre email"
+        },
+        "form": {
+            "nameLabel": "Comment vous appelez-vous ?",
+            "namePlaceholder": "Votre prénom",
+            "cityLabel": "Votre ville",
+            "cityPlaceholder": "Rechercher une ville...",
+            "emailLabel": "Votre email",
+            "emailPlaceholder": "nom@exemple.com",
+            "nextButton": "Suivant",
+            "noResults": "Aucun résultat",
+            "passwordLabel": "Créez un mot de passe sécurisé",
+            "passwordPlaceholder": "Au moins 8 caractères",
+            "passwordStrengthLabel": "Force du mot de passe :",
+            "passwordStrength": {
+                "weak": "🔴 Faible",
+                "medium": "🟡 Moyen",
+                "good": "🟢 Bon",
+                "excellent": "💪 Excellent"
+            },
+            "acceptTermsPrefix": "J'accepte les",
+            "termsLink": "Conditions Générales d'Utilisation",
+            "acceptTermsSuffix": "et la",
+            "privacyLink": "Politique de Confidentialité",
+            "backButton": "Retour",
+            "createAccount": "Créer mon compte",
+            "creating": "Création..."
+        },
+        "success": {
+            "title": "Bienvenue dans la famille !",
+            "subtitle": "Votre compte a été créé avec succès"
+        },
+        "footer": {
+            "alreadyAccount": "Déjà un compte ?",
+            "signIn": "Se connecter",
+            "dataProtected": "Vos données sont protégées"
+        },
+        "benefits": {
+            "title": "Pourquoi rejoindre ToyExchange ?",
+            "environmental": "Réduisez votre impact environnemental",
+            "savings": "Économisez sur les jouets",
+            "community": "Connectez-vous avec des parents",
+            "unlimited": "Accès illimité aux échanges"
+        },
+        "messages": {
+            "accountCreated": "Compte créé 🎉 redirection en cours...",
+            "registrationError": "Erreur lors de l'inscription"
+        }
+    },
+    "publicProfile": {
+        "header": {
+            "profileOf": "Profil de {name}",
+            "memberSince": "Membre depuis {duration}",
+            "fromCity": "de {city}"
+        },
+        "navigation": {
+            "backToSearch": "Retour à la recherche"
+        },
+        "stats": {
+            "title": "Statistiques",
+            "toysPosted": "Jouets postés",
+            "donationsGiven": "Dons offerts",
+            "exchangesCompleted": "Échanges réalisés",
+            "averageRatingLabel": "Note moyenne",
+            "memberSince": "Membre depuis",
+            "toysCount": "{count}",
+            "exchangesCount": "{count}",
+            "donationsCount": "{count}",
+            "averageRating": "{rating}",
+            "memberSinceNew": "Nouveau",
+            "memberSinceMonths": "{months} mois",
+            "notAvailable": "N/A",
+            "newMember": "Nouveau"
+        },
+        "toys": {
+            "title": "Jouets de {name}",
+            "recentToys": "Jouets récents",
+            "noToys": "Aucun jouet publié",
+            "noToysDesc": "Cet utilisateur n'a pas encore publié de jouets",
+            "viewAllToys": "Voir tous les jouets",
+            "modes": {
+                "donation": "Don",
+                "exchange": "Échange",
+                "points": "Points"
+            }
+        },
+        "reviews": {
+            "title": "Avis et commentaires",
+            "reviewsCount": "{count} avis",
+            "noReviews": "Aucun avis pour le moment",
+            "noReviewsDesc": "Cet utilisateur n'a pas encore reçu d'avis",
+            "anonymous": "Utilisateur anonyme",
+            "starsRating": "{rating} étoiles",
+            "timeAgo": {
+                "today": "Aujourd'hui",
+                "yesterday": "Hier",
+                "daysAgo": "Il y a {days} jours",
+                "weeksAgo": "Il y a {weeks} semaines",
+                "monthsAgo": "Il y a {months} mois"
+            }
+        },
+        "actions": {
+            "contactUser": "Contacter {name}",
+            "viewToys": "Voir ses jouets",
+            "reportUser": "Signaler cet utilisateur"
+        },
+        "trust": {
+            "verifiedMember": "Membre vérifié",
+            "reliableMember": "Membre fiable",
+            "activeMember": "Membre actif"
+        }
+    },
+    "publicProfileClient": {
+        "navigation": {
+            "backToToys": "Retour aux jouets"
+        },
+        "header": {
+            "defaultUser": "Utilisateur",
+            "memberSinceLabel": "Membre depuis",
+            "memberSince": "Membre depuis {duration}"
+        },
+        "stats": {
+            "title": "Statistiques",
+            "toys": "Jouets",
+            "exchanges": "Échanges",
+            "donations": "Dons",
+            "rating": "Note",
+            "notAvailable": "N/A"
+        },
+        "toys": {
+            "title": "Jouets récents",
+            "noToys": "Aucun jouet posté pour le moment",
+            "noToysDesc": "Cet utilisateur n'a pas encore publié de jouets",
+            "modes": {
+                "donation": "Don",
+                "exchange": "Échange",
+                "points": "Points"
+            }
+        },
+        "reviews": {
+            "title": "Avis récents",
+            "recentReviewsCount": "Avis récents ({count})",
+            "defaultUser": "Utilisateur"
+        },
+        "badges": {
+            "title": "Badges",
+            "progress": "Badges ({earned}/{total})",
+            "firstExchange": "Premier échange",
+            "firstExchangeDesc": "A réalisé son premier échange",
+            "generous": "Généreux",
+            "generousDesc": "A donné 3 jouets ou plus",
+            "collector": "Collectionneur",
+            "collectorDesc": "A posté 10 jouets ou plus",
+            "ambassador": "Ambassadeur",
+            "ambassadorDesc": "A réalisé 20 échanges ou plus",
+            "expert": "Expert",
+            "expertDesc": "Note moyenne de 4.5+ étoiles",
+            "veteran": "Vétéran",
+            "veteranDesc": "Membre depuis plus d'un an"
+        },
+        "timeAgo": {
+            "fewMinutes": "Il y a quelques minutes",
+            "hours": "Il y a {hours}h",
+            "yesterday": "Hier",
+            "days": "Il y a {days} jours"
+        }
+    },
+    "verifyEmail": {
+        "loading": "Chargement...",
+        "titles": {
+            "verifying": "Vérification en cours...",
+            "verified": "Email vérifié !",
+            "error": "Erreur de vérification",
+            "expired": "Lien expiré"
+        },
+        "messages": {
+            "verifying": "Vérification de votre adresse email en cours...",
+            "success": "Votre email a été vérifié avec succès !",
+            "error": "Une erreur est survenue lors de la vérification",
+            "expired": "Le lien de vérification a expiré",
+            "missingToken": "Token de vérification manquant",
+            "resendSuccess": "Un nouveau lien de vérification a été envoyé",
+            "resendError": "Erreur lors de l'envoi du lien",
+            "generalError": "Une erreur est survenue",
+            "verificationError": "Erreur lors de la vérification"
+        },
+        "actions": {
+            "signIn": "Se connecter",
+            "resendLink": "Renvoyer le lien",
+            "retryRegistration": "Réessayer l'inscription",
+            "backToHome": "Retour à l'accueil"
+        },
+        "info": {
+            "canSignIn": "Vous pouvez maintenant vous connecter à votre compte",
+            "verifyingEmail": "Vérification de votre adresse email..."
+        }
+    },
+    "home": {
+        "hero": {
+            "title": "ToyExchange",
+            "subtitle": "Révolutionnez l'échange de jouets",
+            "tagline": "Moins de gaspillage, plus de magie partagée",
+            "startAdventure": "Commencer l'aventure",
+            "discoverToys": "Découvrir les jouets"
+        },
+        "features": {
+            "title": "Pourquoi ToyExchange ?",
+            "planet": {
+                "title": "Planète préservée",
+                "description": "Chaque échange évite la production d'un nouveau jouet et réduit l'empreinte carbone de votre famille."
+            },
+            "budget": {
+                "title": "Budget maîtrisé",
+                "description": "Économisez jusqu'à 80% sur les jouets tout en offrant des expériences variées à vos enfants."
+            },
+            "network": {
+                "title": "Réseau parents",
+                "description": "Rejoignez une communauté engagée de parents qui partagent vos valeurs de durabilité."
+            }
+        },
+        "howItWorks": {
+            "title": "Comment ça marche ?",
+            "publish": {
+                "title": "Publiez",
+                "description": "Ajoutez les jouets que vous souhaitez échanger"
+            },
+            "negotiate": {
+                "title": "Négociez",
+                "description": "Discutez avec d'autres parents pour organiser l'échange"
+            },
+            "exchange": {
+                "title": "Échangez",
+                "description": "Rencontrez-vous et réalisez l'échange en toute simplicité"
+            }
+        },
+        "cta": {
+            "title": "Rejoignez la révolution du partage",
+            "subtitle": "Commencez aujourd'hui à échanger vos jouets et découvrez de nouveaux trésors pour vos enfants",
+            "button": "Démarrer maintenant"
+        },
+        "footer": {
+            "description": "La plateforme qui révolutionne l'échange de jouets entre parents. Moins de gaspillage, plus de partage, pour un avenir durable.",
+            "legal": {
+                "title": "Légal",
+                "privacy": "Politique de confidentialité",
+                "terms": "Conditions générales",
+                "mentions": "Mentions légales"
+            },
+            "copyright": "© 2025 ToyExchange. Tous droits réservés. Fait avec 💚 pour une planète plus verte."
+        }
+    },
+    "legal": {
+        "mentions": {
+            "page": {
+                "title": "Mentions légales",
+                "subtitle": "Informations légales sur ToyExchange",
+                "lastUpdate": "Dernière mise à jour :",
+                "backToHome": "← Retour à l'accueil"
+            },
+            "company": {
+                "siteName": "**Nom du site / de l'application** : ToyExchange",
+                "editor": "**Éditeur** : Killiann Hervagault",
+                "address": "Adresse : 25 Rue de la planche au gue 44300 Nantes",
+                "email": "Email : support@toy-exchange.org",
+                "publicationDirector": "**Directeur de publication** : Killiann Hervagault"
+            },
+            "hosting": {
+                "host": "**Hébergeur** : Google Cloud Platform",
+                "hostAddress": "Adresse : 8 Rue de Londres 75009 Paris"
+            },
+            "sections": {
+                "intellectualProperty": {
+                    "title": "## Propriété intellectuelle",
+                    "content": "Tous les contenus (textes, images, logo, design) sont la propriété exclusive de ToyExchange, sauf mentions contraires. Toute reproduction, même partielle, est interdite sans autorisation préalable."
+                },
+                "responsibility": {
+                    "title": "## Responsabilité",
+                    "content": "ToyExchange agit comme intermédiaire technique. Il ne saurait être tenu responsable des contenus publiés par les utilisateurs ni des litiges intervenant entre eux."
+                }
+            },
+            "language": {
+                "french": "FR",
+                "english": "EN"
+            }
+        },
+        "privacy": {
+            "page": {
+                "title": "Politique de confidentialité",
+                "subtitle": "Votre vie privée est importante pour nous",
+                "lastUpdate": "Dernière mise à jour :",
+                "backToHome": "← Retour à l'accueil"
+            },
+            "sections": {
+                "dataCollected": {
+                    "title": "**1. Données collectées**",
+                    "content": "Nous collectons les données suivantes : nom, prénom, adresse email, adresse postale, historique des annonces, informations de connexion, données de navigation."
+                },
+                "purposes": {
+                    "title": "**2. Finalités**",
+                    "content": "Vos données sont utilisées pour :\nCréer et gérer votre compte utilisateur.\nPermettre les échanges et dons de jouets.\nAméliorer l'expérience utilisateur.\nRépondre à vos demandes de contact.\nVous envoyer des informations relatives au service."
+                },
+                "legalBasis": {
+                    "title": "**3. Base légale du traitement**",
+                    "content": "Les données sont collectées sur la base de votre consentement et/ou pour l'exécution du contrat d'utilisation de la plateforme."
+                },
+                "recipients": {
+                    "title": "**4. Destinataires**",
+                    "content": "Vos données ne sont partagées qu'avec les prestataires techniques strictement nécessaires au fonctionnement du service (ex : hébergeur)."
+                },
+                "retention": {
+                    "title": "**5. Durée de conservation**",
+                    "content": "Les données sont conservées pendant 3 ans à compter de la dernière activité de l'utilisateur."
+                },
+                "rights": {
+                    "title": "**6. Vos droits**",
+                    "content": "Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, de suppression, d'opposition et de portabilité de vos données. Pour exercer vos droits, vous pouvez nous contacter à l'adresse suivante : privacy@toy-exchange.org."
+                },
+                "cookies": {
+                    "title": "**7. Cookies**",
+                    "content": "ToyExchange utilise des cookies nécessaires au fonctionnement du site.\nAvec votre accord, nous utilisons aussi des cookies de mesure d'audience (pour analyser l'utilisation du site) et des cookies de marketing (Meta Pixel) pour personnaliser nos publicités. Vous pouvez accepter, refuser ou personnaliser vos choix lors de votre première visite."
+                }
+            },
+            "language": {
+                "french": "FR",
+                "english": "EN"
+            }
+        },
+        "terms": {
+            "page": {
+                "title": "Conditions générales d'utilisation",
+                "subtitle": "Les règles d'utilisation de ToyExchange",
+                "lastUpdate": "Dernière mise à jour :",
+                "backToHome": "← Retour à l'accueil"
+            },
+            "sections": {
+                "purpose": {
+                    "title": "**1. Objet**",
+                    "content": "La présente application permet aux utilisateurs de proposer des jouets en échange contre d'autres jouets, de les donner gratuitement ou de les offrir en échange de points utilisables sur la plateforme."
+                },
+                "accessRegistration": {
+                    "title": "**2. Accès et inscription**",
+                    "content": "L'utilisation de la plateforme est réservée aux personnes physiques de 16 ans et plus. L'inscription est gratuite et nécessite la fourniture d'informations personnelles exactes. Chaque utilisateur s'engage à garder son identifiant et mot de passe confidentiels."
+                },
+                "serviceOperation": {
+                    "title": "**3. Fonctionnement du service**",
+                    "content": "Échange : les utilisateurs peuvent proposer un jouet contre un autre.\nDon : les utilisateurs peuvent offrir un jouet sans contrepartie.\nDon contre points : les utilisateurs peuvent donner un jouet en échange de points, utilisables ensuite pour obtenir d'autres jouets."
+                },
+                "userCommitments": {
+                    "title": "**4. Engagements des utilisateurs**",
+                    "content": "Les utilisateurs s'engagent à ne proposer que des jouets conformes aux normes de sécurité, propres et en bon état. Il est strictement interdit de proposer des jouets contrefaits, défectueux ou dangereux."
+                },
+                "platformResponsibility": {
+                    "title": "**5. Responsabilité de la plateforme**",
+                    "content": "La plateforme agit en tant qu'intermédiaire entre utilisateurs. Elle ne peut être tenue responsable de la qualité, de la conformité ou de l'état des jouets échangés ou donnés. Tout litige devra être réglé entre les parties concernées."
+                },
+                "points": {
+                    "title": "**6. Points**",
+                    "content": "Les points permettent d'obtenir des jouets proposés sur la plateforme par d'autres utilisateurs. Ils peuvent être :\n- Acquis gratuitement en donnant des jouets via la plateforme.\n- Achetés via un système de paiement sécurisé (ex. Stripe).\nLes points ne sont pas remboursables, ne peuvent être échangés contre de l'argent, ni transférés entre utilisateurs. Leur usage est strictement limité à l'utilisation sur la plateforme.\nLa plateforme se réserve le droit de modifier à tout moment les règles d'attribution, d'achat ou d'utilisation des points."
+                },
+                "accountSuspension": {
+                    "title": "**7. Suspension ou suppression de compte**",
+                    "content": "En cas de non-respect des présentes CGU, la plateforme pourra suspendre ou supprimer le compte de l'utilisateur, sans préavis."
+                },
+                "applicableLaw": {
+                    "title": "**8. Droit applicable**",
+                    "content": "Les présentes conditions sont soumises au droit français. Tout litige relèvera de la compétence exclusive des tribunaux français."
+                }
+            },
+            "language": {
+                "french": "FR",
+                "english": "EN"
+            }
+        }
+    },
+    "cookie": {
+        "notice": {
+            "main": {
+                "title": "Nous utilisons des cookies",
+                "description": "Nous utilisons des cookies pour améliorer votre expérience, analyser le trafic et personnaliser le contenu. En continuant à naviguer, vous acceptez notre utilisation des cookies.",
+                "learnMore": "En savoir plus"
+            },
+            "categories": {
+                "necessary": {
+                    "title": "Cookies nécessaires",
+                    "description": "Requis pour le fonctionnement du site",
+                    "status": "Toujours activé"
+                },
+                "analytics": {
+                    "title": "Cookies analytiques",
+                    "description": "Nous aident à comprendre l'usage du site"
+                },
+                "marketing": {
+                    "title": "Cookies marketing",
+                    "description": "Pour personnaliser les publicités"
+                }
+            },
+            "actions": {
+                "customize": "Personnaliser",
+                "acceptNecessary": "Nécessaires uniquement",
+                "acceptAll": "Tout accepter"
+            }
+        }
+    },
+    "toysEdit": {
+        "header": {
+            "title": "Modifier le jouet",
+            "subtitle": "Mettez à jour les informations"
+        },
+        "basicInfo": {
+            "title": "Informations de base",
+            "titleField": {
+                "label": "Titre",
+                "placeholder": "Nom du jouet"
+            },
+            "description": {
+                "label": "Description",
+                "placeholder": "Décrivez le jouet..."
+            }
+        },
+        "ageRange": {
+            "title": "Tranche d'âge",
+            "minAge": {
+                "label": "Âge minimum"
+            },
+            "maxAge": {
+                "label": "Âge maximum"
+            },
+            "suitableFor": "Convient aux {min}-{max} ans"
+        },
+        "images": {
+            "title": "Gestion des images",
+            "slotsAvailable": "{count} slots libres",
+            "currentImages": "Images actuelles",
+            "addNewImages": "Ajouter de nouvelles images",
+            "dragAndDrop": {
+                "title": "Glissez vos photos ici",
+                "subtitle": "ou cliquez pour sélectionner ({max} max)"
+            },
+            "newImagesToAdd": "Nouvelles images à ajouter",
+            "limitReached": {
+                "title": "Limite d'images atteinte (5/5)",
+                "subtitle": "Supprimez des images existantes pour en ajouter de nouvelles"
+            },
+            "newLabel": "NOUVEAU"
+        },
+        "actions": {
+            "cancel": "Annuler",
+            "save": "Sauvegarder les modifications",
+            "saving": "Sauvegarde..."
+        },
+        "errors": {
+            "updateError": "Erreur lors de la mise à jour",
+            "tooManyImages": "Vous ne pouvez pas dépasser 5 images par jouet (il reste {slots} slot(s))"
+        }
+    },
+    "components": {
+        "imageUpload": {
+            "uploadZone": {
+                "altText": "Avatar",
+                "dragAndDrop": "Glissez-déposez une image",
+                "clickToChoose": "ou cliquez pour choisir"
+            }
+        }
+    },
+    "navigation": {
+    "logo": {
+      "alt": "ToyExchange logo"
+    },
+    "nav": {
+      "toys": "Jouets",
+      "post": "Poster",
+      "postToy": "Poster un jouet",
+      "messages": "Messages",
+      "dashboard": "Dashboard"
+    },
+    "user": {
+      "profile": "Profil",
+      "signOut": "Se déconnecter",
+      "signIn": "Se connecter",
+      "register": "S'inscrire",
+      "viewProfile": "Voir le profil"
+    },
+    "accessibility": {
+      "signOutTooltip": "Se déconnecter",
+      "avatarAlt": "Avatar"
+    }
   }
-}
 }

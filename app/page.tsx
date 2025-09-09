@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Leaf, Gem, Rocket, Pen, Handshake, Gift, Dice5, Palette, Puzzle, ToyBrick, Train, Dices, Sparkles } from "lucide-react";
+import { useHomeTranslations } from "@/hooks/useHomeTranslations";
 
 export default function HomePage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isVisible, setIsVisible] = useState(false);
+  const t = useHomeTranslations();
 
   useEffect(() => {
     setIsVisible(true);
@@ -51,13 +53,13 @@ export default function HomePage() {
         <div className={`transform transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <div className="mb-8">
             <h1 className="text-5xl md:text-6xl lg:text-8xl font-black bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-4 leading-tight">
-              ToyExchange
+              {t.hero.title}
             </h1>
             <div className="w-32 h-1 bg-gradient-to-r from-cyan-400 to-purple-400 mx-auto rounded-full animate-pulse" />
           </div>
 
           <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-12 font-light leading-relaxed text-center">
-            Révolutionnez l&apos;échange de jouets{" "}
+            {t.hero.subtitle}{" "}
             <span
               className="inline-flex align-middle"
             >
@@ -65,7 +67,7 @@ export default function HomePage() {
             </span>
             <br />
             <span className="bg-gradient-to-r from-green-400 to-cyan-400 bg-clip-text text-transparent font-semibold">
-              Moins de gaspillage, plus de magie partagée
+              {t.hero.tagline}
             </span>
           </p>
 
@@ -74,14 +76,14 @@ export default function HomePage() {
               href="/register"
               className="group relative overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold px-8 py-4 rounded-2xl shadow-2xl hover:scale-105 transition-all duration-300 transform"
             >
-              <span className="relative z-10">Commencer l'aventure</span>
+              <span className="relative z-10">{t.hero.startAdventure}</span>
               <div className="absolute inset-0 bg-gradient-to-r from-purple-700 to-pink-700 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
             </Link>
             <Link
               href="/register"
               className="group bg-white/10 backdrop-blur-md border border-white/20 text-white font-semibold px-8 py-4 rounded-2xl hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl"
             >
-              <span className="group-hover:text-cyan-300 transition-colors">Découvrir les jouets</span>
+              <span className="group-hover:text-cyan-300 transition-colors">{t.hero.discoverToys}</span>
             </Link>
           </div>
         </div>
@@ -91,27 +93,27 @@ export default function HomePage() {
       <section className="relative z-10 py-24 px-6">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-black text-center mb-16 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-            Pourquoi ToyExchange ?
+            {t.features.title}
           </h2>
 
           <div className="grid gap-8 md:grid-cols-3">
             {[
               {
                 icon: <Leaf size={48} className="text-green-400" />,
-                title: "Planète préservée",
-                description: "Chaque échange évite la production d'un nouveau jouet et réduit l'empreinte carbone de votre famille.",
+                title: t.features.planet.title,
+                description: t.features.planet.description,
                 gradient: "from-green-400 to-emerald-600"
               },
               {
                 icon: <Gem size={48} className="text-blue-400" />,
-                title: "Budget maîtrisé",
-                description: "Économisez jusqu'à 80% sur les jouets tout en offrant des expériences variées à vos enfants.",
+                title: t.features.budget.title,
+                description: t.features.budget.description,
                 gradient: "from-blue-400 to-cyan-600"
               },
               {
                 icon: <Rocket size={48} className="text-purple-400" />,
-                title: "Réseau parents",
-                description: "Rejoignez une communauté engagée de parents qui partagent vos valeurs de durabilité.",
+                title: t.features.network.title,
+                description: t.features.network.description,
                 gradient: "from-purple-400 to-pink-600"
               }
             ].map((feature, i) => (
@@ -143,14 +145,14 @@ export default function HomePage() {
       <section className="relative z-10 py-24 px-6 bg-black/20 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-4xl font-black text-center mb-16 text-white">
-            Comment ça marche ?
+            {t.howItWorks.title}
           </h2>
 
           <div className="grid gap-12 md:gap-8 md:grid-cols-3">
             {[
-              { step: "1", title: "Publiez", icon: <Pen size={32} />, desc: "Ajoutez les jouets que vous souhaitez échanger" },
-              { step: "2", title: "Négociez", icon: <Handshake size={32} />, desc: "Discutez avec d'autres parents pour organiser l'échange" },
-              { step: "3", title: "Échangez", icon: <Gift size={32} />, desc: "Rencontrez-vous et réalisez l'échange en toute simplicité" }
+              { step: "1", title: t.howItWorks.publish.title, icon: <Pen size={32} />, desc: t.howItWorks.publish.description },
+              { step: "2", title: t.howItWorks.negotiate.title, icon: <Handshake size={32} />, desc: t.howItWorks.negotiate.description },
+              { step: "3", title: t.howItWorks.exchange.title, icon: <Gift size={32} />, desc: t.howItWorks.exchange.description }
             ].map((item, i) => (
               <div key={i} className="text-center group">
                 <div className="relative inline-block mb-6">
@@ -173,10 +175,10 @@ export default function HomePage() {
       <section className="relative z-10 text-center py-24 px-6">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-black mb-6 bg-gradient-to-r from-white via-cyan-300 to-purple-300 bg-clip-text text-transparent">
-            Rejoignez la révolution du partage
+            {t.cta.title}
           </h2>
           <p className="text-xl text-gray-300 mb-10 font-light">
-            Commencez aujourd'hui à échanger vos jouets et découvrez de nouveaux trésors pour vos enfants
+            {t.cta.subtitle}
           </p>
 
           <div className="relative inline-block group">
@@ -185,7 +187,7 @@ export default function HomePage() {
               className="relative overflow-hidden bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 text-white font-bold px-12 py-5 rounded-2xl shadow-2xl hover:scale-110 transition-all duration-300 text-xl block"
             >
               <span className="relative z-10 flex items-center gap-2 justify-center">
-                Démarrer maintenant <Rocket size={20} />
+                {t.cta.button} <Rocket size={20} />
               </span>
               <div className="absolute inset-0 bg-gradient-to-r from-pink-600 via-purple-600 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </Link>
@@ -202,27 +204,26 @@ export default function HomePage() {
             <div className="md:col-span-2">
               <Link href="/" className="inline-block mb-4">
                 <span className="text-2xl font-black bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                  ToyExchange
+                  {t.hero.title}
                 </span>
               </Link>
               <p className="text-gray-400 max-w-md leading-relaxed">
-                La plateforme qui révolutionne l'échange de jouets entre parents.
-                Moins de gaspillage, plus de partage, pour un avenir durable.
+                {t.footer.description}
               </p>
             </div>
 
             {/* Légal */}
             <div>
-              <h4 className="text-white font-semibold mb-4">Légal</h4>
+              <h4 className="text-white font-semibold mb-4">{t.footer.legal.title}</h4>
               <div className="space-y-2">
                 <Link href="/legal/privacy" className="block text-gray-400 hover:text-cyan-400 transition-colors">
-                  Politique de confidentialité
+                  {t.footer.legal.privacy}
                 </Link>
                 <Link href="/legal/terms" className="block text-gray-400 hover:text-cyan-400 transition-colors">
-                  Conditions générales
+                  {t.footer.legal.terms}
                 </Link>
                 <Link href="/legal/mentions" className="block text-gray-400 hover:text-cyan-400 transition-colors">
-                  Mentions légales
+                  {t.footer.legal.mentions}
                 </Link>
               </div>
             </div>
@@ -233,7 +234,7 @@ export default function HomePage() {
 
           {/* Copyright */}
           <div className="text-center text-gray-500 text-sm">
-            <p>© 2025 ToyExchange. Tous droits réservés. Fait avec 💚 pour une planète plus verte.</p>
+            <p>{t.footer.copyright}</p>
           </div>
         </div>
       </footer>

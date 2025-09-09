@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import PublicProfileClient from "@/components/PublicProfileClient";
 import { withSignedUrls } from "@/lib/withSignedUrls";
 import { getBucket } from "@/lib/storage";
+import { getTranslations } from 'next-intl/server';
 
 interface Props {
   params: {
@@ -12,11 +13,12 @@ interface Props {
 }
 
 export default async function PublicUserProfilePage({ params }: Props) {
-  const { id } = params;
+  const idParams = await params;
+  const t = await getTranslations('publicProfile');
 
   // Récupérer les informations publiques de l'utilisateur
   const user = await prisma.user.findUnique({
-    where: { id },
+    where: { id: idParams.id },
     select: {
       id: true,
       name: true,
@@ -60,7 +62,7 @@ export default async function PublicUserProfilePage({ params }: Props) {
     donationsCount: user.toys.filter(toy => toy.mode === 'DON').length,
     exchangesCount: 0, // Sera calculé séparément
     avgRating: 0, // Sera calculé séparément
-    memberSince: "Nouveau"
+    memberSince: t('stats.newMember')
   };
 
   // Calculer les échanges complétés
@@ -92,7 +94,9 @@ export default async function PublicUserProfilePage({ params }: Props) {
 
   // Calculer l'ancienneté
   const monthsSinceJoin = Math.floor((Date.now() - user.createdAt.getTime()) / (1000 * 60 * 60 * 24 * 30));
-  stats.memberSince = monthsSinceJoin === 0 ? "Nouveau" : `${monthsSinceJoin} mois`;
+  stats.memberSince = monthsSinceJoin === 0 
+    ? t('stats.memberSinceNew') 
+    : t('stats.memberSinceMonths', { months: monthsSinceJoin });
 
   // Récupérer les avis récents
   const recentReviews = await prisma.review.findMany({
@@ -123,7 +127,7 @@ export async function getSignedUrl(image: string): Promise<string> {
 
   const bucket = getBucket();
 
-  // Extraire le chemin de l’objet (ex: avatars/xxx.png)
+  // Extraire le chemin de l'objet (ex: avatars/xxx.png)
   const objectPath = image
   .replace(`https://storage.googleapis.com/${process.env.GCP_BUCKET_NAME}/`, "")
   .split("?")[0];

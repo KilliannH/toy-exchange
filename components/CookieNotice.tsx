@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react";
 import { Cookie, X, Settings } from "lucide-react";
 import Link from "next/link";
+import { useCookieNoticeTranslations } from '../hooks/useCookieNoticeTranslations';
 
 export default function CookieNotice() {
   const [isVisible, setIsVisible] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const translations = useCookieNoticeTranslations();
 
   useEffect(() => {
     // Marquer que nous sommes côté client
@@ -74,13 +76,12 @@ export default function CookieNotice() {
             </div>
             <div className="flex-1">
               <h3 className="text-white font-semibold mb-2">
-                Nous utilisons des cookies
+                {translations.main.title}
               </h3>
               <p className="text-gray-300 text-sm leading-relaxed">
-                Nous utilisons des cookies pour améliorer votre expérience, analyser le trafic et personnaliser le contenu.
-                En continuant à naviguer, vous acceptez notre utilisation des cookies.{' '}
+                {translations.main.description}{' '}
                 <Link href="/legal/privacy" className="text-cyan-400 hover:text-cyan-300 underline">
-                  En savoir plus
+                  {translations.main.learnMore}
                 </Link>
               </p>
 
@@ -90,18 +91,26 @@ export default function CookieNotice() {
                   <div className="grid gap-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="text-white font-medium text-sm">Cookies nécessaires</div>
-                        <div className="text-gray-400 text-xs">Requis pour le fonctionnement du site</div>
+                        <div className="text-white font-medium text-sm">
+                          {translations.categories.necessary.title}
+                        </div>
+                        <div className="text-gray-400 text-xs">
+                          {translations.categories.necessary.description}
+                        </div>
                       </div>
                       <div className="text-green-400 text-xs font-medium bg-green-400/20 px-2 py-1 rounded">
-                        Toujours activé
+                        {translations.categories.necessary.status}
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="text-white font-medium text-sm">Cookies analytiques</div>
-                        <div className="text-gray-400 text-xs">Nous aident à comprendre l'usage du site</div>
+                        <div className="text-white font-medium text-sm">
+                          {translations.categories.analytics.title}
+                        </div>
+                        <div className="text-gray-400 text-xs">
+                          {translations.categories.analytics.description}
+                        </div>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" defaultChecked className="sr-only peer" />
@@ -111,8 +120,12 @@ export default function CookieNotice() {
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="text-white font-medium text-sm">Cookies marketing</div>
-                        <div className="text-gray-400 text-xs">Pour personnaliser les publicités</div>
+                        <div className="text-white font-medium text-sm">
+                          {translations.categories.marketing.title}
+                        </div>
+                        <div className="text-gray-400 text-xs">
+                          {translations.categories.marketing.description}
+                        </div>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" defaultChecked className="sr-only peer" />
@@ -133,7 +146,7 @@ export default function CookieNotice() {
                 className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-medium px-4 py-2 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-sm"
               >
                 <Settings size={16} />
-                Personnaliser
+                {translations.actions.customize}
               </button>
             )}
 
@@ -141,14 +154,14 @@ export default function CookieNotice() {
               onClick={handleAcceptNecessary}
               className="bg-gray-700 hover:bg-gray-600 text-white font-medium px-4 py-2 rounded-xl transition-colors text-sm"
             >
-              Nécessaires uniquement
+              {translations.actions.acceptNecessary}
             </button>
 
             <button
               onClick={handleAcceptAll}
               className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-700 hover:to-purple-700 text-white font-semibold px-6 py-2 rounded-xl transition-all duration-300 shadow-xl text-sm"
             >
-              Tout accepter
+              {translations.actions.acceptAll}
             </button>
           </div>
         </div>

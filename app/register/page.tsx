@@ -9,6 +9,7 @@ import usePlacesAutocomplete, { getGeocode, getLatLng } from "use-places-autocom
 import { Combobox } from "@headlessui/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRegisterTranslations } from "@/hooks/useRegisterTranslations";
 
 export default function RegisterPage() {
     const [name, setName] = useState("");
@@ -16,6 +17,7 @@ export default function RegisterPage() {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [step, setStep] = useState(1);
+    const t = useRegisterTranslations();
 
     const router = useRouter();
     const [city, setCity] = useState("");
@@ -62,7 +64,7 @@ export default function RegisterPage() {
 
         if (res.ok) {
             setStep(3); // 👈 tu affiches ton step de confirmation
-            toast.success("Compte créé 🎉 redirection en cours...");
+            toast.success(t.messages.accountCreated);
 
             // reset des champs
             setName("");
@@ -78,17 +80,12 @@ export default function RegisterPage() {
             }, 1500);
         } else {
             const data = await res.json();
-            toast.error(data.error || "Erreur lors de l'inscription");
+            toast.error(data.error || t.messages.registrationError);
         }
         setLoading(false);
     }
 
     const progressWidth = step === 1 ? "33%" : step === 2 ? "66%" : "100%";
-
-    const passwordStrength =
-        password.length < 4 ? '🔴 Faible' :
-            password.length < 6 ? '🟡 Moyen' :
-                password.length < 8 ? '🟢 Bon' : '💪 Excellent';
 
     return (
         <div className="min-h-screen bg-slate-900 relative flex items-center justify-center pt-20 p-6">
@@ -146,10 +143,10 @@ export default function RegisterPage() {
                                             className="mx-auto" />
                                     </div>
                                     <h1 className="text-4xl font-black bg-gradient-to-r from-emerald-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent mb-3">
-                                        Rejoignez l'aventure !
+                                        {t.header.title}
                                     </h1>
                                     <p className="text-gray-300 font-light">
-                                        Créez votre compte et commencez à échanger
+                                        {t.header.subtitle}
                                     </p>
                                 </div>
 
@@ -168,7 +165,7 @@ export default function RegisterPage() {
                                                 {stepNum}
                                             </div>
                                             <span className="text-sm font-medium">
-                                                {stepNum === 1 ? 'Infos' : 'Sécurité'}
+                                                {t.getStepLabel(stepNum)}
                                             </span>
                                         </div>
                                     ))}
@@ -191,25 +188,25 @@ export default function RegisterPage() {
                                                     </svg>
                                                 </div>
                                                 <span className="group-hover:text-emerald-300 transition-colors duration-300">
-                                                    Continuer avec Google
+                                                    {t.auth.continueWithGoogle}
                                                 </span>
                                             </button>
 
                                             {/* Divider */}
                                             <div className="flex items-center gap-4 my-6">
                                                 <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                                                <span className="text-gray-400 text-sm font-medium">ou avec votre email</span>
+                                                <span className="text-gray-400 text-sm font-medium">{t.auth.orWithEmail}</span>
                                                 <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                                             </div>
 
                                             {/* Name field */}
                                             <div className="relative group">
                                                 <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                                                    <User size={16} /> Comment vous appelez-vous ?
+                                                    <User size={16} /> {t.form.nameLabel}
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    placeholder="Votre prénom"
+                                                    placeholder={t.form.namePlaceholder}
                                                     value={name}
                                                     onChange={(e) => setName(e.target.value)}
                                                     className="w-full bg-white/5 border border-white/20 text-white placeholder-gray-400 px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all duration-300 group-hover:border-white/30"
@@ -221,7 +218,7 @@ export default function RegisterPage() {
                                             {/* City Combobox */}
                                             <div className="relative group">
                                                 <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                                                    <Tent size={16} /> Votre ville
+                                                    <Tent size={16} /> {t.form.cityLabel}
                                                 </label>
                                                 <Combobox value={city} onChange={handleSelect}>
                                                     <Combobox.Input
@@ -229,7 +226,7 @@ export default function RegisterPage() {
                                                         className="w-full bg-white/5 border border-white/20 text-white placeholder-gray-400 px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all duration-300 group-hover:border-white/30"
                                                         displayValue={(city: string) => city}
                                                         onChange={(event) => setValue(event.target.value)}
-                                                        placeholder="Rechercher une ville..."
+                                                        placeholder={t.form.cityPlaceholder}
                                                         disabled={!ready}
                                                     />
                                                     <Combobox.Options className="absolute mt-2 z-10 w-full rounded-2xl bg-black/80 backdrop-blur-lg border border-white/20 text-white shadow-lg max-h-60 overflow-y-auto">
@@ -243,7 +240,7 @@ export default function RegisterPage() {
                                                             </Combobox.Option>
                                                         ))}
                                                         {status === "OK" && data.length === 0 && (
-                                                            <p className="p-3 text-gray-400">Aucun résultat</p>
+                                                            <p className="p-3 text-gray-400">{t.form.noResults}</p>
                                                         )}
                                                     </Combobox.Options>
                                                 </Combobox>
@@ -253,11 +250,11 @@ export default function RegisterPage() {
                                             {/* Email field */}
                                             <div className="relative group">
                                                 <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                                                    <Mail size={16} /> Votre email
+                                                    <Mail size={16} /> {t.form.emailLabel}
                                                 </label>
                                                 <input
                                                     type="email"
-                                                    placeholder="nom@exemple.com"
+                                                    placeholder={t.form.emailPlaceholder}
                                                     value={email}
                                                     onChange={(e) => setEmail(e.target.value)}
                                                     className="w-full bg-white/5 border border-white/20 text-white placeholder-gray-400 px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all duration-300 group-hover:border-white/30"
@@ -271,7 +268,7 @@ export default function RegisterPage() {
                                                 className="w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold px-6 py-4 rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-emerald-500/25 disabled:opacity-50 disabled:hover:scale-100"
                                                 disabled={!name || !email || !city}
                                             >
-                                                Suivant <ArrowRight size={16} className="inline-block ml-1" />
+                                                {t.form.nextButton} <ArrowRight size={16} className="inline-block ml-1" />
                                             </button>
                                         </>
                                     )}
@@ -281,11 +278,11 @@ export default function RegisterPage() {
                                             {/* Password field */}
                                             <div className="relative group">
                                                 <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                                                    <Lock size={16} /> Créez un mot de passe sécurisé
+                                                    <Lock size={16} /> {t.form.passwordLabel}
                                                 </label>
                                                 <input
                                                     type="password"
-                                                    placeholder="Au moins 8 caractères"
+                                                    placeholder={t.form.passwordPlaceholder}
                                                     value={password}
                                                     onChange={(e) => setPassword(e.target.value)}
                                                     className="w-full bg-white/5 border border-white/20 text-white placeholder-gray-400 px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all duration-300 group-hover:border-white/30"
@@ -309,7 +306,7 @@ export default function RegisterPage() {
                                                     ))}
                                                 </div>
                                                 <p className="text-xs text-gray-400">
-                                                    Force du mot de passe : {passwordStrength}
+                                                    {t.form.passwordStrengthLabel} {t.getPasswordStrength(password.length)}
                                                 </p>
                                             </div>
 
@@ -323,21 +320,21 @@ export default function RegisterPage() {
                                                         className="w-5 h-5 mt-0.5 bg-white/5 border-2 border-white/20 rounded text-emerald-500 focus:ring-2 focus:ring-emerald-400 focus:ring-offset-0 transition-all duration-300"
                                                     />
                                                     <span className="text-sm text-gray-300 leading-relaxed group-hover:text-white transition-colors">
-                                                        J'accepte les{' '}
+                                                        {t.form.acceptTermsPrefix}{' '}
                                                         <Link
                                                             href="/legal/terms"
                                                             target="_blank"
                                                             className="text-emerald-400 hover:text-emerald-300 underline transition-colors"
                                                         >
-                                                            Conditions Générales d'Utilisation
+                                                            {t.form.termsLink}
                                                         </Link>
-                                                        {' '}et la{' '}
+                                                        {' '}{t.form.acceptTermsSuffix}{' '}
                                                         <Link
                                                             href="/legal/privacy"
                                                             target="_blank"
                                                             className="text-emerald-400 hover:text-emerald-300 underline transition-colors"
                                                         >
-                                                            Politique de Confidentialité
+                                                            {t.form.privacyLink}
                                                         </Link>
                                                     </span>
                                                 </label>
@@ -348,7 +345,7 @@ export default function RegisterPage() {
                                                     onClick={() => setStep(1)}
                                                     className="flex-1 bg-white/10 border border-white/20 text-white font-semibold px-6 py-4 rounded-2xl hover:bg-white/15 transition-all duration-300"
                                                 >
-                                                    <ArrowLeft size={16} className="inline-block mr-1" /> Retour
+                                                    <ArrowLeft size={16} className="inline-block mr-1" /> {t.form.backButton}
                                                 </button>
 
                                                 <button
@@ -360,11 +357,11 @@ export default function RegisterPage() {
                                                         {loading ? (
                                                             <>
                                                                 <Loader2 className="w-5 h-5 animate-spin" />
-                                                                Création...
+                                                                {t.form.creating}
                                                             </>
                                                         ) : (
                                                             <>
-                                                                <Sparkles size={20} /> Créer mon compte
+                                                                <Sparkles size={20} /> {t.form.createAccount}
                                                             </>
                                                         )}
                                                     </span>
@@ -382,10 +379,10 @@ export default function RegisterPage() {
                                     <CheckCircle size={96} className="mx-auto" />
                                 </div>
                                 <h2 className="text-3xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent mb-4">
-                                    Bienvenue dans la famille !
+                                    {t.success.title}
                                 </h2>
                                 <p className="text-gray-300 mb-6">
-                                    Votre compte a été créé avec succès
+                                    {t.success.subtitle}
                                 </p>
                                 <div className="flex justify-center">
                                     <div className="w-16 h-16 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full flex items-center justify-center animate-pulse">
@@ -399,14 +396,14 @@ export default function RegisterPage() {
                         {step < 3 && (
                             <div className="text-center mt-8 space-y-3">
                                 <p className="text-gray-400 text-sm">
-                                    Déjà un compte ?{" "}
+                                    {t.footer.alreadyAccount}{" "}
                                     <a href="/login" className="text-emerald-400 hover:text-emerald-300 font-semibold transition-colors duration-200">
-                                        Se connecter
+                                        {t.footer.signIn}
                                     </a>
                                 </p>
                                 <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
                                     <Lock size={12} />
-                                    <span>Vos données sont protégées</span>
+                                    <span>{t.footer.dataProtected}</span>
                                 </div>
                             </div>
                         )}
@@ -416,14 +413,14 @@ export default function RegisterPage() {
                 {/* Benefits sidebar */}
                 <div className="mt-8 bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
                     <h3 className="text-lg font-bold text-white mb-4 text-center">
-                        <Trophy size={20} className="inline-block mr-2" /> Pourquoi rejoindre ToyExchange ?
+                        <Trophy size={20} className="inline-block mr-2" /> {t.benefits.title}
                     </h3>
                     <div className="space-y-4">
                         {[
-                            { icon: <Gift size={20} />, text: "Réduisez votre impact environnemental", color: "from-green-400 to-emerald-500" },
-                            { icon: <Handshake size={20} />, text: "Économisez sur les jouets", color: "from-yellow-400 to-orange-500" },
-                            { icon: <Handshake size={20} />, text: "Connectez-vous avec des parents", color: "from-blue-400 to-cyan-500" },
-                            { icon: <Gamepad2 size={20} />, text: "Accès illimité aux échanges", color: "from-purple-400 to-pink-500" }
+                            { icon: <Gift size={20} />, text: t.benefits.environmental, color: "from-green-400 to-emerald-500" },
+                            { icon: <Handshake size={20} />, text: t.benefits.savings, color: "from-yellow-400 to-orange-500" },
+                            { icon: <Handshake size={20} />, text: t.benefits.community, color: "from-blue-400 to-cyan-500" },
+                            { icon: <Gamepad2 size={20} />, text: t.benefits.unlimited, color: "from-purple-400 to-pink-500" }
                         ].map((benefit, i) => (
                             <div key={i} className="flex items-center gap-3 group">
                                 <div className="text-2xl group-hover:scale-110 transition-transform duration-300">
@@ -457,3 +454,4 @@ export default function RegisterPage() {
             `}</style>
         </div>
     );
+}
