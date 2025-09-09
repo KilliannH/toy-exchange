@@ -15,18 +15,18 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://example.com"),
   title: {
-    default: "ToyExchange — Échange & don de jouets près de chez vous",
+    default: "ToyExchange — Toy Exchange and Donation Near You",
     template: "%s | ToyExchange",
   },
-  description: "Trouvez, échangez ou donnez des jouets facilement. Une communauté locale, des jouets heureux.",
+  description: "Easily find, swap, or donate toys. Local community, happy toys.",
   alternates: { canonical: "/" },
   robots: { index: true, follow: true },
   openGraph: {
     type: "website",
     siteName: "ToyExchange",
     url: "/",
-    title: "ToyExchange — Échange & don de jouets",
-    description: "Trouvez, échangez ou donnez des jouets facilement.",
+    title: "ToyExchange — Toy exchange and donation",
+    description: "Find, trade or donate toys easily.",
     images: [
     {
       url: `${process.env.NEXT_PUBLIC_APP_URL}/og-default.png`,
@@ -37,8 +37,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "ToyExchange — Échange & don de jouets",
-    description: "Trouvez, échangez ou donnez des jouets facilement.",
+    title: "ToyExchange — Toy exchange and donation",
+    description: "Find, trade or donate toys easily.",
     images: [`${process.env.NEXT_PUBLIC_APP_URL}/og-default.png`],
   },
 };
