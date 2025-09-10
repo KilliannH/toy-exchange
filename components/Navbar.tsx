@@ -108,7 +108,6 @@ export default function NavBar() {
           <div className="hidden md:flex items-center gap-8">
             {session?.user && (
               <>
-              <LanguageSwitcher />
                 <Link
                   href="/toys"
                   className="text-white/80 hover:text-white font-medium hover:scale-105 transition-all duration-200 relative group flex items-center gap-2"
@@ -323,6 +322,11 @@ export default function NavBar() {
             ) : (
               // Non-authenticated state
               <div className="px-6 space-y-4">
+                {/* Language Switcher for mobile non-authenticated users */}
+                <div className="mb-6">
+                  <LanguageSwitcher />
+                </div>
+                
                 <button
                   onClick={() => {
                     signIn();
