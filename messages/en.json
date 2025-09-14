@@ -885,7 +885,7 @@
     },
     "publicProfileClient": {
         "navigation": {
-            "backToToys": "← Back to toys"
+            "backToToys": "Back to toys"
         },
         "header": {
             "defaultUser": "User",

@@ -191,18 +191,12 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
 
     return (
         <>
-            <div className="min-h-screen bg-slate-900 relative">
-                {/* Animated background */}
-                <div className="absolute inset-0 opacity-20">
-                    <div className="absolute top-1/4 left-1/6 w-96 h-96 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full blur-3xl animate-pulse" />
-                    <div className="absolute bottom-1/4 right-1/6 w-80 h-80 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-3xl animate-bounce" style={{ animationDuration: '3s' }} />
-                </div>
-
-                <div className="relative z-10 pt-24 pb-12 px-6 max-w-4xl mx-auto">
+            <div className="min-h-screen bg-slate-900 relative overflow-hidden">
+                <div className="z-10 pt-16 sm:pt-20 lg:pt-24 pb-8 sm:pb-10 lg:pb-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
                     {/* Profile header */}
-                    <div className="text-center mb-12">
+                    <div className="text-center mb-8 sm:mb-10 lg:mb-12">
                         <div className="relative group inline-block mb-6">
-                            <div className="w-32 h-32 rounded-full shadow-2xl overflow-hidden flex items-center justify-center bg-gradient-to-r from-cyan-400 to-purple-400">
+                            <div className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-full shadow-2xl overflow-hidden flex items-center justify-center bg-gradient-to-r from-cyan-400 to-purple-400">
                                 {user?.image ? (
                                     <img
                                         src={user.image}
@@ -212,83 +206,90 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
                                         className="object-cover w-full h-full"
                                     />
                                 ) : (
-                                    <span className="text-white text-4xl font-black">
-                                        {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase()}
+                                    <span className="text-white text-3xl sm:text-4xl lg:text-5xl font-black">
+                                        {user?.name?.charAt(0)?.toUpperCase() ||
+                                            user?.email?.charAt(0)?.toUpperCase()}
                                     </span>
                                 )}
                             </div>
                             <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400/40 to-purple-400/40 rounded-full blur-md opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
                         </div>
 
-                        <h1 className="text-5xl font-black bg-gradient-to-r from-white via-cyan-300 to-purple-300 bg-clip-text text-transparent mb-4">
+                        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black bg-gradient-to-r from-white via-cyan-300 to-purple-300 bg-clip-text text-transparent mb-3 sm:mb-4">
                             {t.header.title}
                         </h1>
-                        <p className="text-xl text-gray-300 font-light">
+                        <p className="text-base sm:text-lg lg:text-xl text-gray-300 font-light">
                             {t.header.subtitle}
                         </p>
                     </div>
 
-                    <div className="grid lg:grid-cols-3 gap-8">
-                        {/* Main profile info */}
-                        <div className="lg:col-span-2 space-y-6">
+                    {/* Main grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                        {/* Main profile info (2 cols on md+, 2 cols span on lg) */}
+                        <div className="md:col-span-2 space-y-6">
                             {/* Personal info card */}
-                            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
-                                <div className="flex items-center justify-between mb-6">
-                                    <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                                        <User className="w-8 h-8" />
+                            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-4 sm:p-6 lg:p-8">
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
+                                    <h2 className="text-lg sm:text-2xl font-bold text-white flex items-center gap-2 sm:gap-3">
+                                        <User className="w-6 h-6 sm:w-8 sm:h-8" />
                                         {t.personalInfo.title}
                                     </h2>
                                     <a
                                         href="/profile/edit"
-                                        className="group bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-semibold px-6 py-3 rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl flex items-center gap-2 ml-8"
+                                        className="group bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-semibold px-4 py-2 sm:px-6 sm:py-3 rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl flex items-center gap-2"
                                     >
                                         <Edit className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
                                         {t.personalInfo.editButton}
                                     </a>
                                 </div>
 
-                                <div className="grid gap-6">
+                                <div className="grid gap-4 sm:gap-6">
                                     {[
                                         {
                                             label: t.personalInfo.fullName,
                                             value: user.name || t.personalInfo.notProvided,
-                                            icon: <User className="w-8 h-8" />,
+                                            icon: <User className="w-6 h-6 sm:w-8 sm:h-8" />,
                                             color: "from-blue-400 to-cyan-400",
-                                            isEmpty: !user.name
+                                            isEmpty: !user.name,
                                         },
                                         {
                                             label: t.personalInfo.email,
                                             value: user.email,
-                                            icon: <Mail className="w-8 h-8" />,
+                                            icon: <Mail className="w-6 h-6 sm:w-8 sm:h-8" />,
                                             color: "from-purple-400 to-pink-400",
-                                            isEmpty: false
+                                            isEmpty: false,
                                         },
                                         {
                                             label: t.personalInfo.city,
                                             value: user.city || t.personalInfo.notProvided,
-                                            icon: <MapPin className="w-8 h-8" />,
+                                            icon: <MapPin className="w-6 h-6 sm:w-8 sm:h-8" />,
                                             color: "from-green-400 to-emerald-400",
-                                            isEmpty: !user.city
-                                        }
+                                            isEmpty: !user.city,
+                                        },
                                     ].map((field, index) => (
-                                        <div key={index} className="group bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:border-white/20 transition-all duration-300">
-                                            <div className="flex items-center gap-4">
+                                        <div
+                                            key={index}
+                                            className="group bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-6 hover:bg-white/10 hover:border-white/20 transition-all duration-300"
+                                        >
+                                            <div className="flex items-center gap-3 sm:gap-4">
                                                 <div className="text-cyan-400 group-hover:scale-110 transition-transform duration-300">
                                                     {field.icon}
                                                 </div>
                                                 <div className="flex-1">
-                                                    <div className="text-sm text-gray-400 font-medium mb-1">
+                                                    <div className="text-xs sm:text-sm text-gray-400 font-medium mb-1">
                                                         {field.label}
                                                     </div>
-                                                    <div className={`text-lg font-semibold ${field.isEmpty
-                                                        ? "text-gray-500 italic"
-                                                        : `bg-gradient-to-r ${field.color} bg-clip-text text-transparent`
-                                                        }`}>
+                                                    <div
+                                                        className={`text-base sm:text-lg font-semibold ${field.isEmpty
+                                                                ? "text-gray-500 italic"
+                                                                : `bg-gradient-to-r ${field.color} bg-clip-text text-transparent`
+                                                            }`}
+                                                    >
                                                         {field.value}
                                                     </div>
                                                 </div>
                                                 {field.isEmpty && (
-                                                    <AlertTriangle className="w-6 h-6 text-yellow-400 animate-pulse" />
+                                                    <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400 animate-pulse" />
                                                 )}
                                             </div>
                                         </div>
@@ -296,61 +297,44 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
                                 </div>
                             </div>
 
-                            {/* Preferences card */}
-                            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
-                                <h2 className="text-2xl font-bold text-white flex items-center gap-3 mb-6">
-                                    <Settings className="w-8 h-8" />
-                                    {t.preferences.title}
-                                </h2>
-
-                                <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-2xl p-6">
-                                    <div className="flex items-center gap-4">
-                                        <MapPin className="w-8 h-8 text-cyan-400 animate-pulse" />
-                                        <div className="flex-1">
-                                            <div className="text-sm text-cyan-300 font-medium mb-1">
-                                                {t.preferences.searchRadius}
+                            {/* Preferences + Danger zone */}
+                            <div className="space-y-6">
+                                {/* Preferences */}
+                                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-4 sm:p-6 lg:p-8">
+                                    <h2 className="text-lg sm:text-2xl font-bold text-white flex items-center gap-3 mb-4 sm:mb-6">
+                                        <Settings className="w-6 h-6 sm:w-8 sm:h-8" />
+                                        {t.preferences.title}
+                                    </h2>
+                                    <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-2xl p-4 sm:p-6">
+                                        <div className="flex items-center gap-3 sm:gap-4">
+                                            <MapPin className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400 animate-pulse" />
+                                            <div className="flex-1">
+                                                <div className="text-xs sm:text-sm text-cyan-300 font-medium mb-1">
+                                                    {t.preferences.searchRadius}
+                                                </div>
+                                                <div className="text-lg sm:text-2xl font-bold text-white">
+                                                    {user.radiusKm ? `${user.radiusKm} km` : "10 km"}
+                                                </div>
+                                                <div className="text-xs text-gray-400 mt-1">
+                                                    {user.radiusKm
+                                                        ? t.preferences.custom
+                                                        : t.preferences.defaultValue}
+                                                </div>
                                             </div>
-                                            <div className="text-2xl font-bold text-white">
-                                                {user.radiusKm ? `${user.radiusKm} km` : "10 km"}
+                                            <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                                                {user.radiusKm || 10}
                                             </div>
-                                            <div className="text-xs text-gray-400 mt-1">
-                                                {user.radiusKm ? t.preferences.custom : t.preferences.defaultValue}
-                                            </div>
-                                        </div>
-                                        <div className="w-16 h-16 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold">
-                                            {user.radiusKm || 10}
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* DANGER ZONE */}
-                            <div className="bg-red-500/5 backdrop-blur-xl border border-red-500/20 rounded-3xl p-8">
-                                <div className="flex items-center gap-3 mb-6">
-                                    <Shield className="w-8 h-8 text-red-400" />
-                                    <h2 className="text-2xl font-bold text-red-400">
-                                        {t.dangerZone.title}
-                                    </h2>
-                                </div>
-
-                                <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-6">
-                                    <div className="flex items-start gap-4">
-                                        <div className="text-red-400 mt-1">
-                                            <AlertCircle className="w-6 h-6" />
-                                        </div>
-                                        <div className="flex-1">
-                                            <h3 className="text-lg font-semibold text-red-300 mb-2">
-                                                {t.dangerZone.deleteAccountTitle}
-                                            </h3>
-                                            <p className="text-red-200/80 text-sm mb-4 leading-relaxed">
-                                                {t.dangerZone.deleteDescription}
-                                            </p>
-                                            <ul className="text-red-200/70 text-sm space-y-1 mb-6 ml-4">
-                                                {t.getDeleteConfirmationItems(stats, earnedBadges).map((item, index) => (
-                                                    <li key={index}>{item}</li>
-                                                ))}
-                                            </ul>
-                                        </div>
+                                {/* Danger zone */}
+                                <div className="bg-red-500/5 backdrop-blur-xl border border-red-500/20 rounded-3xl p-4 sm:p-6 lg:p-8">
+                                    <div className="flex items-center gap-3 mb-4 sm:mb-6">
+                                        <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-red-400" />
+                                        <h2 className="text-lg sm:text-2xl font-bold text-red-400">
+                                            {t.dangerZone.title}
+                                        </h2>
                                     </div>
 
                                     <div className="flex justify-end">
@@ -366,16 +350,16 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
                             </div>
                         </div>
 
-                        {/* Sidebar stats */}
-                        <div className="space-y-6">
+                        {/* Sidebar (stats, badges, actions) */}
+                        <div className="space-y-4 sm:space-y-6">
                             {/* Activity stats */}
-                            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6">
-                                <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                                    <BarChart3 className="w-6 h-6" />
+                            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-4 sm:p-6">
+                                <h3 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6 flex items-center gap-2">
+                                    <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6" />
                                     {t.stats.title}
                                 </h3>
 
-                                <div className="space-y-4">
+                                <div className="space-y-4 text-base sm:text-xl">
                                     {[
                                         { label: t.stats.toysPosted, value: stats.toysCount.toString(), icon: <Gamepad2 className="w-6 h-6" />, color: "from-blue-500 to-cyan-500" },
                                         { label: t.stats.exchangesCompleted, value: stats.exchangesCount.toString(), icon: <RefreshCw className="w-6 h-6" />, color: "from-green-500 to-emerald-500" },
@@ -398,9 +382,9 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
                             </div>
 
                             {/* Badges */}
-                            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6">
-                                <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                                    <Trophy className="w-6 h-6" />
+                            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-4 sm:p-6">
+                                <h3 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6 flex items-center gap-2">
+                                    <Trophy className="w-5 h-5 sm:w-6 sm:h-6" />
                                     {t.badges.title}
                                 </h3>
 
@@ -439,9 +423,9 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
                             </div>
 
                             {/* Quick actions */}
-                            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6">
-                                <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                                    <Zap className="w-6 h-6" />
+                            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl px-3 sm:px-4 py-2 sm:py-3">
+                                <h3 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2 mb-4">
+                                    <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
                                     {t.quickActions.title}
                                 </h3>
 
@@ -474,211 +458,213 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
                         </div>
                     </div>
 
-                    {/* Achievement banner */}
-                    <div className="mt-12 bg-gradient-to-r from-emerald-500/10 via-cyan-500/10 to-purple-500/10 backdrop-blur-xl border border-emerald-500/20 rounded-3xl p-8 text-center">
-                        <div className="flex items-center justify-center gap-4 mb-4">
-                            <div className="text-4xl text-emerald-400 animate-bounce">
-                                <Trophy size={48} className="mx-auto" />
-                            </div>
-                            <h3 className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-                                {t.achievement.title}
-                            </h3>
-                            <div className="text-4xl text-cyan-400 animate-bounce" style={{ animationDelay: '0.2s' }}>
-                                <CheckCircle size={48} className="mx-auto" />
-                            </div>
-                        </div>
-                        <p className="text-gray-300 mb-6">
-                            {t.achievement.subtitle}
-                        </p>
-
-                        {/* Progress to next level */}
-                        <div className="max-w-md mx-auto">
-                            <div className="flex justify-between text-sm text-gray-400 mb-2">
-                                <span>{t.achievement.levelLabel} {t.getUserLevel(stats.exchangesCount)}</span>
-                                <span>{t.getNextLevelProgress(stats.exchangesCount)}</span>
-                            </div>
-                            <div className="h-3 bg-white/10 rounded-full overflow-hidden">
-                                <div
-                                    className="h-full bg-gradient-to-r from-emerald-400 to-cyan-500 rounded-full animate-pulse"
-                                    style={{
-                                        width: `${Math.min((stats.exchangesCount / t.getNextLevelTarget(stats.exchangesCount)) * 100, 100)}%`
-                                    }}
-                                />
-                            </div>
-                            <div className="text-xs text-gray-500 mt-2">
-                                {t.getNextLevelRemaining(stats.exchangesCount)} <TrendingUp className="inline-block w-4 h-4 text-gray-400" />
-                            </div>
-                        </div>
+            {/* Achievement banner */}
+            <div className="mt-12 bg-gradient-to-r from-emerald-500/10 via-cyan-500/10 to-purple-500/10 backdrop-blur-xl border border-emerald-500/20 rounded-3xl p-8 text-center">
+                <div className="flex items-center justify-center gap-4 mb-4">
+                    <div className="text-4xl text-emerald-400 animate-bounce">
+                        <Trophy size={48} className="mx-auto" />
                     </div>
+                    <h3 className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                        {t.achievement.title}
+                    </h3>
+                    <div className="text-4xl text-cyan-400 animate-bounce" style={{ animationDelay: '0.2s' }}>
+                        <CheckCircle size={48} className="mx-auto" />
+                    </div>
+                </div>
+                <p className="text-gray-300 mb-6">
+                    {t.achievement.subtitle}
+                </p>
 
-                    {/* Recent activity */}
-                    <div className="mt-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
-                        <h2 className="text-2xl font-bold text-white flex items-center gap-3 mb-6">
-                            <TrendingUp className="w-8 h-8" />
-                            {t.activity.title}
-                        </h2>
-
-                        {loadingActivities ? (
-                            <div className="flex items-center justify-center py-8">
-                                <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
-                                <span className="ml-3 text-gray-400">{t.activity.loading}</span>
-                            </div>
-                        ) : activities.length > 0 ? (
-                            <div className="space-y-4">
-                                {activities.map((activity, index) => (
-                                    <div
-                                        key={index}
-                                        className="group bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:border-white/20 transition-all duration-300"
-                                    >
-                                        <div className="flex items-start gap-4">
-                                            <div className="mt-1 group-hover:scale-110 transition-transform duration-300">
-                                                {getActivityIcon(activity.type)}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <h4 className="text-white font-medium group-hover:text-cyan-300 transition-colors">
-                                                        {activity.action}
-                                                    </h4>
-                                                    <div className="flex items-center gap-1 text-gray-500 text-sm">
-                                                        <Clock className="w-4 h-4" />
-                                                        {formatTimeAgo(activity.time)}
-                                                    </div>
-                                                </div>
-                                                <p className="text-gray-400 text-sm truncate">
-                                                    {activity.toy}
-                                                </p>
-                                                <div className={`mt-2 inline-block px-2 py-1 rounded-lg text-xs font-medium ${activity.type === 'post'
-                                                        ? 'bg-blue-500/20 text-blue-300'
-                                                        : activity.type === 'exchange'
-                                                            ? 'bg-green-500/20 text-green-300'
-                                                            : 'bg-purple-500/20 text-purple-300'
-                                                    }`}>
-                                                    {t.getActivityType(activity.type)}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-
-                                {/* Lien vers l'historique complet */}
-                                <div className="text-center pt-4">
-                                    <a
-                                        href="/dashboard"
-                                        className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 text-sm font-medium transition-colors group"
-                                    >
-                                        {t.activity.viewAll}
-                                        <TrendingUp className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                    </a>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="text-center py-8">
-                                <div className="text-gray-500 mb-4">
-                                    <Package className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                                </div>
-                                <h3 className="text-lg font-medium text-gray-400 mb-2">
-                                    {t.activity.noActivity}
-                                </h3>
-                                <p className="text-gray-500 text-sm mb-6">
-                                    {t.activity.startByAdding}
-                                </p>
-                                <a
-                                    href="/post"
-                                    className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-semibold px-6 py-3 rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl"
-                                >
-                                    <Plus className="w-4 h-4" />
-                                    {t.activity.addToy}
-                                </a>
-                            </div>
-                        )}
+                {/* Progress to next level */}
+                <div className="max-w-md mx-auto">
+                    <div className="flex justify-between text-sm text-gray-400 mb-2">
+                        <span>{t.achievement.levelLabel} {t.getUserLevel(stats.exchangesCount)}</span>
+                        <span>{t.getNextLevelProgress(stats.exchangesCount)}</span>
+                    </div>
+                    <div className="h-3 bg-white/10 rounded-full overflow-hidden">
+                        <div
+                            className="h-full bg-gradient-to-r from-emerald-400 to-cyan-500 rounded-full animate-pulse"
+                            style={{
+                                width: `${Math.min((stats.exchangesCount / t.getNextLevelTarget(stats.exchangesCount)) * 100, 100)}%`
+                            }}
+                        />
+                    </div>
+                    <div className="text-xs text-gray-500 mt-2">
+                        {t.getNextLevelRemaining(stats.exchangesCount)} <TrendingUp className="inline-block w-4 h-4 text-gray-400" />
                     </div>
                 </div>
             </div>
 
-            {/* Modal de confirmation de suppression */}
-            {showDeleteModal && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-slate-900 border border-red-500/30 rounded-3xl p-8 max-w-md w-full relative">
+            {/* Recent activity */}
+            <div className="mt-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
+                <h2 className="text-2xl font-bold text-white flex items-center gap-3 mb-6">
+                    <TrendingUp className="w-8 h-8" />
+                    {t.activity.title}
+                </h2>
+
+                {loadingActivities ? (
+                    <div className="flex items-center justify-center py-8">
+                        <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
+                        <span className="ml-3 text-gray-400">{t.activity.loading}</span>
+                    </div>
+                ) : activities.length > 0 ? (
+                    <div className="space-y-4">
+                        {activities.map((activity, index) => (
+                            <div
+                                key={index}
+                                className="group bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:border-white/20 transition-all duration-300"
+                            >
+                                <div className="flex items-start gap-4">
+                                    <div className="mt-1 group-hover:scale-110 transition-transform duration-300">
+                                        {getActivityIcon(activity.type)}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <h4 className="text-white font-medium group-hover:text-cyan-300 transition-colors">
+                                                {activity.action}
+                                            </h4>
+                                            <div className="flex items-center gap-1 text-gray-500 text-sm">
+                                                <Clock className="w-4 h-4" />
+                                                {formatTimeAgo(activity.time)}
+                                            </div>
+                                        </div>
+                                        <p className="text-gray-400 text-sm truncate">
+                                            {activity.toy}
+                                        </p>
+                                        <div className={`mt-2 inline-block px-2 py-1 rounded-lg text-xs font-medium ${activity.type === 'post'
+                                            ? 'bg-blue-500/20 text-blue-300'
+                                            : activity.type === 'exchange'
+                                                ? 'bg-green-500/20 text-green-300'
+                                                : 'bg-purple-500/20 text-purple-300'
+                                            }`}>
+                                            {t.getActivityType(activity.type)}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+
+                        {/* Lien vers l'historique complet */}
+                        <div className="text-center pt-4">
+                            <a
+                                href="/dashboard"
+                                className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 text-sm font-medium transition-colors group"
+                            >
+                                {t.activity.viewAll}
+                                <TrendingUp className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            </a>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="text-center py-8">
+                        <div className="text-gray-500 mb-4">
+                            <Package className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                        </div>
+                        <h3 className="text-lg font-medium text-gray-400 mb-2">
+                            {t.activity.noActivity}
+                        </h3>
+                        <p className="text-gray-500 text-sm mb-6">
+                            {t.activity.startByAdding}
+                        </p>
+                        <a
+                            href="/post"
+                            className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-semibold px-6 py-3 rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl"
+                        >
+                            <Plus className="w-4 h-4" />
+                            {t.activity.addToy}
+                        </a>
+                    </div>
+                )}
+            </div>
+        </div >
+            </div >
+
+        {/* Modal de confirmation de suppression */ }
+    {
+        showDeleteModal && (
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div className="bg-slate-900 border border-red-500/30 rounded-3xl p-8 max-w-md w-full relative">
+                    <button
+                        onClick={() => {
+                            setShowDeleteModal(false);
+                            setDeleteConfirmation("");
+                        }}
+                        className="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors"
+                    >
+                        <X className="w-6 h-6" />
+                    </button>
+
+                    <div className="text-center mb-6">
+                        <div className="text-6xl text-red-400 mb-4">
+                            <AlertTriangle size={64} className="mx-auto animate-pulse" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-red-400 mb-2">
+                            {t.deleteModal.title}
+                        </h3>
+                        <p className="text-gray-300 text-sm">
+                            {t.deleteModal.subtitle}
+                        </p>
+                    </div>
+
+                    <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 mb-6">
+                        <p className="text-red-200 text-sm mb-4">
+                            {t.deleteModal.aboutToDelete}
+                        </p>
+                        <ul className="text-red-200/80 text-xs space-y-1">
+                            {t.getDeleteConfirmationItems(stats, earnedBadges).map((item, index) => (
+                                <li key={index}>{item}</li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    <div className="mb-6">
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                            {t.deleteModal.confirmInstruction} <span className="font-bold text-red-400">{t.deleteModal.deleteWord}</span>
+                        </label>
+                        <input
+                            type="text"
+                            value={deleteConfirmation}
+                            onChange={(e) => setDeleteConfirmation(e.target.value)}
+                            className="w-full bg-slate-800 border border-gray-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                            placeholder={t.deleteModal.placeholder}
+                            autoFocus
+                        />
+                    </div>
+
+                    <div className="flex gap-4">
                         <button
                             onClick={() => {
                                 setShowDeleteModal(false);
                                 setDeleteConfirmation("");
                             }}
-                            className="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors"
+                            className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 rounded-xl transition-colors"
                         >
-                            <X className="w-6 h-6" />
+                            {t.deleteModal.cancel}
                         </button>
-
-                        <div className="text-center mb-6">
-                            <div className="text-6xl text-red-400 mb-4">
-                                <AlertTriangle size={64} className="mx-auto animate-pulse" />
-                            </div>
-                            <h3 className="text-2xl font-bold text-red-400 mb-2">
-                                {t.deleteModal.title}
-                            </h3>
-                            <p className="text-gray-300 text-sm">
-                                {t.deleteModal.subtitle}
-                            </p>
-                        </div>
-
-                        <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 mb-6">
-                            <p className="text-red-200 text-sm mb-4">
-                                {t.deleteModal.aboutToDelete}
-                            </p>
-                            <ul className="text-red-200/80 text-xs space-y-1">
-                                {t.getDeleteConfirmationItems(stats, earnedBadges).map((item, index) => (
-                                    <li key={index}>{item}</li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        <div className="mb-6">
-                            <label className="block text-sm font-medium text-gray-300 mb-2">
-                                {t.deleteModal.confirmInstruction} <span className="font-bold text-red-400">{t.deleteModal.deleteWord}</span>
-                            </label>
-                            <input
-                                type="text"
-                                value={deleteConfirmation}
-                                onChange={(e) => setDeleteConfirmation(e.target.value)}
-                                className="w-full bg-slate-800 border border-gray-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
-                                placeholder={t.deleteModal.placeholder}
-                                autoFocus
-                            />
-                        </div>
-
-                        <div className="flex gap-4">
-                            <button
-                                onClick={() => {
-                                    setShowDeleteModal(false);
-                                    setDeleteConfirmation("");
-                                }}
-                                className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 rounded-xl transition-colors"
-                            >
-                                {t.deleteModal.cancel}
-                            </button>
-                            <button
-                                onClick={handleDeleteAccount}
-                                disabled={deleteConfirmation !== t.deleteModal.deleteWord || isDeleting}
-                                className={`flex-1 font-semibold py-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 ${deleteConfirmation === t.deleteModal.deleteWord && !isDeleting
-                                        ? "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-xl"
-                                        : "bg-gray-600 text-gray-400 cursor-not-allowed"
-                                    }`}
-                            >
-                                {isDeleting ? (
-                                    <>
-                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        {t.deleteModal.deleting}
-                                    </>
-                                ) : (
-                                    <>
-                                        {t.deleteModal.deleteButton}
-                                    </>
-                                )}
-                            </button>
-                        </div>
+                        <button
+                            onClick={handleDeleteAccount}
+                            disabled={deleteConfirmation !== t.deleteModal.deleteWord || isDeleting}
+                            className={`flex-1 font-semibold py-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 ${deleteConfirmation === t.deleteModal.deleteWord && !isDeleting
+                                ? "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-xl"
+                                : "bg-gray-600 text-gray-400 cursor-not-allowed"
+                                }`}
+                        >
+                            {isDeleting ? (
+                                <>
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    {t.deleteModal.deleting}
+                                </>
+                            ) : (
+                                <>
+                                    {t.deleteModal.deleteButton}
+                                </>
+                            )}
+                        </button>
                     </div>
                 </div>
-            )}
+            </div>
+        )
+    }
         </>
     );
 }

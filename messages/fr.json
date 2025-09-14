@@ -884,7 +884,7 @@
     },
     "publicProfileClient": {
         "navigation": {
-            "backToToys": "← Retour aux jouets"
+            "backToToys": "Retour aux jouets"
         },
         "header": {
             "defaultUser": "Utilisateur",
